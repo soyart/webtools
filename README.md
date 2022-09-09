@@ -175,7 +175,7 @@ And now, check your link destinations. You should see all those soft links:
 
 ## <a name="longterm"></a>Long-term usage
 
-> See branch `artnoi.com` if you're not sure what to do
+> See branch [`artnoi.com`](https://github.com/artnoi43/webtools/tree/artnoi.com) if you're not sure what to do
 
 As explained, this repo is meant to be the reference code base for webtools from today onwards. I will no longer be helping with diverged webtools code. So, to use this repo directly to develop your website, you just need to
 
