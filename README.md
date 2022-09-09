@@ -1,5 +1,5 @@
 # webtools
-webtools is a set of shell scripts that, together with `ssg`, makes maintaining and publishing multiple simple static websites simpler. This repository serves as [an example project](#longterm).
+webtools is a wrapper for [ssg](https://rgz.ee/ssg.html). It's a set of shell scripts that makes maintaining and publishing multiple simple static websites with ssg easier by writing a manifest config file. This repository serves as [an example project](#longterm).
 
 > As of now, webtools require [`unix/sh-tools`](https://gitlab.com/artnoi/unix) for some of its features e.g. yes-no prompt.
 
