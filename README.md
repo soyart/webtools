@@ -3,18 +3,8 @@ webtools is a set of shell scripts that, together with `ssg`, makes maintaining 
 
 > As of now, webtools require [`unix/sh-tools`](https://gitlab.com/artnoi/unix) for some of its features e.g. yes-no prompt.
 
-It has been my web publishing environment for over a year, and it's pretty simple to setup and use continously.
-
-Before creating this repo, webtools has always been bundled with `sh-tools`, and the code in the repo is different than the one I usually use. And because I always showed it to my friends, many people use it, but with their own modifications.
-
-Usually people start by mirroring my setup, and then they make more customizations, both to the project tree and in the webtools code. Over time, these scattered webtools become cluttered and a mess to deal with, and both the users and I are lost. So I made my mind to use this repository as the upstream code, where the reference webtools code is hosted.
-
-From this repo, my friends or you can clone this repository, create a fork, and start building your shitty static websites in the branches. When webtools or ssg is updated, you can just pull the changes and merge to your branch.
-
-webtools is composed of many shell scripts that read from the same configuration `webtools.conf`. Each script is a standalone script that works well when chained together. Here are webtools components.
-
 ## Usage
-webtools is written to reflect my needs - managing multiple simple static sites with shared resources. The convention for webtools is that, each website should live in its own root level directory. Provided in this example is `./artnoi.com`. Anything exclusive to that website should live there.
+webtools is written to reflect my needs - managing multiple simple static sites with shared resources. The convention for webtools is that, each website should live in its own root level directory. Provided in this example are `./johndoes.com` and `./artnoi.com`. Anything exclusive to that website should live there.
 
 Usually, each website has 3 subdirectories under their root:
 
@@ -184,6 +174,9 @@ And now, check your link destinations. You should see all those soft links:
 	$ tree example.com johndoes.com;
 
 ## <a name="longterm"></a>Long-term usage
+
+> See branch `artnoi.com` if you're not sure what to do
+
 As explained, this repo is meant to be the reference code base for webtools from today onwards. I will no longer be helping with diverged webtools code. So, to use this repo directly to develop your website, you just need to
 
 1. Clone this repository, and `unix/sh-tools`
@@ -229,3 +222,13 @@ Try generating HTML documents and sending them to the server
 	$ curl ramaxisgay.kuy;
 
 5. If all works and you can push to your server, then you're all set. When there's a new change in the master branch, you can just pull it and merge to your branch. The only culprits for conflicts will be `extra_vars.sh` and `webtools.conf`, which is quite easy to resolve.
+
+It has been my web publishing environment for over a year, and it's pretty simple to setup and use continously.
+
+Before creating this repo, webtools has always been bundled with `sh-tools`, and the code in the repo is different than the one I usually used. And because I always showed it to my friends, many people use it, but with their own modifications.
+
+Usually people start by mirroring my setup, and then they make more customizations, both to the project tree and in the webtools code. Over time, these scattered webtools become cluttered and a mess to deal with, and both the users and I are lost. So I made my mind to use this repository as the upstream code, where the reference webtools code is hosted.
+
+From this repo, my friends or you can clone this repository, create a fork, and start building your shitty static websites in the branches. When webtools or ssg is updated, you can just pull the changes and merge to your branch.
+
+webtools is composed of many shell scripts that read from the same configuration `webtools.conf`. Each script is a standalone script that works well when chained together. Here are webtools components.
