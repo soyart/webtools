@@ -44,13 +44,13 @@ dolink() {
 	# Find targets
 	pwdir="$(pwd)";
 	src_dir="$(find $pwdir -wholename $pwdir/$1)";
-	dst_dir="$(find $pwdir -wholename $pwdir/$2)";
+	dst_dir="$pwdir/$2";
 
 	# $3 is dry-run flag
 	test ${3} != "dry" &&
 		ln -sf "$src_dir" "$dst_dir";
 
-	echo "[$0 $3] $src_dir-> $dst_dir";
+	echo "[$0 $3] $src_dir -> $dst_dir";
 }
 
 # Markdown directories (array indices/keys)
