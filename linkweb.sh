@@ -1,24 +1,72 @@
 #!/usr/bin/env bash
 ## linkweb.sh - link files for ssg5
 
+# linkweb.sh has the potential to really nuke your directories,
+# so you should first dry-run it with -n flag
+
+main() {
+	for srcdir in ${!WEB_DIST[@]}; do
+		# Extract website name and ask user for confirmation
+		webname="${WEB_NAMES[$srcdir]}";
+		distdir="${WEB_DIST[$srcdir]}";
+
+		# Dry-run with -n flag
+		runmode="live"
+		[[ $1 == "-n" ]]  && runmode="dry";
+
+		simyn "linkweb.sh: link for $webname?"\
+			|| continue;
+
+		simyn "${0}: Link source (Markdown) directories?"\
+			&& linksrc "$srcdir" "$srcdir" "$runmode";
+		simyn "${0}: Link distribution (HTML) directories?"\
+			&& linkdist "$srcdir" "$distdir" "$runmode";
+	done;
+}
+
+
 # Source webtools.conf and source.sh
 [[ "$fts_status" != 'ok' ]]\
 && . 'webtools.conf';
+
+dolink() {
+	test -z "$1" && echo "[$0] missing a source file for $2"\
+		&& return;
+	test -z "$2" && echo "[$0] missing a destination (soft link) for $1"\
+		&& return;
+
+	# Find targets
+	# TODO: find with tilde expansion does not work yet
+	# find ~+ gets expanded to $(pwd)
+#	src_dir=$(find ~+ -path ${1});
+#	dst_dir=$(find ~+ -path ${2});
+
+	# Find targets
+	pwdir="$(pwd)";
+	src_dir="$(find $pwdir -wholename $pwdir/$1)";
+	dst_dir="$(find $pwdir -wholename $pwdir/$2)";
+
+	# $3 is dry-run flag
+	test ${3} != "dry" &&
+		ln -sf "$src_dir" "$dst_dir";
+
+	echo "[$0 $3] $src_dir-> $dst_dir";
+}
 
 # Markdown directories (array indices/keys)
 linksrc() {
 	for d in "${!WEB_DIST[@]}";
 	do
 		# ssg files
-		ln -sf "${LINK_SSG_HEADER[$1]}" "$2/_header.html";
-		ln -sf "${LINK_SSG_FOOTER[$1]}" "$2/_footer.html";
+		dolink "${LINK_SSG_HEADER[$1]}" "$2/_header.html" $3;
+		dolink "${LINK_SSG_FOOTER[$1]}" "$2/_footer.html" $3;
 		
 		# Non-ssg files
 		# You can uncomment the lines below if you want ssg5 to automatically copy style.css and favicon.ico for you
-		ln -sf "${LINK_STYLECSS[$1]}" "$2/style.css";
-		ln -sf "${LINK_LOGO[$1]}" "$2/favicon.svg";
-		ln -sf "${LINK_LOGO[$1]}" "$2/favicon.ico";
-		cp -r "${LINK_FONTS[$1]}" "$2/";
+		dolink "${LINK_STYLECSS[$1]}" "$2/style.css" $3;
+		dolink "${LINK_LOGO[$1]}" "$2/favicon.svg" $3;
+		dolink "${LINK_LOGO[$1]}" "$2/favicon.ico" $3;
+		dolink "${LINK_FONTS[$1]}" "$2/fonts" $3;
 	done;
 }
 
@@ -26,27 +74,13 @@ linksrc() {
 linkdist() {
 	for d in "${!WEB_DIST[@]}";
 	do
-		ln -sf "${LINK_LOGO[$1]}" "$2/favicon.svg";
-		ln -sf "${LINK_LOGO[$1]}" "$2/favicon.ico";
-		ln -sf "${LINK_BODYLOGO[$1]}" "$2/toplogo.png";
-		ln -sf "${LINK_STYLECSS[$1]}" "$2/style.css";
-		ln -sf "${LINK_SCRIPTJS[$1]}" "$2/script.js";
-		cp -r "${LINK_FONTS[$1]}" "$2/";
+		dolink "${LINK_LOGO[$1]}" "$2/favicon.svg" $3;
+		dolink "${LINK_LOGO[$1]}" "$2/favicon.ico" $3;
+		dolink "${LINK_BODYLOGO[$1]}" "$2/toplogo.png" $3;
+		dolink "${LINK_STYLECSS[$1]}" "$2/style.css" $3;
+		dolink "${LINK_SCRIPTJS[$1]}" "$2/script.js" $3;
+		dolink "${LINK_FONTS[$1]}" "$2/fonts" $3;
 	done;
 }
 
-main() {
-	for srcdir in ${!WEB_DIST[@]}; do
-		# Extract website name and ask user for confirmation
-		webname="${WEB_NAMES[$srcdir]}";
-		distdir="${WEB_DIST[$srcdir]}";
-		simyn "linkweb.sh: link for $webname?"\
-			|| continue;
-		simyn "${0}: Link source (Markdown) directories?"\
-			&& linksrc "$srcdir" "$srcdir";
-		simyn "${0}: Link distribution (HTML) directories?"\
-			&& linkdist "$srcdir" "$distdir";
-	done;
-}
-
-main
+main $1;
