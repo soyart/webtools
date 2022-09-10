@@ -16,7 +16,8 @@ fi
 
 genhtml() {
 	simyn "${0}: [$3] Generate HTML in $2 from $1 using $ssg_cmd"\
-	&& ${ssg_cmd} "$1" "$2" "$3" "$4";
+		&& mkdir -p $2\
+		&& ${ssg_cmd} "$1" "$2" "$3" "$4";
 }
 
 loop_genhtml() {

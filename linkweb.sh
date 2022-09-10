@@ -47,8 +47,10 @@ dolink() {
 	dst_dir="$pwdir/$2";
 
 	# $3 is dry-run flag
-	test ${3} != "dry" &&
-		ln -sf "$src_dir" "$dst_dir";
+	test ${3} != "dry"\
+		&& test -L "$dst_dir"\
+		&& rm "$dst_dir"\
+		&& ln -s "$src_dir" "$dst_dir";
 
 	echo "[$0 $3] $src_dir -> $dst_dir";
 }
