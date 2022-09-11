@@ -1,29 +1,63 @@
 #!/usr/bin/env bash
 
-# This file is sourced everytime webtools.conf is sourced.
+# This file provides frequently used jq wrappers for wtjq.
+MANIFEST="manifest.json"
 
 # Get non-webtools dependencies, e.g. ssg, yn.sh, and lb.sh
 . netget.sh;
 get_unix;
-. yn.sh;
-. lb.sh;
+. bin/yn.sh;
+. bin/lb.sh;
 
-MANIFEST="manifest.json"
+get_all_sites_json() {
+	if [ -z $1 ]; then
+		data=$(cat $MANIFEST);
+	else
+		data=$1;
+	fi
 
-test -z $1\
-	&& SITES_DATA_JSON=$(cat $MANIFEST | jq -c)\
-	&& return;
+	echo $data | jq -c;
+}
 
-SITEID="$1";
-SITEDATA_JSON=$(cat $MANIFEST | jq -c .$SITEID);
+access_field_json() {
+	test -z "$1"\
+		&& test -z $2\
+		&& echo "missing both data and key"\
+		&& exit 1
 
-test -z "$SITEDATA_JSON"\
-	&& echo "missing JSON manifest for key $SITEID"\
-	&& exit 1;
+	test -z "$1"\
+		&& echo "missing data"\
+		&& exit 1;
 
-# Source other local variables.
-# It is recommended that the 3 directories should be defined in the file $extras points to
-#extras="./extra_vars.sh";
-#test -f $extras && . "${extras}"\
-#	|| printf "did not source %s\n" "${extras}";
+	test -z "$2"\
+		&& echo "missing key"\
+		&& exit 1;
 
+	data=$1;
+	field=$2
+
+	echo $data | jq -c ".${field}"
+}
+
+get_site_from_file_json() {
+	key=$1;
+	access_field_json "$(cat $MANIFEST)" "${key}";
+}
+
+get_name_json() {
+	test -z $1\
+		&& echo "missing data to get a name from"\
+		&& exit 1
+
+	echo $1 | jq -c '.name'
+}
+
+get_site_keys_json() {
+	if [ -z $1 ]; then
+		data=$(cat $MANIFEST);
+	else
+		data=$1;
+	fi
+
+	echo $data | jq -c 'keys|.[]';
+}
