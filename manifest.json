@@ -1,0 +1,32 @@
+{
+	"johndoecom": {
+		"name": "JohnDoe.com",
+		"url": "https://johndoe.com",
+		"src": "johndoe.com/src",
+		"resource": "johndoe.com/resc",
+		"dist": "johndoe.com/dist",
+		"links": {
+			"shared/fonts": "johndoe.com/dist/fonts",
+			"johndoe.com/resc/_header.html": "johndoe.com/src/_header.html",
+			"johndoe.com/resc/_footer.html": "johndoe.com/src/_footer.html",
+			"johndoe.com/resc/style.css": "johndoe.com/dist/style.css",
+			"johndoe.com/resc/script.js": "johndoe.com/dist/script.js",
+			"johndoe.com/resc/logo.svg": "johndoe.com/dist/logo.svg"
+		}
+	},
+	"artnoicom": {
+		"name": "Artnoi.com",
+		"url": "https://artnoi.com",
+		"src": "artnoi.com/src",
+		"dist": "artnoi.com/dist",
+		"resource": "artnoi.com/resc",
+		"links": {
+			"shared/fonts": "artnoi.com/dist/fonts",
+			"artnoi.com/resc/_header.html": "artnoi.com/src/_header.html",
+			"artnoi.com/resc/_footer.html": "artnoi.com/src/_footer.html",
+			"artnoi.com/resc/style.css": "artnoi.com/dist/style.css",
+			"artnoi.com/resc/script.js": "artnoi.com/dist/script.js",
+			"artnoi.com/resc/logo.svg": "artnoi.com/dist/logo.svg"
+		}
+	}
+}
