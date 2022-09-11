@@ -10,16 +10,18 @@ MODECLEAN="clean-links"
 . init-jq.sh
 
 main() {
-	if [[ $1 == "-*" ]]; then
+	if [[ $1 != "-*" ]]; then
 		echo "[$PROG] all sites mode"
 		runflag=$1;
 		link_func="link_many_sites";
 		data=$(get_all_sites_json);
+	
 	elif [[ $2 != "-*" ]]; then
 		sitekey="$1";
 		runflag="$2";
 		link_func="link_one_site";
 		data=$(get_site_from_file_json "${sitekey}");
+		sitename=$(get_name_json "$data")
 	fi
 
 	case $runflag in
@@ -31,7 +33,7 @@ main() {
 			runmode="$MODELIVE"; ;;
 	esac
 
-	"${link_func}" "$runmode" "$data" "$sitekey";
+	"${link_func}" "$runmode" "$data" "$sitename";
 }
 
 link_many_sites() {
@@ -41,25 +43,31 @@ link_many_sites() {
 
 	for site in ${sites[@]}; do
 		sitedata=$(access_field_json $data_json $site);
-		sitekey=$(get_name_json $sitedata)
-		link_one_site "$runmode" $sitedata $sitekey
+		sitename=$(get_name_json $sitedata)
+		link_one_site "$runmode" "$sitedata" "$sitename"
 	done;
 }
 
 link_one_site() {
 	runmode="$1";
 	sitedata="$2";
-	sitekey="$3";
-	
-	site_links=$(echo $sitedata | jq -c '.links');
-	link_sources=$(echo $site_links | jq -c 'keys | .[]');
+	sitename="$3";
 
-	simyn "[$PROG] Run for $sitekey ($runmode)?"\
-		&& looplink "$site_links" "$link_sources" "$runmode";
+	links_map=$(echo $sitedata | jq -c '.links');
+	links_sources=$(echo $links_map | jq -c 'keys | .[]');
+
+
+	wrapped_looplink $runmode "$links_map" $links_sources $sitename;
 }
 
-rmlink() {
-	test -L "$1" && rm "$1";
+wrapped_looplink() {
+	runmode=$1;
+	linksmap=$2;
+	sources=$3;
+	sitename=$4;
+
+	simyn "[$PROG] Run for $sitename ($runmode)?"\
+		&& looplink "$linksmap" "$sources" "$runmode";
 }
 
 looplink() {
@@ -94,6 +102,10 @@ looplink() {
 		esac
 		echo "[$PROG] $src -> $dst ($runmode)";
 	done
+}
+
+rmlink() {
+	test -L "$1" && rm "$1";
 }
 
 main $1 $2;
