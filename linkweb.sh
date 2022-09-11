@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 ## linkweb.sh - link files for ssg5
 
+# Source webtools.conf and source.sh
+[[ "$fts_status" != 'ok' ]]\
+&& . 'webtools.conf';
+
 # linkweb.sh has the potential to really nuke your directories,
 # so you should first dry-run it with -n flag
 
@@ -11,10 +15,13 @@ main() {
 		distdir="${WEB_DIST[$srcdir]}";
 
 		# Dry-run with -n flag
-		runmode="live"
-		[[ $1 == "-n" ]]  && runmode="dry";
+		runmode="live-link"
+		case $1 in
+			"-n") runmode="dry-link" ;;
+			"-c") runmode="clean" ;;
+		esac
 
-		simyn "linkweb.sh: link for $webname?"\
+		simyn "[linkweb.sh]: $runmode for $webname?"\
 			|| continue;
 
 		simyn "${0}: Link source (Markdown) directories?"\
@@ -23,11 +30,6 @@ main() {
 			&& linkdist "$srcdir" "$distdir" "$runmode";
 	done;
 }
-
-
-# Source webtools.conf and source.sh
-[[ "$fts_status" != 'ok' ]]\
-&& . 'webtools.conf';
 
 dolink() {
 	test -z "$1" && echo "[$0] missing a source file for $2"\
@@ -46,8 +48,13 @@ dolink() {
 	src_dir="$(find $pwdir -wholename $pwdir/$1)";
 	dst_dir="$pwdir/$2";
 
-	# $3 is dry-run flag
-	test ${3} != "dry"\
+	test ${3} == "clean"\
+		&& echo "[$0] removing link $dst_dir"\
+		&& rm $dst_dir\
+		&& return;
+
+	# $3 is flag
+	test ${3} != "dry-link"\
 		&& actual_link $src_dir $dst_dir;
 	
 	echo "[$0 $3] $src_dir -> $dst_dir";
