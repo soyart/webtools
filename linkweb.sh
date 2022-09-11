@@ -48,11 +48,21 @@ dolink() {
 
 	# $3 is dry-run flag
 	test ${3} != "dry"\
-		&& test -L "$dst_dir"\
-		&& rm "$dst_dir"\
-		&& ln -s "$src_dir" "$dst_dir";
-
+		&& actual_link $src_dir $dst_dir;
+	
 	echo "[$0 $3] $src_dir -> $dst_dir";
+}
+
+actual_link() {
+	src=$1
+	dst=$2
+
+
+	test -L "$dst"\
+		&& echo "removing old symlink for $src"\
+		&& rm "$dst";
+
+	ln -sf "$src" "$dst";
 }
 
 # Markdown directories (array indices/keys)
