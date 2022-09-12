@@ -2,9 +2,9 @@ bak
 bin/*
 
 artnoi.com
-johndoe.com/dist/*
 
 # These files are linked by linkweb.sh
 johndoe.com/src/fonts
 johndoe.com/src/_footer.html
 johndoe.com/src/_header.html
+johndoe.com/dist/*
