@@ -44,6 +44,7 @@ main() {
 		runflag="$2";
 		gen_func="gen_one_site";
 		data=$(get_site_from_file_json "${sitekey}");
+
 		[ -z $data ]\
 			&& echo "[$PROG] no sitekey $sitekey found"\
 			&& exit 1

@@ -15,7 +15,7 @@ get_all_sites_json() {
 }
 
 get_all_servers_json() {
-	echo $(cat $MANIFEST) | jq -c '.servers';
+	echo $(cat $MANIFEST) | jq -c '.servers[]';
 }
 
 get_site_from_file_json() {
