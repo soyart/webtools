@@ -18,7 +18,7 @@ main() {
 		echo "[$PROG] all sites mode"
 		[ -z $1 ]\
 			&& runflag="";
-		[ $1 == "-a" ]\
+		[[ $1 == "-a" ]]\
 			&& runflag=$2\
 			|| runflag=$1;
 
