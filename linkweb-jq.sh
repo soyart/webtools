@@ -16,11 +16,17 @@ main() {
 	# PROG -a;
 	# PROG -a -n;
 		echo "[$PROG] all sites mode"
-		[ -z $1 ]\
-			&& runflag="";
-		[[ $1 == "-a" ]]\
-			&& runflag=$2\
-			|| runflag=$1;
+		if [ -z $1 ]; then
+		# PROG
+			runflag="";
+		elif [[ $1 == "-a" ]]; then
+		# PROG -a;
+		# PROG -a -n;
+			runflag="$2"
+		else
+		# PROG -n
+			runflag="$1"
+		fi
 
 		link_func="link_many_sites";
 		data=$(get_all_sites_json);
