@@ -18,6 +18,10 @@ get_all_servers_json() {
 	echo $(cat $MANIFEST) | jq -c '.servers[]';
 }
 
+get_cleanup_json() {
+	echo $(cat $MANIFEST) | jq -c '.cleanup';
+}
+
 get_site_from_file_json() {
 	test -z "$1"\
 		&& echo "<<missing sitekey>>"\
@@ -65,3 +69,21 @@ access_field_json() {
 	echo $data | jq -c ".${field}"
 }
 
+access_field_array_json() {
+	test -z "$1"\
+		&& test -z $2\
+		&& echo "<<missing both data and key>>"\
+		&& exit 1
+
+	test -z "$1"\
+		&& echo "<<missing data>>"\
+		&& exit 1;
+
+	test -z "$2"\
+		&& echo "<<missing key>>"\
+		&& exit 1;
+
+	data=$1;
+	field=$2
+	access_field_json "$data" "${field}[]"
+}

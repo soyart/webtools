@@ -1,4 +1,8 @@
 {
+	"cleanup": {
+		"toRemove": [ ".DS_Store", "lost+found", ".files" ],
+		"noRemove": [ ".stversions" ] 
+	},
 	"servers": [
 		{
 			"hostname": "vultr-alpine",
@@ -9,7 +13,6 @@
 			"scpPath": "root@45.1.69.5:/var/www/htdocs/johndoe.com/."
 		}
 	],
-
 	"sites": [
 		{
 			"sitekey": "jd",

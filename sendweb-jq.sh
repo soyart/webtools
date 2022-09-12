@@ -70,22 +70,19 @@ send_one_site() {
 	servers="$3";
 
 	name=$(get_name_json "$site");
-	url=$(access_field_json "$site" "url");
 	dist=$(access_field_json "$site" "dist");
 
 	src=$(echo $src | tr -d '"');
 	dist=$(echo $dist | tr -d '"');
 
-	if [[ $runmode == $MODELIVE ]]; then
-		simyn "Send (publish) $name?"\
-		&& send_to_servers "$runmode" "$dist" "$servers";
-	fi
+	send_to_servers "$runmode" "$name" "$dist" "$servers";
 }
 
 send_to_servers() {
 	runmode="$1";
-	dist="$2";
-	servers="$3";
+	name="$2"
+	dist="$3";
+	servers="$4";
 
 	for server in ${servers}; do
 		hostname=$(access_field_json "$server" "hostname");
@@ -94,12 +91,39 @@ send_to_servers() {
 		scppath=$(echo $scppath | tr -d '"');
 		fullpath="$hostname@$scppath"
 
-		simyn "Send $dist to $hostname?"\
-			&& scp -r "$dist" "$fullpath"\
-			|| continue;
+		if simyn "Publish $name to $hostname?";
+		then
+			if simyn "Send $dist as a tarball? ($hostname)";
+			then
+				sendweb_tarball "$dist" "$hostname" "$fullpath";
+			else
+				simyn "Send $dist as a directory? ($hostname)"\
+					&& sendweb "$dist" "$fullpath";
+			fi
 
-		echo "$dist -> $fullpath"
+			echo "$dist -> $fullpath"
+		fi
 	done;
+}
+
+sendweb() {
+	dist="$1";
+	fullpath="$3";
+
+	scp -r "$1" "$2";
+}
+
+sendweb_tarball() {
+	dist="$1";
+	hostname="$2";
+	fullpath="$3";
+
+	tarball="/tmp/$(basename $dist).tar.gz";
+	tar -czvf "$tarball" "$dist";
+	sendweb "$tarball" "$fullpath";
+
+	simyn "Remove tarball $tarball ?"\
+		&& rm -v $tarball;
 }
 
 main $1 $2;
