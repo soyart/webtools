@@ -89,19 +89,18 @@ send_to_servers() {
 		scppath=$(access_field_json "$server" "scpPath");
 		hostname=$(echo $hostname | tr -d '"');
 		scppath=$(echo $scppath | tr -d '"');
-		fullpath="$hostname@$scppath"
 
 		if simyn "Publish $name to $hostname?";
 		then
 			if simyn "Send $dist as a tarball? ($hostname)";
 			then
-				sendweb_tarball "$dist" "$hostname" "$fullpath";
+				sendweb_tarball "$dist" "$hostname" "$scppath";
 			else
 				simyn "Send $dist as a directory? ($hostname)"\
-					&& sendweb "$dist" "$fullpath";
+					&& sendweb "$dist" "$scppath";
 			fi
 
-			echo "$dist -> $fullpath"
+			echo "$dist -> $scppath";
 		fi
 	done;
 }
