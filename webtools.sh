@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 
-# Source external files and source.sh
-[[ "$fts_status" != 'ok' ]]\
-&& . 'webtools.conf';
+. wtjq-init.sh;
 
 # Our arrays of script ${script[]}; webtools.sh runs in these array order
 typeset -a scripts;
@@ -21,7 +19,7 @@ for s in "${scripts[@]}";
 do
 	# prompt user to run each script
 	simyn "$0: Run $s"\
-	&& run_ext_scripts "$s"\
+	&& ./$s\
 	&& ranscripts+="$s ";
 	# line() is sourced by source.sh from lb.sh
 	line;

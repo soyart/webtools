@@ -1,7 +1,7 @@
 # webtools
-webtools is a wrapper for [ssg](https://rgz.ee/ssg.html). It's a set of shell scripts that makes maintaining and publishing multiple simple static websites with ssg easier by writing a manifest config file. This repository serves as [an example project](#longterm).
+webtools is a wrapper for [ssg](https://rgz.ee/ssg.html). It's a set of shell scripts that makes maintaining and publishing multiple simple static websites with ssg easier by writing a manifest config file `manifest.json`. This repository serves as [an example project](#longterm).
 
-> As of now, webtools require [`unix/sh-tools`](https://gitlab.com/artnoi/unix) for some of its features e.g. yes-no prompt.
+> As of now, webtools require [`unix/sh-tools`](https://gitlab.com/artnoi/unix) for some of its features e.g. yes-no prompt. If it is not found on your host, `netget.sh` will download missing dependencies from Github.
 
 ## Usage
 webtools is written to reflect my needs - managing multiple simple static sites with shared resources. The convention for webtools is that, each website should live in its own root level directory. Provided in this example are `./johndoes.com` and `./artnoi.com`. Anything exclusive to that website should live there.
@@ -18,7 +18,7 @@ The usual workflow for the 1st run
 
 1. You prepare your source directory and resources
 
-2. You update central configurations in `webtools.conf` to reflect your needs
+2. You update your site manifest(s) in `manifest.json` to reflect your needs
 
 3. You run a webtools command to perform some task
 
@@ -30,19 +30,25 @@ After the 1st run, you can now just do tasks 3-4 and your websites will get upda
 These scripts are run on the user local machine when they are writing or publishing.
 
 ### `cleanup.sh`
+
+    $ cleanup.sh [ROOT_DIR];
+
 `cleanup.sh` finds and cleans files whose names match some configured patterns. The default values include `.DS_Store` and `.files` file createdby `ssg`, as well as `*sync-conflict*` for Syncthing users. This is usually runs when `.files` becomes outdated or corrupted.
 
 ### `genhtml.sh`
 As the name suggests, this script loops over available websites, and use `ssg` to convert Markdown files into structured website tree of HTML files.
 
+    $ genhtml.sh [SITEKEY] [-n];
+
 ### `linkweb.sh`
 This script loops over available configured websites to create symbolic links as configured. Useful when you're managing expensive resources.
+
+    $ linkweb.sh [SITEKEY] [-n | -c];
 
 ### `sendweb.sh`
 This script loops over available configured websites and tries to send the target directories to remote locations
 
-#### `sendweb_tarred.sh` (WIP)
-This script is like `sendweb.sh`, but the payload is tarred first before sending. This is not done and tested yet
+    $ sendweb.sh [SITEKEY] [-n];
 
 ## Server-side components
 These scripts are run on the remote server, usually when the new files were just recently pushed. In the future, `sendweb.sh` maybe refactored to be able to specify these scripts to run on the server after pushing finished. Most if not all of these server-side scripts are in OpenBSD Korn Shell, which do not support associative arrays.
@@ -81,22 +87,12 @@ If the command above went well, then `genhtml.sh` and the 3 variables work now.
 
 This means that, if you want to change `_header.html` and you want that change reflected in the `dist` folder, `ssg` will not proceed and your HTML files will stay the same with same header. Try this one for yourself:
 
-    $ ./genhtml.sh;
-	$ ./genhtml.sh;
+    $ ./genhtml.sh; # New HTML files created
+	$ ./genhtml.sh; # No HTML files created!
 
-The second call to `genhtml.sh` will never yield anything. This is because, when the first call is done, `.files` has been updated with the latest hash of the Markdowns. When the second call starts, `ssg` still sees that `.files` had not changed, and so it exits without doing anything.
+The second call to `genhtml.sh` will never yield anything. This is because, when the first call is done to `genhtml.sh`, the hash table in `.files` has been updated with the latest hash of the Markdowns. When the second call starts, `ssg` still sees that `.files` had not changed, and so it exits without doing anything.
 
-To make `ssg` create our website again, we must remove `.files`. We can do that manually, but it gets tiresome after a few websites. So that you do is you use `cleanup.sh` to take care of these deletetions for you.
-
-First thing to do is to update `webtools.conf` by adding `.files` to `CLEANUP_PATTERNS` if it's not there already:
-
-    # webtools.conf
-	.
-	.
-	CLEANUP_PATTERNS=( '.DS_Store' 'lost+found' '.files' )
-	CLEANUP_EXCLUDES=( )
-	.
-	.
+To make `ssg` create our website again, we must remove `.files`. We can do that manually, but it gets tiresome after a few websites. So that you do is you use `cleanup.sh` to take care of these deletetions for you, since string `.files` is already in the manifest (`cleanup.toRemove` array).
 
 Try doing just that by executing `cleanup.sh`:
 
@@ -110,14 +106,12 @@ Your website should pop up in the prompt, and a new `index.html` should be avail
 ### Using `sendweb.sh`
 Now that you can create new HTML files at will, it's time we push our documents to the webserver. To do that, let's first assume that on our local machine, we have a SSH Host `myserverlol` defined in `~/.ssh/config` with user `admin`, and we want to push our documents to `$ADMIN_HOMEDIR/dropbox/websites`, which is writable by user `admin`.
 
-Then we'll need to update `webtools.conf` to know SSH hostname and SCP path (location):
+To do this, add the server object to `servers` arrays of the manifest files:
 
-    # webtools.conf
-	.
-	.
-	SENDWEB_DESTS['myserverlol server on Vultr']='admin@myserverlol:~/dropbox/websites/.'
-	.
-	.
+		{
+			"hostname": "myserverlol",
+			"scpPath": "admin@myserverlol@:~/dropbox/websites"
+		}
 
 Now, try executing `sendweb.sh`. It should give you a prompt asking if you really want to send the directory.
 
@@ -129,41 +123,11 @@ As you can see, webtools is pretty straightforward. You setup a source directory
 
 `linkweb.sh` allows webtools users to put shared resources anywhere on their machine, and links it back to the `src` or `dist` directory for optimum storage and maintenance.
 
-`linkweb.sh` links files to 2 major locations - (1) the source, Markdown directory, and (2) the distribution HTML directory.
+> `linkweb.sh` does this by reading the manifest. Each website will have field `links` which is map of source file to the link destination.
 
 For the source directory, you might want to link ssg `_header.html`/`_footer.html`, and for the distribution directory, you might wanna link things like style cheat or media e.g. images.
 
 > Users of `linkweb.sh` should already know where they want each file to go in and why
-
-First, you define where the original files are in `webtools.conf` with the relevant variables. Then, you update `linkweb.sh` by providing it with destination path.
-
-> You are free to rename/repurpose/remap any variables you like. But remember that any link mappings in `webtools.conf` need to be reflected by `linkweb.sh` accordingly. (Yup, this is ugly)
-
-Some default `linkweb.sh` mappings:
-
-- `LINK_STYLECSS` maps to `$DEST/style.css`
-
-- `LINK_SSG_HEADER` maps to `$DEST/_header.html`
-
-- `LINK_SSG_FOOTER` maps to `$DEST/_footer.html`
-
-- `LINK_SCRIPTJS` maps to `$DEST/script.js`
-
-- `LINK_LOGO` maps to `$DEST/favicon.ico` and `$DEST/favicon.svg`;
-
-For example, if your websites `example.com` and `johndoe.com` share these resources:
-
-1. CSS style cheat in `./shared/style.css` - I want it to be at the document root of my website `/style.css`
-
-2. ssg footer file `_footer.html` in `/home/artnoi/Downloads`
-
-Then you can update `webtools.conf` provided variables for `linkweb.sh`
-
-    # webtools.conf
-	${LINK_STYLECSS['example.com/src']}="shared/style.css"
-	${LINK_FONTS['example.com/src']}="/home/artnoi/Downloads/_footer.html"
-	${LINK_STYLECSS['johndoe.com/src']}="shared/style.css"
-	${LINK_FONTS['johndoe.com/src']}="/home/artnoi/Downloads/_footer.html"
 
 And now, run `linkweb.sh`:
 
@@ -221,7 +185,7 @@ Try generating HTML documents and sending them to the server
 	$ ./sendweb.sh;
 	$ curl ramaxisgay.kuy;
 
-5. If all works and you can push to your server, then you're all set. When there's a new change in the master branch, you can just pull it and merge to your branch. The only culprits for conflicts will be `extra_vars.sh` and `webtools.conf`, which is quite easy to resolve.
+5. If all works and you can push to your server, then you're all set. When there's a new change in the master branch, you can just pull it and merge to your branch. The only culprits for conflicts will be `manifest.json`, which is quite easy to resolve.
 
 It has been my web publishing environment for over a year, and it's pretty simple to setup and use continously.
 
@@ -231,4 +195,4 @@ Usually people start by mirroring my setup, and then they make more customizatio
 
 From this repo, my friends or you can clone this repository, create a fork, and start building your shitty static websites in the branches. When webtools or ssg is updated, you can just pull the changes and merge to your branch.
 
-webtools is composed of many shell scripts that read from the same configuration `webtools.conf`. Each script is a standalone script that works well when chained together. Here are webtools components.
+webtools is composed of many shell scripts that read from the same configuration `manifest.json`. Each script is a standalone script that works well when chained together. Here are webtools components.
