@@ -84,7 +84,7 @@ send_to_servers() {
 	dist="$3";
 	servers="$4";
 
-	for server in ${servers}; do
+	for server in ${servers[@]}; do
 		hostname=$(access_field_json "$server" "hostname");
 		scppath=$(access_field_json "$server" "scpPath");
 		hostname=$(echo $hostname | tr -d '"');

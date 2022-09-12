@@ -14,7 +14,7 @@ fi
 [ -z "$rootdir" ]\
 		&& rootdir='.';
 
-for to_remove in ${to_removes}; do
+for to_remove in ${to_removes[@]}; do
 	to_remove=$(echo "$to_remove" | tr -d '"');
 	results=$(find "$rootdir" -name "$to_remove");
 
