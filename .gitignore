@@ -2,5 +2,7 @@ bak
 bin/*
 !bin/ssg
 
+artnoi.com/dist/*
+
 # These files are linked by linkweb.sh
 dist
