@@ -36,7 +36,11 @@ main() {
 		sitekey="$1";
 		runflag="$2";
 		link_func="link_one_site";
-		data=$(get_site_from_file_json "${sitekey}");
+		data=$(get_site_from_file_json "$sitekey");
+		[ -z $data ]\
+			&& echo "[$PROG] no sitekey $sitekey found"\
+			&& exit 1
+
 		sitename=$(get_name_json "$data");
 	fi
 
@@ -54,13 +58,11 @@ main() {
 
 link_many_sites() {
 	runmode=$1;
-	data_json=$2;
-	sites=$(echo $data_json | jq -c 'keys | .[]');
+	sites=$2;
 
 	for site in ${sites[@]}; do
-		sitedata=$(access_field_json $data_json $site);
-		sitename=$(get_name_json $sitedata);
-		link_one_site "$runmode" "$sitedata" "$sitename";
+		sitename=$(get_name_json $site);
+		link_one_site "$runmode" "$site" "$sitename";
 	done;
 }
 
@@ -69,7 +71,7 @@ link_one_site() {
 	sitedata="$2";
 	sitename="$3";
 
-	links_map=$(echo $sitedata | jq -c '.links');
+	links_map=$(access_field_json $sitedata "links");
 	links_sources=$(echo $links_map | jq -c 'keys | .[]');
 
 	wrapped_looplink "$runmode" "$links_map" "$links_sources" "$sitename";

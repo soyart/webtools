@@ -35,8 +35,8 @@ main() {
 			runflag="$1"
 		fi
 
-		gen_func="gen_many_sites";
 		data=$(get_all_sites_json);
+		gen_func="gen_many_sites";
 	else
 	# PROG sitename;
 	# PROG sitename -n;
@@ -44,8 +44,11 @@ main() {
 		runflag="$2";
 		gen_func="gen_one_site";
 		data=$(get_site_from_file_json "${sitekey}");
-		sitename=$(get_name_json "$data");
+		[ -z $data ]\
+			&& echo "[$PROG] no sitekey $sitekey found"\
+			&& exit 1
 	fi
+
 	case $runflag in
 		"-n")
 			runmode="$MODEDRY"; ;;
@@ -53,30 +56,26 @@ main() {
 			runmode="$MODELIVE"; ;;
 	esac
 
-	"${gen_func}" "$runmode" "$data" "$sitename";
+	"${gen_func}" "$runmode" "$data";
 }
 
 gen_many_sites() {
 	runmode=$1;
-	data_json=$2;
-	sites=$(echo $data_json | jq -c 'keys | .[]');
+	sites=$2;
 
 	for site in ${sites[@]}; do
-		sitedata=$(access_field_json $data_json $site);
-		sitekey=$(get_name_json $sitedata)
-		gen_one_site "$runmode" $sitedata $sitekey
+		gen_one_site "$runmode" $site
 	done;
 }
 
 gen_one_site() {
 	runmode="$1";
-	sitedata="$2";
-	sitekey="$3";
+	site="$2";
 
-	src=$(access_field_json $sitedata "src");
-	dist=$(access_field_json $sitedata "dist");
-	name=$(get_name_json $sitedata);
-	url=$(access_field_json $sitedata "url");
+	name=$(get_name_json "$site");
+	url=$(access_field_json "$site" "url");
+	src=$(access_field_json "$site" "src");
+	dist=$(access_field_json "$site" "dist");
 
 	src=$(echo $src | tr -d '"');
 	dist=$(echo $dist | tr -d '"');
@@ -87,7 +86,7 @@ gen_one_site() {
 		|| return;
 	fi
 
-	echo "[$PROG] Site $sitekey ($name $url)"
+	echo "[$PROG] Site $name ($name $url)"
 	echo "[$PROG] $src -> $dist"
 }
 
