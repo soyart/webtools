@@ -16,5 +16,10 @@ fi
 
 for to_remove in ${to_removes}; do
 	to_remove=$(echo "$to_remove" | tr -d '"');
-	find "$rootdir" -name "$to_remove";
+	results=$(find "$rootdir" -name "$to_remove");
+
+	for result in ${results[@]}; do
+		simyn "Remove $result?"\
+			&& rm -v $result;
+	done;
 done;
