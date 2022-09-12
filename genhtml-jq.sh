@@ -17,19 +17,35 @@ else
 fi
 
 main() {
-	if [[ $1 == "-*" ]]; then
+	if [ -z $2 ] || [[ $1 == "-*" ]]; then
+	# PROG
+	# PROG -n
+	# PROG -a;
+	# PROG -a -n;
 		echo "[$PROG] all sites mode"
-		runflag=$1;
+		if [ -z $1 ]; then
+		# PROG
+			runflag="";
+		elif [[ $1 == "-a" ]]; then
+		# PROG -a;
+		# PROG -a -n;
+			runflag="$2"
+		else
+		# PROG -n
+			runflag="$1"
+		fi
+
 		gen_func="gen_many_sites";
 		data=$(get_all_sites_json);
-	
-	elif [[ $2 != "-*" ]]; then
+	else
+	# PROG sitename;
+	# PROG sitename -n;
 		sitekey="$1";
 		runflag="$2";
 		gen_func="gen_one_site";
 		data=$(get_site_from_file_json "${sitekey}");
+		sitename=$(get_name_json "$data");
 	fi
-
 	case $runflag in
 		"-n")
 			runmode="$MODEDRY"; ;;
@@ -37,18 +53,18 @@ main() {
 			runmode="$MODELIVE"; ;;
 	esac
 
-	"${gen_func}" "$runmode" "$data" "$sitekey";
+	"${gen_func}" "$runmode" "$data" "$sitename";
 }
 
 gen_many_sites() {
 	runmode=$1;
 	data_json=$2;
-	sites=$(echo $data_json | jq -c 'keys');
+	sites=$(echo $data_json | jq -c 'keys | .[]');
 
 	for site in ${sites[@]}; do
 		sitedata=$(access_field_json $data_json $site);
 		sitekey=$(get_name_json $sitedata)
-		link_one_site "$runmode" $sitedata $sitekey
+		gen_one_site "$runmode" $sitedata $sitekey
 	done;
 }
 
@@ -65,9 +81,11 @@ gen_one_site() {
 	src=$(echo $src | tr -d '"');
 	dist=$(echo $dist | tr -d '"');
 
-	test $runmode == $MODELIVE\
+	if [[ $runmode == $MODELIVE ]]; then
+		simyn "Generate distribution (HTML) files for $name?"\
 		&& "$ssg_cmd" "$src" "$dist" "$name" "$url"\
-		|| continue;
+		|| return;
+	fi
 
 	echo "[$PROG] Site $sitekey ($name $url)"
 	echo "[$PROG] $src -> $dist"
