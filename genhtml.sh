@@ -82,9 +82,10 @@ gen_one_site() {
 	dist=$(echo $dist | tr -d '"');
 
 	if [[ $runmode == $MODELIVE ]]; then
-		simyn "Generate distribution (HTML) files for $name?"\
-		&& "$ssg_cmd" "$src" "$dist" "$name" "$url"\
-		|| return;
+		if simyn "Generate distribution (HTML) files for $name?"; then
+			[ ! -d $dist ] && mkdir -p $dist;
+			"$ssg_cmd" "$src" "$dist" "$name" "$url"
+		fi
 	fi
 
 	echo "[$PROG] Site $name ($name $url)"
