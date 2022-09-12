@@ -10,13 +10,7 @@ get_unix;
 . bin/lb.sh;
 
 get_all_sites_json() {
-	if [ -z $1 ]; then
-		data=$(cat $MANIFEST);
-	else
-		data=$1;
-	fi
-
-	echo $data | jq -c;
+	echo $(cat $MANIFEST) | jq -c;
 }
 
 access_field_json() {

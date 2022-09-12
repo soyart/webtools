@@ -10,17 +10,23 @@ MODECLEAN="clean-links"
 . init-jq.sh
 
 main() {
+	if [ -z $2 ] || [ $1 == "-*" ]; then
+	# PROG
+	# PROG -n
 	# PROG -a;
 	# PROG -a -n;
-	if [[ $1 == "-a" ]]; then
 		echo "[$PROG] all sites mode"
-		runflag=$2;
+		[ -z $1 ]\
+			&& runflag="";
+		[ $1 == "-a" ]\
+			&& runflag=$2\
+			|| runflag=$1;
+
 		link_func="link_many_sites";
 		data=$(get_all_sites_json);
-	
+	else
 	# PROG sitename;
 	# PROG sitename -n;
-	elif [[ $2 != "-*" ]]; then
 		sitekey="$1";
 		runflag="$2";
 		link_func="link_one_site";
@@ -43,7 +49,7 @@ main() {
 link_many_sites() {
 	runmode=$1;
 	data_json=$2;
-	sites=$(echo $data_json | jq -c 'keys');
+	sites=$(echo $data_json | jq -c 'keys | .[]');
 
 	for site in ${sites[@]}; do
 		sitedata=$(access_field_json $data_json $site);
