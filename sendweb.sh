@@ -6,7 +6,7 @@ MODELIVE="live-send"
 MODEDRY="dry-run"
 
 # Source jq wrapper functions
-. init-jq.sh
+. wtjq-init.sh
 
 main() {
 	if [ -z $2 ] || [[ $1 == "-*" ]]; then

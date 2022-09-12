@@ -6,7 +6,7 @@ MODELIVE="live-gen"
 MODEDRY="dry-run"
 
 # Source jq wrapper functions
-. init-jq.sh
+. wtjq-init.sh
 
 # Test if we have ssg installed
 if command -v ssg; then

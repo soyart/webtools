@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
+# wtjq-init.sh
 # This file provides frequently used jq wrappers for wtjq.
+
 MANIFEST="manifest.json"
 
 # Get non-webtools dependencies, e.g. ssg, yn.sh, and lb.sh
