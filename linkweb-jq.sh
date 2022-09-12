@@ -10,18 +10,22 @@ MODECLEAN="clean-links"
 . init-jq.sh
 
 main() {
-	if [[ $1 != "-*" ]]; then
+	# PROG -a;
+	# PROG -a -n;
+	if [[ $1 == "-a" ]]; then
 		echo "[$PROG] all sites mode"
-		runflag=$1;
+		runflag=$2;
 		link_func="link_many_sites";
 		data=$(get_all_sites_json);
 	
+	# PROG sitename;
+	# PROG sitename -n;
 	elif [[ $2 != "-*" ]]; then
 		sitekey="$1";
 		runflag="$2";
 		link_func="link_one_site";
 		data=$(get_site_from_file_json "${sitekey}");
-		sitename=$(get_name_json "$data")
+		sitename=$(get_name_json "$data");
 	fi
 
 	case $runflag in
@@ -43,8 +47,8 @@ link_many_sites() {
 
 	for site in ${sites[@]}; do
 		sitedata=$(access_field_json $data_json $site);
-		sitename=$(get_name_json $sitedata)
-		link_one_site "$runmode" "$sitedata" "$sitename"
+		sitename=$(get_name_json $sitedata);
+		link_one_site "$runmode" "$sitedata" "$sitename";
 	done;
 }
 
@@ -56,8 +60,7 @@ link_one_site() {
 	links_map=$(echo $sitedata | jq -c '.links');
 	links_sources=$(echo $links_map | jq -c 'keys | .[]');
 
-
-	wrapped_looplink $runmode "$links_map" $links_sources $sitename;
+	wrapped_looplink "$runmode" "$links_map" "$links_sources" "$sitename";
 }
 
 wrapped_looplink() {

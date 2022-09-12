@@ -49,7 +49,7 @@ get_name_json() {
 		&& echo "missing data to get a name from"\
 		&& exit 1
 
-	echo $1 | jq -c '.name'
+	access_field_json $1 "name";
 }
 
 get_site_keys_json() {
