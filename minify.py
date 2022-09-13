@@ -6,24 +6,25 @@ import htmlmin
 
 def loop_dir(dir_name, start_path):
     prev = os.getcwd()
-    print(f"> Call loop_dir({dir_name})")
+#    print(f"> Call loop_dir({dir_name})")
     os.chdir(dir_name)
-    print(f"> PWD: {os.getcwd()}")
+#    print(f"> PWD: {os.getcwd()}")
     basedir = os.path.basename(".")
     dir_files = os.listdir(basedir)
 
     for current_file in dir_files:
-        print(f"> Working on {current_file}")
+#        print(f"> Working on {current_file}")
         if os.path.isdir(current_file):
             prev = f"../{current_file}"
-            print(f"> prev is now {prev}")
+#            print(f"> prev is now {prev}")
             loop_dir(current_file, start_path)
         if ".html" in current_file:
-            print(f'> {current_file} is html')
+#            print(f'> {current_file} is html')
             read_and_minify(current_file)
 
-    print(f"> loop_dir DONE for {dir_name}")
-    print(f"> Now PWD ${os.getcwd()}")
+#    print(f"> loop_dir DONE for {dir_name}")
+#    print(f"> Now PWD ${os.getcwd()}")
+
     try:
         os.chdir(prev)
     except FileNotFoundError:
@@ -41,12 +42,15 @@ def read_and_minify(html_filename):
     if this_visited:
         return
 
-    fp = open(html_filename)
-    document = fp.read()
+    fp_r = open(html_filename, "r")
+    document = fp_r.read()
+    fp_r.close()
+
     minified = htmlmin.minify(document)
     print(f"> HTML: {html_filename}")
-    print(f"> Minified:")
-    print(minified)
+    fp_w = open(html_filename, "w")
+    fp_w.write(minified)
+    fp_w.close()
 
     visited[fullpath] = True
 
@@ -56,7 +60,12 @@ if len(sys.argv) < 2:
     exit()
 
 root_dir = sys.argv[1]
-root_fullpath = os.path.abspath(root_dir)
 print(f'HTML directory: {root_dir}')
 
-loop_dir(root_dir, root_fullpath)
+path_len = len(root_dir)
+trailing = root_dir[path_len-1]
+if trailing == "/":
+  root_dir = root_dir[:path_len-1]
+
+root_fullpath = os.path.abspath(root_dir)
+loop_dir(root_fullpath, root_fullpath)
