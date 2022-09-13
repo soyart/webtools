@@ -23,7 +23,15 @@ def loop_dir(dir_name, start_path):
     try:
         os.chdir(prev)
     except FileNotFoundError:
-        # And see if we reach start_path, if so, we are done.
+      # This error should happen when you are finishing processing newyear.html, assuming that this script processes everything as in the order of the tree below.
+
+#        dist
+#        ├── index.html
+#        ├── blog
+#        │   ├── august.html
+#        │   └── newyear.html
+#        ├── porn
+
         if os.path.abspath("..") != start_path:
             os.chdir("..")
         else:
@@ -63,4 +71,5 @@ if trailing == "/":
   root_dir = root_dir[:path_len-1]
 
 root_fullpath = os.path.abspath(root_dir)
-loop_dir(root_fullpath, root_fullpath)
+before_root = os.path.abspath("..")
+loop_dir(root_fullpath, before_root)
