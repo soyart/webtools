@@ -5,31 +5,26 @@ import sys
 import htmlmin
 
 def loop_dir(dir_name, start_path):
+    # Save previous CWD before chdir
     prev = os.getcwd()
-#    print(f"> Call loop_dir({dir_name})")
     os.chdir(dir_name)
-#    print(f"> PWD: {os.getcwd()}")
+
     basedir = os.path.basename(".")
     dir_files = os.listdir(basedir)
-
     for current_file in dir_files:
-#        print(f"> Working on {current_file}")
         if os.path.isdir(current_file):
             prev = f"../{current_file}"
-#            print(f"> prev is now {prev}")
             loop_dir(current_file, start_path)
         if ".html" in current_file:
-#            print(f'> {current_file} is html')
             read_and_minify(current_file)
 
-#    print(f"> loop_dir DONE for {dir_name}")
-#    print(f"> Now PWD ${os.getcwd()}")
-
+    # Try go back to prev.
+    # If there's an error, it means that we have traversed most of the subdirs already, so we should go back to .. and see if that is a start_path
     try:
         os.chdir(prev)
     except FileNotFoundError:
-        dotdot_dir = os.path.abspath("..")
-        if dotdot_dir != start_path:
+        # And see if we reach start_path, if so, we are done.
+        if os.path.abspath("..") != start_path:
             os.chdir("..")
         else:
             print("> DONE")
