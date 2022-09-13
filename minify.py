@@ -4,8 +4,7 @@ import os
 import sys
 import htmlmin
 
-
-def loop_dir(dir_name):
+def loop_dir(dir_name, start_path):
     prev = os.getcwd()
     print(f"> Call loop_dir({dir_name})")
     os.chdir(dir_name)
@@ -17,12 +16,23 @@ def loop_dir(dir_name):
         print(f"> Working on {current_file}")
         if os.path.isdir(current_file):
             prev = f"../{current_file}"
-            loop_dir(current_file)
+            print(f"> prev is now {prev}")
+            loop_dir(current_file, start_path)
         if ".html" in current_file:
             print(f'> {current_file} is html')
             read_and_minify(current_file)
 
-    os.chdir(prev)
+    print(f"> loop_dir DONE for {dir_name}")
+    print(f"> Now PWD ${os.getcwd()}")
+    try:
+        os.chdir(prev)
+    except FileNotFoundError:
+        dotdot_dir = os.path.abspath("..")
+        if dotdot_dir != start_path:
+            os.chdir("..")
+        else:
+            print("> DONE")
+            exit()
 
 visited = {}
 def read_and_minify(html_filename):
@@ -46,6 +56,7 @@ if len(sys.argv) < 2:
     exit()
 
 root_dir = sys.argv[1]
+root_fullpath = os.path.abspath(root_dir)
 print(f'HTML directory: {root_dir}')
 
-loop_dir(root_dir)
+loop_dir(root_dir, root_fullpath)
