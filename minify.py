@@ -39,12 +39,8 @@ def loop_dir(dir_name, start_path):
             print("[{prog_name}] > DONE")
             exit()
 
-visited = {}
 def read_and_minify(html_filename):
     full_path = os.path.abspath(html_filename)
-    this_visited = visited.get(full_path)
-    if this_visited:
-        return
 
     fp_r = open(html_filename, "r")
     document = fp_r.read()
@@ -52,27 +48,30 @@ def read_and_minify(html_filename):
 
     minified = htmlmin.minify(document)
     print(f"[{prog_name}] Minify: {full_path}")
+
     fp_w = open(html_filename, "w")
     fp_w.write(minified)
     fp_w.close()
 
-    visited[full_path] = True
+def main():
+    if len(sys.argv) < 2:
+        print("[{prog_name}] Missing HTML root directory")
+        print("Usage: {prog_name} <HTML_DIR>")
+        exit()
+    
+    root_dir = sys.argv[1]
+    print(f'[{prog_name}] HTML directory: {root_dir}')
+    
+    path_len = len(root_dir)
+    trailing = root_dir[path_len-1]
+    if trailing == "/":
+      root_dir = root_dir[:path_len-1]
+    
+    root_full_path = os.path.abspath(root_dir)
+    before_cwd = os.path.abspath("..")
+    
+    # call loop_dir (recursive)
+    loop_dir(root_full_path, before_cwd)
 
-if len(sys.argv) < 2:
-    print("[{prog_name}] Missing HTML root directory")
-    print("Usage: {prog_name} <HTML_DIR>")
-    exit()
-
-root_dir = sys.argv[1]
-print(f'[{prog_name}] HTML directory: {root_dir}')
-
-path_len = len(root_dir)
-trailing = root_dir[path_len-1]
-if trailing == "/":
-  root_dir = root_dir[:path_len-1]
-
-root_full_path = os.path.abspath(root_dir)
-before_cwd = os.path.abspath("..")
-
-# call loop_dir (recursive)
-loop_dir(root_full_path, before_cwd)
+if __name__ == "__main__":
+    sys.exit(main())
