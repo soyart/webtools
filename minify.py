@@ -11,9 +11,8 @@ def loop_dir(dir_name, start_path):
     prev = os.getcwd()
     os.chdir(dir_name)
 
-    basedir = os.path.basename(".")
-    dir_files = os.listdir(basedir)
-    for current_file in dir_files:
+    files_here = os.listdir(".")
+    for current_file in files_here:
         if os.path.isdir(current_file):
             prev = f"../{current_file}"
             loop_dir(current_file, start_path)
