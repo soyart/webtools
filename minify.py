@@ -73,7 +73,7 @@ if trailing == "/":
   root_dir = root_dir[:path_len-1]
 
 root_full_path = os.path.abspath(root_dir)
-before_root = os.path.abspath("..")
+before_cwd = os.path.abspath("..")
 
 # call loop_dir (recursive)
-loop_dir(root_full_path, before_root)
+loop_dir(root_full_path, before_cwd)
