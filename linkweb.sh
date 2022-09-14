@@ -10,7 +10,19 @@ MODECLEAN="clean-links"
 . wtjq-init.sh
 
 main() {
-	if [ -z $2 ] || [ $1 == "-*" ]; then
+	if [ ! -z $1 ] && [ "$1" != "-"* ]; then
+	# PROG sitename;
+	# PROG sitename -n;
+		sitekey="$1";
+		runflag="$2";
+		data=$(get_site_from_file_json "$sitekey");
+		[ -z $data ]\
+			&& echo "[$PROG] no sitekey $sitekey found"\
+			&& exit 1
+
+		sitename=$(get_name_json "$data");
+		link_func="link_one_site";
+	else
 	# PROG
 	# PROG -n
 	# PROG -a;
@@ -30,18 +42,7 @@ main() {
 
 		link_func="link_many_sites";
 		data=$(get_all_sites_json);
-	else
-	# PROG sitename;
-	# PROG sitename -n;
-		sitekey="$1";
-		runflag="$2";
-		link_func="link_one_site";
-		data=$(get_site_from_file_json "$sitekey");
-		[ -z $data ]\
-			&& echo "[$PROG] no sitekey $sitekey found"\
-			&& exit 1
 
-		sitename=$(get_name_json "$data");
 	fi
 
 	case $runflag in

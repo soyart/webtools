@@ -9,7 +9,18 @@ MODEDRY="dry-run"
 . wtjq-init.sh
 
 main() {
-	if [ -z $2 ] || [[ $1 == "-*" ]]; then
+	if [ ! -z $1 ] && [ "$1" != "-"* ]; then
+	# PROG sitename;
+	# PROG sitename -n;
+		sitekey="$1";
+		runflag="$2";
+		send_func="send_one_site";
+		data=$(get_site_from_file_json "${sitekey}");
+
+		[ -z $data ]\
+			&& echo "[$PROG] no sitekey $sitekey found"\
+			&& exit 1
+	else
 	# PROG
 	# PROG -n
 	# PROG -a;
@@ -29,17 +40,6 @@ main() {
 
 		data=$(get_all_sites_json);
 		send_func="send_many_sites";
-	else
-	# PROG sitename;
-	# PROG sitename -n;
-		sitekey="$1";
-		runflag="$2";
-		send_func="send_one_site";
-		data=$(get_site_from_file_json "${sitekey}");
-
-		[ -z $data ]\
-			&& echo "[$PROG] no sitekey $sitekey found"\
-			&& exit 1
 	fi
 
 	case $runflag in
