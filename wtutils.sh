@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 
-# wtjq-init.sh
-# This file provides frequently used jq wrappers for wtjq.
+# wtutils define helper functions for webtools
 
-MANIFEST="manifest.json"
+announce() {
+	echo "[$0] $@"
+}
 
-# Get non-webtools dependencies, e.g. ssg, yn.sh, and lb.sh
-. netget.sh;
-get_unix;
-. bin/yn.sh;
-. bin/lb.sh;
+die() {
+	echo "[$0] $@" >&2
+	exit 1
+}
 
 # Gets all sites directly from file
 get_all_sites_json() {
@@ -26,8 +26,7 @@ get_cleanup_json() {
 
 get_site_from_file_json() {
 	test -z "$1"\
-		&& echo "<<missing sitekey>>"\
-		&& exit 1;
+		&& die "<<missing sitekey>>";
 
 	sitekey=$1;
 	cat manifest.json | jq -c ".sites[] | select(.sitekey == \"$sitekey\")";
@@ -45,8 +44,7 @@ get_sitekeys_json() {
 
 get_name_json() {
 	test -z $1\
-		&& echo "<<missing data to get a name from>>"\
-		&& exit 1
+		&& die "<<missing data to get a name from>>";
 
 	access_field_json $1 'name';
 }
@@ -54,16 +52,13 @@ get_name_json() {
 access_field_json() {
 	test -z "$1"\
 		&& test -z $2\
-		&& echo "<<missing both data and key>>"\
-		&& exit 1
+		&& die "<<missing both data and key>>";
 
 	test -z "$1"\
-		&& echo "<<missing data>>"\
-		&& exit 1;
+		&& die "<<missing data>>";
 
 	test -z "$2"\
-		&& echo "<<missing key>>"\
-		&& exit 1;
+		&& die "<<missing key>>";
 
 	data=$1;
 	field=$2
@@ -74,16 +69,13 @@ access_field_json() {
 access_field_array_json() {
 	test -z "$1"\
 		&& test -z $2\
-		&& echo "<<missing both data and key>>"\
-		&& exit 1
+		&& die "<<missing both data and key>>";
 
 	test -z "$1"\
-		&& echo "<<missing data>>"\
-		&& exit 1;
+		&& die "<<missing data>>";
 
 	test -z "$2"\
-		&& echo "<<missing key>>"\
-		&& exit 1;
+		&& die "<<missing key>>";
 
 	data=$1;
 	field=$2

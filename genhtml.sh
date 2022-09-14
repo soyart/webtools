@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
 # linkweb-jq.sh is a wtjq replacement for linkweb.sh.
 
-PROG=${0#'./'}
 MODELIVE="live-gen"
 MODEDRY="dry-run"
 
 # Source jq wrapper functions
-. wtjq-init.sh
+. init-wt.sh
 
 # Test if we have ssg installed
 if command -v ssg; then
@@ -26,14 +25,13 @@ main() {
 		data=$(get_site_from_file_json "${sitekey}");
 
 		[ -z $data ]\
-			&& echo "[$PROG] no sitekey $sitekey found"\
-			&& exit 1
+			&& die "no sitekey $sitekey found";
 	else
 	# PROG
 	# PROG -n
 	# PROG -a;
 	# PROG -a -n;
-		echo "[$PROG] all sites mode"
+		announce "all sites mode"
 		if [ -z $1 ]; then
 		# PROG
 			runflag="";
@@ -84,9 +82,12 @@ gen_one_site() {
 	if [[ $runmode == $MODELIVE ]]; then
 		if simyn "Generate distribution (HTML) files for $name?"; then
 			[ ! -d $dist ] && mkdir -p $dist;
-			"$ssg_cmd" "$src" "$dist" "$name" "$url"
+			"$ssg_cmd" "$src" "$dist" "$name" "$url"\
+				&&simyn "Minify $dist with minify.py?"\
+					&& ./minify.py "$dist";
 		fi
 	fi
+
 
 	echo "[$PROG] Site $name ($name $url)"
 	echo "[$PROG] $src -> $dist"

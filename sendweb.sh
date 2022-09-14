@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
 # linkweb-jq.sh is a wtjq replacement for linkweb.sh.
 
-PROG=${0#'./'}
 MODELIVE="live-send"
 MODEDRY="dry-run"
 
 # Source jq wrapper functions
-. wtjq-init.sh
+. init-wt.sh
 
 main() {
 	if [ ! -z $1 ] && [ "$1" != "-"* ]; then
@@ -18,14 +17,13 @@ main() {
 		data=$(get_site_from_file_json "${sitekey}");
 
 		[ -z $data ]\
-			&& echo "[$PROG] no sitekey $sitekey found"\
-			&& exit 1
+			&& die "[$PROG] no sitekey $sitekey found";
 	else
 	# PROG
 	# PROG -n
 	# PROG -a;
 	# PROG -a -n;
-		echo "[$PROG] all sites mode"
+		announce "all sites mode"
 		if [ -z $1 ]; then
 		# PROG
 			runflag="";
@@ -75,7 +73,8 @@ send_one_site() {
 	src=$(echo $src | tr -d '"');
 	dist=$(echo $dist | tr -d '"');
 
-	send_to_servers "$runmode" "$name" "$dist" "$servers";
+	simyn "Publish $name?"\
+		&& send_to_servers "$runmode" "$name" "$dist" "$servers";
 }
 
 send_to_servers() {
