@@ -1,6 +1,8 @@
 # webtools
 webtools is a wrapper for [ssg](https://rgz.ee/ssg.html). It's a set of shell scripts that makes maintaining and publishing multiple simple static websites with ssg easier by writing a manifest config file `manifest.json`. This repository serves as [an example project](#longterm).
 
+The 4 webtools scripts are [`cleanup.sh`](./cleanup.sh), [`linkweb.sh`](/linkweb.sh), [`genhtml.sh`](/genhtml.sh), and [`sendweb.sh`](/sendweb.sh). webtools also ships with a Python script [`minify.py`](/minify.py), which depends on `python-htmlmin` (available on Arch Linux as `python-htmlmin`).
+
 > As of now, webtools require [`unix/sh-tools`](https://gitlab.com/artnoi/unix) for some of its features e.g. yes-no prompt. If it is not found on your host, `netget.sh` will download missing dependencies from Github.
 
 ## Usage
