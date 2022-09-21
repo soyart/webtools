@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-. wtjq-init.sh;
+. init-wt.sh;
 
 cleanup=$(get_cleanup_json)
 to_removes=$(access_field_array_json $cleanup "toRemove")

@@ -1,21 +1,31 @@
 #!/usr/bin/env bash
 # linkweb-jq.sh is a wtjq replacement for linkweb.sh.
 
-PROG=${0#'./'}
 MODELIVE="live-links"
 MODEDRY="dry-run"
 MODECLEAN="clean-links"
 
 # Source jq wrapper functions
-. wtjq-init.sh
+. init-wt.sh
 
 main() {
-	if [ -z $2 ] || [ $1 == "-*" ]; then
+	if [ ! -z $1 ] && [ "$1" != "-"* ]; then
+	# PROG sitename;
+	# PROG sitename -n;
+		sitekey="$1";
+		runflag="$2";
+		data=$(get_site_from_file_json "$sitekey");
+		[ -z $data ]\
+			&& die "no sitekey $sitekey found";
+
+		sitename=$(get_name_json "$data");
+		link_func="link_one_site";
+	else
 	# PROG
 	# PROG -n
 	# PROG -a;
 	# PROG -a -n;
-		echo "[$PROG] all sites mode"
+		announce "all sites mode"
 		if [ -z $1 ]; then
 		# PROG
 			runflag="";
@@ -30,18 +40,7 @@ main() {
 
 		link_func="link_many_sites";
 		data=$(get_all_sites_json);
-	else
-	# PROG sitename;
-	# PROG sitename -n;
-		sitekey="$1";
-		runflag="$2";
-		link_func="link_one_site";
-		data=$(get_site_from_file_json "$sitekey");
-		[ -z $data ]\
-			&& echo "[$PROG] no sitekey $sitekey found"\
-			&& exit 1
 
-		sitename=$(get_name_json "$data");
 	fi
 
 	case $runflag in
@@ -106,7 +105,7 @@ looplink() {
 		dst="$pwdir/$dst";
 
 		if ! [ -r "$src" ]; then
-			echo "file $src not readable, skipping";
+			announce "file $src not readable, skipping";
 			continue;
 		fi;
 
@@ -117,7 +116,8 @@ looplink() {
 				rmlink "$dst";
 				ln -s "$src" "$dst"; ;;
 		esac
-		echo "[$PROG] $src -> $dst ($runmode)";
+
+		announce "$src -> $dst ($runmode)";
 	done
 }
 
