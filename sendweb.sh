@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # linkweb-jq.sh is a wtjq replacement for linkweb.sh.
 
-MODELIVE="live-send"
-MODEDRY="dry-run"
-
 # Source jq wrapper functions
 . init-wt.sh
+
+MODELIVE="live-send"
+MODEDRY="dry-run"
 
 main() {
 	if [ ! -z $1 ] && [ "$1" != "-"* ]; then
