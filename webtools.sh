@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-. wtjq-init.sh;
-
 # Our arrays of script ${script[]}; webtools.sh runs in these array order
 typeset -a scripts;
 typeset -a ranscripts;
