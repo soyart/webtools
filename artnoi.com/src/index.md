@@ -18,6 +18,6 @@ All pages on artnoi.com are simple HTML documents with one single separate style
 ## Credits
 The website partially uses monospaced [TTF Hack](https://sourcefoundry.org/hack/), which is my desktop and terminal font face, with blue-ish color scheme from [Iceberg](https://github.com/cocopon/iceberg.vim).
 
-I wrote my web pages in Markdown and then use [ssg](https://www.romanzolotarev.com/ssg.html) to generate the HTML files.
+I write my web pages in Markdown and then use [webtools](https://github.com/artnoi43/webtools) to generate and manage the HTML files.
 
 artnoi.com is [served using OpenBSD `httpd(8)` and `relayd(8)`](/blog/2022/openbsd-webserver).
