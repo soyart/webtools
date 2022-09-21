@@ -93,4 +93,4 @@ gen_one_site() {
 	echo "[$PROG] $src -> $dist"
 }
 
-main $1 $2;
+main $@;

@@ -125,4 +125,4 @@ rmlink() {
 	test -L "$1" && rm "$1";
 }
 
-main $1 $2;
+main $@;

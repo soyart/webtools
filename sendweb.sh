@@ -124,4 +124,4 @@ sendweb_tarball() {
 		&& rm -v $tarball;
 }
 
-main $1 $2;
+main $@;
