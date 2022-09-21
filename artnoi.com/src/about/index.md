@@ -5,11 +5,11 @@ Hello, world! I'm Prem Phansuriyanon, a finance student turned self-taught progr
 
 - [pphansuriyanon@gmail.com](mailto:pphansuriyanon@gmail.com)
 
-- [twitter](https://twitter.com/artnoi)
+- [twitter.com/artnoi](https://twitter.com/artnoi)
 
-- [github](https://github.com/artnoi43)
+- [github.com/artnoi](https://github.com/artnoi43)
 
-- [gitlab](https://gitlab.com/artnoi)
+- [gitlab.com/artnoi](https://gitlab.com/artnoi)
 
 ## Software development
 ### Personal projects
