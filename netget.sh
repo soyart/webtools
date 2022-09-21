@@ -40,15 +40,16 @@ downloader() {
 get_shtools() {
 	target_dir="$1";
 	target_file="$2";
+	rel_path="$target_dir/$target_file"
 	download_url="$3";
 
-	if [ ! -x "$target" ]; then
-		echo "missing $target"\
-			&& echo "downloading $target from $download_url"\
+	if [ ! -x "$rel_path" ]; then
+		echo "missing $rel_path"\
+			&& echo "downloading $rel_path from $download_url"\
 			&& downloader "$download_url" "$target_dir" "$target_file"\
 			&& echo "$target_file downloaded to $target_dir from $download_url";
 	else
-		echo "$target_dir/$target_file: ok";
+		echo "$rel_path: ok";
 	fi
 }
 
