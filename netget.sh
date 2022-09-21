@@ -15,13 +15,23 @@ downloader() {
 }
 
 # Download using ftp or curl to bin/ssg
+# Since ssg is not from me, you may need to check its content first.
 get_ssg() {
 	if [ ! -x bin/ssg ]; then
-		echo "missing bin/ssg"\
-		&& echo "get_ssg.sh: Downloading ssg from rgz.ee/bin"\
-		&& downloader "https://rgz.ee/bin/ssg" "bin" "ssg"\
-		&& echo "ssg downloaded to bin/ssg, please copy it to your one of your PATH"\
-		&& echo "Your PATH: $PATH";
+		ssg_url="https://rgz.ee/bin/ssg";
+		ssg_tmp="/tmp/ssg_webtools_tmp.sh";
+		ssg_dst="bin/ssg";
+
+		echo "missing bin/ssg";
+		echo "";
+		echo "Getting preview";
+
+		curl "$ssg_url" > "$ssg_tmp"\
+		&& cat  "$ssg_tmp"\
+		&& simyn "Install this version of ssg?"\
+		&& mv $ssg_tmp "$ssg_dst"\
+		&& chmod +x "$ssg_dst"\
+		&& echo "ssg download from $ssg_url to ./$ssg_dst";
 	else
 		echo "bin/ssg: ok"
 	fi
