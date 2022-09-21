@@ -15,11 +15,11 @@ get_ssg() {
 		echo "Getting preview";
 
 		curl "$ssg_url" > "$ssg_tmp"\
-		&& cat  "$ssg_tmp"\
-		&& simyn "Install this version of ssg?"\
-		&& mv $ssg_tmp "$ssg_dst"\
-		&& chmod +x "$ssg_dst"\
-		&& echo "ssg download from $ssg_url to ./$ssg_dst";
+			&& cat  "$ssg_tmp"\
+			&& simyn "Install this version of ssg?"\
+			&& mv $ssg_tmp "$ssg_dst"\
+			&& chmod +x "$ssg_dst"\
+			&& echo "ssg download from $ssg_url to ./$ssg_dst";
 	else
 		echo "bin/ssg: ok"
 	fi
@@ -44,11 +44,11 @@ get_shtools() {
 
 	if [ ! -x "$target" ]; then
 		echo "missing $target"\
-		&& echo "downloading $target from $download_url"\
-		&& downloader "$download_url" "$target_dir" "$target_file"\
-		&& echo "$target_file downloaded to $target_dir from $download_url"
+			&& echo "downloading $target from $download_url"\
+			&& downloader "$download_url" "$target_dir" "$target_file"\
+			&& echo "$target_file downloaded to $target_dir from $download_url";
 	else
-		echo "$target_dir/$target_file: ok"
+		echo "$target_dir/$target_file: ok";
 	fi
 }
 
@@ -63,6 +63,6 @@ get_yn() {
 }
 
 get_unix() {
-	get_lb
-	get_yn
+	get_lb;
+	get_yn;
 }
