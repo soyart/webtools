@@ -2,7 +2,7 @@
 . init-wt.sh;
 
 cleanup=$(get_cleanup_json)
-to_removes=$(access_field_array_json $cleanup "toRemove")
+to_removes=$(access_field_array_json "$cleanup" "toRemove")
 
 if [ -z "$1" ]; then
 	read -r -p "$0: Relative path to search (DEFAULT=BLANK=$pwd): " rootdir;
@@ -20,6 +20,6 @@ for to_remove in ${to_removes[@]}; do
 
 	for result in ${results[@]}; do
 		simyn "Remove $result?"\
-			&& rm -v $result;
+			&& rm -v "$result";
 	done;
 done;
