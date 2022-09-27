@@ -5,12 +5,8 @@
 	},
 	"servers": [
 		{
-			"hostname": "vultr-alpine",
-			"scpPath": "root@181.191.224.8:~/drop/."
-		},
-		{
-			"hostname": "digitallake-debian",
-			"scpPath": "root@45.1.69.5:/var/www/htdocs/johndoe.com/."
+			"hostname": "wbsd",
+			"scpPath": "wbsd:~/web/."
 		}
 	],
 	"sites": [
@@ -41,9 +37,10 @@
 				"shared/fonts": "artnoi.com/dist/fonts",
 				"artnoi.com/resc/_header.html": "artnoi.com/src/_header.html",
 				"artnoi.com/resc/_footer.html": "artnoi.com/src/_footer.html",
-				"artnoi.com/resc/style.css": "artnoi.com/dist/style.css",
+				"artnoi.com/resc/style-minimal.css": "artnoi.com/dist/style.css",
 				"artnoi.com/resc/script.js": "artnoi.com/dist/script.js",
-				"artnoi.com/resc/logo.svg": "artnoi.com/dist/logo.svg"
+				"artnoi.com/resc/logo.svg": "artnoi.com/dist/logo.svg",
+				"artnoi.com/resc/openbsd.png": "artnoi.com/dist/toplogo.png"
 			}
 		}
 	]
