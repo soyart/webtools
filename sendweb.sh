@@ -117,7 +117,7 @@ sendweb_tarball() {
 	fullpath="$3";
 
 	tarball="/tmp/$(basename $dist).tar.gz";
-	tar -czvf "$tarball" "$dist";
+	tar --dereference -czvf "$tarball" "$dist";
 	sendweb "$tarball" "$fullpath";
 
 	simyn "Remove tarball $tarball ?"\
