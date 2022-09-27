@@ -1,6 +1,55 @@
 # Git cheat sheet
-## Reseting Git repositories
+## Stashing changes
+Add the changes to stash, and then stash. Once you're done, pop the stash, and optionally reset the staging changes:
 
+    $ git add ./recent_works;
+	$ git stash;
+	.
+	.
+	$ git stash pop;
+	$ git reset; # Un-add stashed changes
+
+## Comparing Git repositories
+Usually, to compare diffs between branches, we'd do:
+
+    $ git diff <BRANCH_A> <BRANCH_B>;
+    $ git diff master develop;
+
+We can also compare remote branch with the exact same command:
+
+	$ git diff origin/master master;
+
+If the remote branch is not known to the local repo, add it, and then compare
+
+    $ git remote add github_upstream https://github.com/foo/bar;
+	$ git diff github_upstream/main main;
+
+If the branch to compare lives in a local directory, add the local repo, and see diffs.
+
+    $ git remote add -f localrepo path/to/localrepo;
+	$ git remote update;
+	$ git diff master localrepo/master;
+
+And we can just remove the remote repo once we're done.
+
+    $ git remote rm localrepo;
+
+### Comparing Git repositories: special keywords
+We can use `@`, `@{upstream}`, `@{push}` to get diffs too.
+
+Comparing working copy with upstream branch.
+
+    $ git diff @{upstream};
+
+Comparing current `HEAD` with upstream branch.
+
+    $ git diff @ @{upstream};
+
+Comparing against a branch we're pushing to (in case upstream is not yet set)
+
+    $ git diff @{push};
+
+## Reseting Git repositories
 > If you want to preserve recent changes, use shallow clone instead. This guide will removes all commit history and start over.
 
 ### Local
