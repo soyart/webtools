@@ -4,11 +4,13 @@
 
 ## Combining `find(1)` with `rm(1)`
 
-`find(1)` is a very powerful UNIX tool. This example shows how we can find and remove unwanted files recursively:
+`find(1)` is a very powerful UNIX tool. This example shows how we can find
+and remove unwanted files recursively:
 
     $ find <path> -name <name> -exec rm -f {} \;
 
-The example below will recursively remove file(s) `.DS_Store`, starting from the working directory:
+The example below will recursively remove file(s) `.DS_Store`,
+starting from the working directory:
 
     $ find . -name '.DS_Store' -exec rm -f {} \;
 
@@ -22,11 +24,16 @@ The example below will recursively remove file(s) `.DS_Store`, starting from the
 
 ## POSIX shell parameter expansion
 
-People should know parameter expansion to avoid invoking (abusing) `cat(1)`, `awk(1)`, `sed(1)`, and `grep(1)`.
+People should know parameter expansion to avoid invoking (abusing) `cat(1)`,
+`awk(1)`, `sed(1)`, and `grep(1)`.
 
-However, when people use shell parameter expansion, they use non-POSIX syntax, i.e. `bash`-specific syntax, which is not portable.
+However, when people use shell parameter expansion, they use non-POSIX syntax,
+i.e. `bash`-specific syntax, which is not portable.
 
-> The examples are for POSIX-compliant shell like UNIX `sh(1)` and `dash(1)`. If you are using `bash(1)` and don't care about portability, see [reference manual for `bash(1)` shell](https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html). You can also see `dash` man pages for POSIX parameter expansion.
+> The examples are for POSIX-compliant shell like UNIX `sh(1)` and `dash(1)`.
+If you are using `bash(1)` and don't care about portability,
+see [reference manual for `bash(1)` shell](https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html).
+You can also see `dash` man pages for POSIX parameter expansion.
 
 ### String length
 
@@ -80,14 +87,16 @@ Remove pattern expands to 'oobar':
     $ echo ${string%%o*r};
     f
 
-The example below will move (i.e. rename) all files with `.text` extension to `.txt` with a shell `for` loop (e.g. `token.text` -> `token.txt`):
+The example below will move (i.e. rename) all files with `.text` extension to
+`.txt` with a shell `for` loop (e.g. `token.text` -> `token.txt`):
 
     for f in *.text;
     do
       mv "${f}" "${f%.text}.txt";
     done;
 
-The example below will move all files starting with substring `gh` to be starting with `github` instead (e.g. `gh_key` -> `github_key`):
+The example below will move all files starting with substring `gh` to be
+starting with `github` instead (e.g. `gh_key` -> `github_key`):
 
     for f in gh*;
     do
@@ -378,9 +387,11 @@ On Arch Linux with NGINX, include this snippet in your NGINX configuration to en
       try_files $uri =404;
     }
 
-The snippet above should be put in a `server` block that listens on standard HTTP port 80.
+The snippet above should be put in a `server` block
+that listens on standard HTTP port 80.
 
-For NGINX to serve HTTPS, add the following snippet to `server` block listening on port 443.
+For NGINX to serve HTTPS, add the following snippet to `server` block
+listening on port 443.
 
     ssl_certificate /etc/letsencrypt/live/example.com/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;
@@ -388,21 +399,28 @@ For NGINX to serve HTTPS, add the following snippet to `server` block listening 
     include /etc/letsencrypt/options-ssl-nginx.conf;
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 
-On FreeBSD, the package recommends putting the following line in `/etc/periodic.conf` so that certbot will renew certificates periodically:
+On FreeBSD, the package recommends putting the following line
+in `/etc/periodic.conf` so that certbot will renew certificates periodically:
 
     weekly_certbot_enable="YES"
 
-Artnoi.com used both `cron` and `periodic.conf` schedulers when it was running on FreeBSD and NGINX. Now it runs [OpenBSD](https://artnoi.com/blog/2020/bsdbox/).
+Artnoi.com used both `cron` and `periodic.conf` schedulers when it was running
+on FreeBSD and NGINX. Now it runs [OpenBSD](https://artnoi.com/blog/2020/bsdbox/).
 
 ## Screenshots on Sway
 
-My prefered way to do this is to use 2 separate programs to take screenshots, (1) `slurp` for selecting a region, (2) `grim` for actually capturing the image:
+My prefered way to do this is to use 2 separate programs to take screenshots,
+   (1) `slurp` for selecting a region, (2) `grim` for actually capturing the image:
 
-    $ grim -g "$(slurp -d)" -o /tmp/scrot.png
+> The man page suggests that `-o <OUTFILE>` can be used to specify output file,
+however, my experience in October 2022 was that `-o` flag does not work,
+and you can just supply the outfile name as last argument.
+
+    $ grim -g "$(slurp -d)" /tmp/scrot.png
 
 Or, if you want to redirect the output to stdout to `wl-copy`:
 
-    $ grim -g "$(slurp -d)" - | wl-copy;
+    $ grim -g "$(slurp -d)" - | wl-copy -t 'image/png';
 
 This will capture the screenshot selected and piped to `wl-copy`.
 
