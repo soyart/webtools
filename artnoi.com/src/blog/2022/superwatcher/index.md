@@ -101,3 +101,20 @@ So what I usually do is using a `for` loop to increment `FilterQuery.FromBlock` 
 `FilterQuery.ToBlock` perpetually. The initial `FromBlock` would be the _factory
 contract creation block_, or the block _when the __pool factory__ contract was deployed_.
 This is different to the contract created by the pool factory (`PoolCreated`).
+
+To track the created Uniswap LP internal states, we also use the same method `FilterLogs`.
+But this time it's different, in that the contract addresses and log topics
+would be different for different events.
+
+## How superwatcher comes in
+
+As you can see, most of the logic around tracking these pools are _filtering logs_,
+and if we can have a way to inject each service's contract address and log topics
+into the code doing log filtering, then we can definitely get all the interesting
+event logs.
+
+And if we some how are able to inject the so-called _handle funcs_ into the code
+doing log filtering, then we can also handle _all_ of the log types.
+
+But one thing makes this approach highly impractical - the chain reorgs. With this,
+we can't just write.
