@@ -1,4 +1,4 @@
-Oct 23, 2022
+Nov 2, 2022
 
 # Introducing superwatcher
 
@@ -14,107 +14,61 @@ Event logs are, essentially, data emitted by smart contracts after certain event
 an event log costs _gas_. As a result, smart contract programmers have to decide
 when and when not to emit event log.
 
-## How event logs are useful: Uniswapv3 example
+### Why not just filter logs?
 
-Event logs allow us to _follow_ a smart contract states.
+Most of the Web3 backend code revolves around log and transaction subscription, which is fine and easy
+_if_ the blockchain today is what it has always _trying_ to be - a reliable source of truth. This however
+is not the case. As of this writing, most Ethereum-like blockchains experience what we hatefully call _chain reorg_.
 
-For example, Uniswap pool computes swap rate based on the pool internal states, chiefly,
-the balance of the pool's tokens.
+Chain reorgs happen when the blockchain nodes decided that some of the produced blocks contained
+frauded transactions. To discard the produced blocks, the produced (reorged) blocks will be
+invalidated with a new block replacing the reorged blocks.
 
-A Uniswap pool life cycle is something like this:
+These new blocks and their hashes are used instead to link the current chain to its future blocks.
 
-> __Note: this is a highly simplified version of a DEX pool__
+So with this in mind, you should begin to see why handling a chain reorg is cubersome and tiring.
+Any recent data you got from the chain has the probability to be invalidated later by the chain itself.
 
-1. Some wallets create new Uniswap pool using the so-called _factory_ contract `Uniswapv3PoolFactory`
+## superwatcher
 
-    > This emits event `PoolCreated` if the pool creation is successful
+superwatcher is a _Go library_ for implementing Ethereum event log-filtering services. It
+provides a clean and sane interface for interacting with event logs on the Ethereum blockchain.
 
-2. The new pool is created, and all of its states are at initial states.
+Baked to its core was chain reorg support. Unlike `go-ethereum` code, superwatcher takes chain reorgs
+very seriously, and it expects that its users know about what a chain reorg is and what to do when one happens.
 
-3. Other wallets transfer/stake tokens into the pool,
-    altering the pool internal states
+The exposed interface that the users will implement only roughly defines 3 methods,
+first one for handling filtered event logs (obviously), the second was what to do if we know that some logs were reorged,
+and the third one for handling superwatcher error.
 
-    > This emits event `Transfer`, which also contains information about the transfer
+### superwatcher internals
 
-4. Some users decide to do a _swap_ on the pool.
+I view superwatcher as 3 separate components: (1) the log emitter, (2) the emitter client, and (3) the superwatcher engine.
 
-    Swap rate is computed using variables from the internal states.
-    The internal states will also change after the swap.
+1. Log emitter
 
-    > This emits event `Swap`, which also contains information about the swap,
-    i.e. the swap quantity and rate.
+    The log emitter emits logs (yup). It is initialized with some contract addresses and log topics, which would then be
+    used to filter only the logs matching these critetia.
 
-Knowing this, if we were to create a simple program to track all Uniswap pools,
-and the pools' current swap rates (by keep the pool internal states ourselves
-instead of calling the smart contract each time), we can do all of that simply
-by processing the logs.
+    It loops to filter logs in a sliding window fashion, to catch chain reorgs obviously. At the end of each loop, it emits
+    (publishes) the result to whoever is listening on the right channel, which, for most of the time, is its client.
 
-### Tracking `PoolCreated` event to know when new pools are created
+2. Log emitter client
+    
+    The log emitter client (emitter client) is the consumer for the emitter. When initialized together, the logs flow from
+    the emitter to the client via a Go channel. The emitter client inspects the result and the channels, before returning the
+    result to whoever embeds it. It also syncs the emitter loop, meaning that the emitter will not advance if the emitter client
+    does not instruct it to do so.
 
-Before we can track our pools balances (for swap rate computation), we must first
-track all pools' creations. We can do this by listening specifically for event
-`PoolCreated` from the `Uniswapv3PoolFactory` contract.
+    Using the emitter client helps abstract the emitter emitting logic away from our other code.
 
-If we do this correctly, we should be able to know the address of every
-Uniswapv3 pool ever created by this factory smart contract.
+3. The engine
 
-### Tracking events `Transfer` and `Swap`
+    The superwatcher engine is the star of the show. It embeds the emitter client, and uses injected service methods to process
+    logs and chain reorgs. It also keeps some states and metadata, usually log history, to determine what to do with the current log.
 
-After we know the addresses of the pools, we can then filter the logs from these
-addresses, and we _specifically_ listens for `Transfer` and `Swap` events.
+    Injecting service code into the engine can be done by initializing the engine with a struct implementing `ServiceEngine` interface.
+    The `ServiceEngine` was designed to support middleware-like designs, that is, we can wrap one service engine inside another,
+    or have multiple service _sub-engines_ that gets wrapped by a _router_ or _main service engine_ and so on.
 
-By tracking those events and updating the pool states to our own database,
-we now have the inputs (pool states) for swap algorithm used by the pool.
-
-### Calculating swap rate on our own computers
-
-And if we have code for the pool's business logic, then we can just call the pool
-function responsible for computing the swap rate, i.e. function `GetExchange`.
-
-In Go case, we can use `abigen` to convert a Solidity or other smart contract source
-to Go files. So, by using `abigen`, we can create Go version of the smart contract
-that we can import `GetExchange` from.
-
-This allows us to be virtually the off-chain pool, and we should technically be
-able to do this just by following event logs.
-
-## How to follow logs (filter logs) to do what I just explained
-
-There are 2 ways to follow the logs. Either by _subscribing_ or by _filtering_ logs.
-
-Subscribing to logs are not very reliable in `go-ethereum` due to chain reorgs, which
-is a PIA to work with. This is why I chose to go with the _filtering_ method.
-
-The `go-ethereum` project provides you with an Ethereum RPC client `ethclient.Client`
-that has method `FilterLogs(ethereum.FilterQuery) ([]types.Log, error)` that we can
-use to filter event logs. See [this tutorial](https://goethereumbook.org/event-read/)
-to learn how it works.
-
-With `FilterLogs`, we have full the control over the filter block range,
-contract addresses, and log _topics_ to filter with. This means that we can literally
-scan the whole blockchain if we want to, from the genesis to the current block.
-
-But that would be needlessly expensive, hence why we will not be filtering
-the whole blockchain.
-
-So what I usually do is using a `for` loop to increment `FilterQuery.FromBlock` and
-`FilterQuery.ToBlock` perpetually. The initial `FromBlock` would be the _factory
-contract creation block_, or the block _when the __pool factory__ contract was deployed_.
-This is different to the contract created by the pool factory (`PoolCreated`).
-
-To track the created Uniswap LP internal states, we also use the same method `FilterLogs`.
-But this time it's different, in that the contract addresses and log topics
-would be different for different events.
-
-## How superwatcher comes in
-
-As you can see, most of the logic around tracking these pools are _filtering logs_,
-and if we can have a way to inject each service's contract address and log topics
-into the code doing log filtering, then we can definitely get all the interesting
-event logs.
-
-And if we some how are able to inject the so-called _handle funcs_ into the code
-doing log filtering, then we can also handle _all_ of the log types.
-
-But one thing makes this approach highly impractical - the chain reorgs. With this,
-we can't just write.
+    The engine syncs with the emitter via the emitter client.
