@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # linkweb-jq.sh is a wtjq replacement for linkweb.sh.
 
+# Source jq wrapper functions
+. init-wt.sh
+
 MODELIVE="live-links"
 MODEDRY="dry-run"
 MODECLEAN="clean-links"
-
-# Source jq wrapper functions
-. init-wt.sh
 
 main() {
 	if [ ! -z $1 ] && [ "$1" != "-"* ]; then
@@ -125,4 +125,4 @@ rmlink() {
 	test -L "$1" && rm "$1";
 }
 
-main $1 $2;
+main $@;

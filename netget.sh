@@ -2,6 +2,29 @@
 
 # TODO: refactor
 
+# Download using ftp or curl to bin/ssg
+# Since ssg is not from me, you may need to check its content first.
+get_ssg() {
+	if [ ! -x bin/ssg ]; then
+		ssg_url="https://rgz.ee/bin/ssg";
+		ssg_tmp="/tmp/ssg_webtools_tmp.sh";
+		ssg_dst="bin/ssg";
+
+		echo "missing bin/ssg";
+		echo "";
+		echo "Getting preview";
+
+		curl "$ssg_url" > "$ssg_tmp"\
+			&& cat  "$ssg_tmp"\
+			&& simyn "Install this version of ssg?"\
+			&& mv $ssg_tmp "$ssg_dst"\
+			&& chmod +x "$ssg_dst"\
+			&& echo "ssg download from $ssg_url to ./$ssg_dst";
+	else
+		echo "bin/ssg: ok"
+	fi
+}
+
 downloader() {
 	URL=$1;
 	save_name="$2/$3"
@@ -14,41 +37,33 @@ downloader() {
 	chmod u+x $save_name;
 }
 
-# Download using ftp or curl to bin/ssg
-get_ssg() {
-	if [ ! -x bin/ssg ]; then
-		echo "missing bin/ssg"\
-		&& echo "get_ssg.sh: Downloading ssg from rgz.ee/bin"\
-		&& downloader "https://rgz.ee/bin/ssg" "bin" "ssg"\
-		&& echo "ssg downloaded to bin/ssg, please copy it to your one of your PATH"\
-		&& echo "Your PATH: $PATH";
+get_shtools() {
+	target_dir="$1";
+	target_file="$2";
+	rel_path="$target_dir/$target_file"
+	download_url="$3";
+
+	if [ ! -x "$rel_path" ]; then
+		echo "missing $rel_path"\
+			&& echo "downloading $rel_path from $download_url"\
+			&& downloader "$download_url" "$target_dir" "$target_file"\
+			&& echo "$target_file downloaded to $target_dir from $download_url";
 	else
-		echo "bin/ssg: ok"
+		echo "$rel_path: ok";
 	fi
 }
+
 get_lb() {
-	if [ ! -x bin/lb.sh ]; then
-		echo "missing bin/lb.sh"\
-		&& echo "downloading lb.sh from gitlab.com/artnoi/unix"\
-		&& downloader "https://gitlab.com/artnoi/unix/-/raw/main/sh-tools/bin/lb.sh" "bin" "lb.sh"\
-		&& echo "lb.sh downloaded to bin"
-	else
-		echo "bin/lb.sh: ok"
-	fi
+	get_shtools "bin" "lb.sh"\
+		"https://gitlab.com/artnoi/unix/-/raw/main/sh-tools/bin/lb.sh";
 }
 
 get_yn() {
-	if [ ! -x bin/yn.sh ]; then
-		echo "missing bin/yn.sh"\
-		&& echo "downloading yn.sh from gitlab.com/artnoi/unix"\
-		&& downloader "https://gitlab.com/artnoi/unix/-/raw/main/sh-tools/bin/yn.sh" "bin" "yn.sh"\
-		&& echo "yn.sh downloaded to bin"
-	else
-		echo "bin/yn.sh: ok"
-	fi
+	get_shtools "bin" "yn.sh"\
+		"https://gitlab.com/artnoi/unix/-/raw/main/sh-tools/bin/yn.sh";
 }
 
 get_unix() {
-	get_lb
-	get_yn
+	get_lb;
+	get_yn;
 }

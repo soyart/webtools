@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # linkweb-jq.sh is a wtjq replacement for linkweb.sh.
 
-MODELIVE="live-gen"
-MODEDRY="dry-run"
-
 # Source jq wrapper functions
 . init-wt.sh
+
+MODELIVE="live-gen"
+MODEDRY="dry-run"
 
 # Test if we have ssg installed
 if command -v ssg; then
@@ -93,4 +93,4 @@ gen_one_site() {
 	echo "[$PROG] $src -> $dist"
 }
 
-main $1 $2;
+main $@;
