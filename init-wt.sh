@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# wtjq-init.sh
-# This file provides frequently used jq wrappers for wtjq.
+
+# This file provides frequently used jq wrappers for webtools scripts.
 
 MANIFEST="./manifest.json"
 PROG=${0#'./'}
