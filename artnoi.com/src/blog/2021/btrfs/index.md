@@ -12,6 +12,7 @@ By using Btrfs technologies like **Copy-on-Write** and **compression**, we can i
 And if you use Btrfs on top of some encryption scheme like [LUKS](/cheat/device-mapper/), compressed filesystem data is smaller, so encryption performance overhead should also gets smaller.
 
 ## Why Btrfs
+
 Apart from CoW, Btrfs also features compression, with support for multiple compression algorithms (`lzo`, `zlib`, and newer `zstd`). Compression improves I/O performance at the cost of CPU time.
 
 > Btrfs is beneficial for SSD users; it minimizes writes and improves I/O speed thanks to CoW and compression.
@@ -19,11 +20,13 @@ Apart from CoW, Btrfs also features compression, with support for multiple compr
 To use Btrfs, we need userspace utilities `btrfs` and other Btrfs programs. On Arch Linux, they are packaged into `btrfs-programs`.
 
 ## Why not ZFS?
+
 Because of ZFS license incompatibility with Linux's GPLv2, [installing root on ZFS is tiring](/blog/2019/zfsarch/), especially when the only bootable Linux system you have is a live USB.
 
-So I was looking for a Linux-native ZFS replacement, that has support for [Copy-on-Write](https://en.wikipedia.org/wiki/Copy-on-write), [snapshots](https://en.wikipedia.org/wiki/Snapshot_(computer_storage)), [logical volume management](https://en.wikipedia.org/wiki/Logical_volume_management), [transparent disk encryption](https://en.wikipedia.org/wiki/Full_disk_encryption), and transparent compression as my new root filesystem.
+So I was looking for a Linux-native ZFS replacement, that has support for [Copy-on-Write](https://en.wikipedia.org/wiki/Copy-on-write), [snapshots](<https://en.wikipedia.org/wiki/Snapshot_(computer_storage)>), [logical volume management](https://en.wikipedia.org/wiki/Logical_volume_management), [transparent disk encryption](https://en.wikipedia.org/wiki/Full_disk_encryption), and transparent compression as my new root filesystem.
 
 # Btrfs vs ZFS
+
 ZFS originally came from Sun, and Btrfs from Oracle (who ultimately took over Sun). Btrfs is more modern, and Linux-centric, so it can be better integrated into many Linux distros.
 
 In fact, once it is stable enough, Btrfs may eventually replace EXT4 as default root filesystems for many Linux distributions.
@@ -37,6 +40,7 @@ Because of the reasons above, I'll continue using ZFS for data storage, but conv
 > TLDR; Btrfs does not replace ZFS for storage, but does fit better as Linux root filesystem.
 
 # Getting started with Btrfs
+
 Btrfs has been included in the Linux kernel for a long ass time, so you can just install the userspace utilities `btrfs-progs` in order to use Btrfs on Linux systems. `btrfs-progs` includes tools that we are going to use later in this page like
 
 - `btrfs-convert(8)` to convert EXT2-4 and ReiserFS to Btrfs - we will use this program to convert our old root FS.
@@ -56,7 +60,8 @@ There are many other tools that I already use a lot, like
 - `btrfs-send(8)` to send Btrfs subvolume
 
 ## <a name="guide"></a>Converting old EXT4 root to Btrfs
-The EXT4 root filesystem must *not* be mounted when being converted, so we must boot from other system *if* that EXT4 root is the only bootable root filesystem on the device.
+
+The EXT4 root filesystem must _not_ be mounted when being converted, so we must boot from other system _if_ that EXT4 root is the only bootable root filesystem on the device.
 
 > Most live installers ship with `btrfs-convert` program that we will use, so you may just boot from any live ISOs to perform FS conversion.
 
@@ -75,6 +80,7 @@ If it went well, you can safely destroy the backup EXT2 subvolume `/ext2_saved` 
     # btrfs subvolume delete /ext2_saved;
 
 ## Booting into Btrfs root
+
 Btrfs is not supported by `fsck(8)`, so you may want to embed `btrfs` binary to perform filesystem check during boot. On Arch Linux, simply add this `BINARIES` line in `mkinitcpio.conf(5)`:
 
     BINARIES=('/usr/bin/btrfs')
@@ -86,9 +92,10 @@ Because Btrfs is native to Linux, booting Linux into Btrfs root is easy, and now
 > I'm not sure about this, but it seems to be the case - if you used `sd-encrypt` hook for LUKS with a key file in a separate partition (like a USB flash drive), that separate partition must have matching filesystem with your root (Btrfs).
 
 ### Btrfs compression
-Mounting Btrfs with option `compress=`*alg* will enable [transparent file compression](https://btrfs.wiki.kernel.org/index.php/Compression) on that filesystem.
 
-In my experience, `zstd` works *best*; the root filesystem shrank from ~4-5GB to ~1.7GB.
+Mounting Btrfs with option `compress=`_alg_ will enable [transparent file compression](https://btrfs.wiki.kernel.org/index.php/Compression) on that filesystem.
+
+In my experience, `zstd` works _best_; the root filesystem shrank from ~4-5GB to ~1.7GB.
 
 `zstd` is new compression algo originally developed at Facebook. Facebook also uses Btrfs and `zstd` extensively in their data centers.
 
@@ -96,7 +103,7 @@ Mounting with `zstd` compress option:
 
     # mount -o compress=zstd <device> <mountpoint>;
 
-Note that only new files written after mounting with `compress=`*alg* will be compressed. To compress the whole (previously uncompressed) filesystem with `zstd`, use `filesystem defragment -czstd` command:
+Note that only new files written after mounting with `compress=`_alg_ will be compressed. To compress the whole (previously uncompressed) filesystem with `zstd`, use `filesystem defragment -czstd` command:
 
     # btrfs filesystem defragment -r -v -czstd <mountpoint>;
 
@@ -133,6 +140,7 @@ Or, if it's unmounted:
     # btrfs filesystem label <device> <newlabel>;
 
 ## Btrfs snapshots
+
 In Btrfs, a snapshot is a subvolume sharing data with other subvolume using Btrfs Copy-on-Write technology.
 
 Create a Btrfs CoW snapshot with:
@@ -149,11 +157,12 @@ To send a snapshot, use `send` command. For example, sending and receiving snaps
 
     # btrfs send /rootbak | btrfs receive /backup;
 
-Also just like ZFS, Btrfs can also send incremental snapshots (with `-p` *parent*):
+Also just like ZFS, Btrfs can also send incremental snapshots (with `-p` _parent_):
 
     # btrfs send -p /rootbak /rootbak_new | btrfs receive /backup;
 
 ## Disabling Copy-on-Write
+
 To disable CoW for new files, use mount option `nodatacow`. This will disable CoW and compression, albeit only for new files.
 
 To disable CoW on specific files or directories, add `C` to their attributes:

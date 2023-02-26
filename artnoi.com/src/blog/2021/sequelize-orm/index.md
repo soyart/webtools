@@ -1,11 +1,13 @@
 Aug 22, [2021](/blog/2021)
 
 # Sequelize ORM Command-line
+
 Sequelize is a JavaScript ORM library that works with many DBMSs. It supports most major SQL-based DBMS software (MySQL, SQLite, PostgreSQL, etc). It is very easy to use, and suitable for newbie programmers like I am. This blog post will be about using Sequelize with MariaDB.
 
 > This blog post makes use of the command-line utility `sequelize-cli` (`sequelize`), because I find this approach easier and less prone to human errors.
 
 ## Setting up Sequelize
+
 First, install `sequelize`, `mysql2` (local), and `sequelize-cli` (global) for MariaDB (MySQL):
 
     $ npm install sequelize mysql2;
@@ -16,6 +18,7 @@ Then, initialize Sequelize:
     $ sequelize init;
 
 ## Creating database and tables
+
 Edit Sequelize database configuration in `./config/config.json`.
 
 Now, you can create use Sequelize to create the database for you (which is the one configured in the file in the previous step):
@@ -40,4 +43,5 @@ You can also manually add attributes (table columns) in `./model/<model_name>.js
     $ sequelize db:migrate:undo # Revert a migration
 
 ## Coding
+
 The models' properties such as relationship and columns can be edited after its initial generation in `./models/<Model>.js`. There are many guides online on how to do this. Everyone does it differently, so I will not be writing about it.

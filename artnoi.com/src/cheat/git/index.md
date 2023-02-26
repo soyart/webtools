@@ -1,15 +1,18 @@
 # Git cheat sheet
+
 ## Stashing changes
+
 Add the changes to stash, and then stash. Once you're done, pop the stash, and optionally reset the staging changes:
 
     $ git add ./recent_works;
-	$ git stash;
-	.
-	.
-	$ git stash pop;
-	$ git reset; # Un-add stashed changes
+    $ git stash;
+    .
+    .
+    $ git stash pop;
+    $ git reset; # Un-add stashed changes
 
 ## Comparing Git repositories
+
 Usually, to compare diffs between branches, we'd do:
 
     $ git diff <BRANCH_A> <BRANCH_B>;
@@ -17,24 +20,25 @@ Usually, to compare diffs between branches, we'd do:
 
 We can also compare remote branch with the exact same command:
 
-	$ git diff origin/master master;
+    $ git diff origin/master master;
 
 If the remote branch is not known to the local repo, add it, and then compare
 
     $ git remote add github_upstream https://github.com/foo/bar;
-	$ git diff github_upstream/main main;
+    $ git diff github_upstream/main main;
 
 If the branch to compare lives in a local directory, add the local repo, and see diffs.
 
     $ git remote add -f localrepo path/to/localrepo;
-	$ git remote update;
-	$ git diff master localrepo/master;
+    $ git remote update;
+    $ git diff master localrepo/master;
 
 And we can just remove the remote repo once we're done.
 
     $ git remote rm localrepo;
 
 ### Comparing Git repositories: special keywords
+
 We can use `@`, `@{upstream}`, `@{push}` to get diffs too.
 
 Comparing working copy with upstream branch.
@@ -50,9 +54,11 @@ Comparing against a branch we're pushing to (in case upstream is not yet set)
     $ git diff @{push};
 
 ## Reseting Git repositories
+
 > If you want to preserve recent changes, use shallow clone instead. This guide will removes all commit history and start over.
 
 ### Local
+
 [To start over](https://stackoverflow.com/a/2006252), remove `.git` directory and re-initialize the repository with:
 
     $ sudo rm -r .git;
@@ -64,7 +70,8 @@ Now we have our new `.git` directory, we can add then files with `git add <files
     $ git commit -m 'Initialized';
 
 ### Remote
-To *force* rebase a remote repository with our recently reset local repository, first you will need to add the remote repository URL to our local repository:
+
+To _force_ rebase a remote repository with our recently reset local repository, first you will need to add the remote repository URL to our local repository:
 
     $ git remote add [OPTIONS] <REMOTE NAME> <URL>;
 
@@ -76,7 +83,7 @@ and
 
     git@gitlab.com:artnoi/gfc.git
 
-Now you can *force* update the remote repository with the following `git push` command:
+Now you can _force_ update the remote repository with the following `git push` command:
 
     $ git push --force --set-upstream <REMOTE NAME> <BRANCH NAME>;
 
@@ -85,8 +92,7 @@ Now you can *force* update the remote repository with the following `git push` c
 > We will be using OpenBSD's OpenSSH, and this guide assumes you will be using just one keypair for one account (i.e. GitHub or GitLab), so that one keypair will be used to authenticate all projects on the website.
 
 Generate new RSA keypair with `ssh-keygen(1)`:
-	
-	$ ssh-keygen -t <TYPE> -C <COMMENT>
+$ ssh-keygen -t <TYPE> -C <COMMENT>
 
 For example, 4096-bit RSA keypair:
 
@@ -116,11 +122,11 @@ If that works, we can now reassign Git URLs as remote URLs, replacing HTTP URLs:
 Edit OpenSSH configuration (`$HOME/.ssh/config`) to explicitly use the keyfiles:
 
     Host gitlab.com
-	  PreferredAuthentications publickey
-	  IdentityFile <KEY FILE>
+      PreferredAuthentications publickey
+      IdentityFile <KEY FILE>
 
     Host github.com
-	  PreferredAuthentications publickey
-	  IdentityFile <KEY FILE>
+      PreferredAuthentications publickey
+      IdentityFile <KEY FILE>
 
 After this is done, you should be able to use your SSH keys to authenticate with remote repositories.

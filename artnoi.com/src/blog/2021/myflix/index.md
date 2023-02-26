@@ -1,4 +1,5 @@
 May 1, [2021](/blog/2021/)
+
 # How I replaced Plex with WireGuard and NFS
 
 This article will tell you how you can host your own media library remotely with [WireGuard VPN](/blog/2020/wireguard/) and NFS.
@@ -53,7 +54,7 @@ If the goal is just to read (or write) remote files, why bother using Plex when 
 
 ## How my setup is better than Plex
 
-With my setup, I'm able to *losslessly* stream 1080p video from a server in Singapore or my home server to any location.
+With my setup, I'm able to _losslessly_ stream 1080p video from a server in Singapore or my home server to any location.
 
 This setup works fine even if the server is not very powerful, while Plex suffers if the connection/IO/graphics is not high enough. In short, this setup is faster, lighter, and more reliable.
 

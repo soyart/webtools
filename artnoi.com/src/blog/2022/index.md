@@ -1,4 +1,5 @@
 # Blog posts from 2022
+
 [Refactoring gfc](/blog/2022/gfc-refactor/)
 
 [Hosting HTTPS website with OpenBSD](/blog/2022/openbsd-webserver/)
@@ -11,4 +12,4 @@
 
 [fngobot-cli](/blog/2022/fngobot-cli/)
 
-[Henlo 2022](/blog/2022/henlo/)  
+[Henlo 2022](/blog/2022/henlo/)
