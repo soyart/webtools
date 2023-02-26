@@ -1,4 +1,5 @@
 Dec 6, [2021](/blog/2021)
+
 # Hardware graphics acceleration on Arch Linux
 
 Whenever I set up a new Arch Linux installation on a new hardware, I always had to go through the Arch Wiki and other resources to check out how to enable hardware acceleration for that new hardware, be it an Intel, AMD, or NVIDIA. So I decided to compile those instructions in this article.
@@ -36,11 +37,13 @@ Add this option to your kernel parameter:
     nvidia-drm.modeset=1
 
 ### Update your initramfs (`/etc/mkinitcpio.conf`)
+
 Add the following modules to hook `MODULE`:
 
     MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm)
 
 ## AMD graphics
+
 ### OpenGL
 
 Install package `mesa`
@@ -66,6 +69,7 @@ To override this driver and use correct driver for your AMD graphics, use `VDPAU
 Install package `libva-vdpau-driver`
 
 ### Update your initramfs (`/etc/mkinitcpio.conf`)
+
 Add the following modules to hook `MODULE`:
 
     MODULES=(amdgpu radeon)
@@ -73,7 +77,9 @@ Add the following modules to hook `MODULE`:
 IIRC, these kernel modules are already in the default kernel. For more info on AMDGPU, see [this wiki page](https://wiki.archlinux.org/title/AMDGPU#Video_acceleration)
 
 ## Intel graphics
+
 See [Arch Wiki](https://wiki.archlinux.org/title/Hardware_video_acceleration)
 
 ## Firefox hardware acceleration
+
 See [Arch Wiki](https://wiki.archlinux.org/title/Firefox#Hardware_video_acceleration)

@@ -1,16 +1,19 @@
 # Blog posts
+
 The blog posts are sorted from most recent (newest first).
 
 ## [**2022**](/blog/2022/)
+
 [Refactoring gfc](/blog/2022/gfc-refactor/)  
 [Hosting HTTPS website with OpenBSD](/blog/2022/openbsd-webserver/)  
 [I reset my servers](/blog/2022/reset/)  
 [stubborn](/blog/2022/stubborn/)  
 [todong](/blog/2022/todong/)  
 [fngobot-cli](/blog/2022/fngobot-cli/)  
-[Henlo 2022](/blog/2022/henlo/)  
+[Henlo 2022](/blog/2022/henlo/)
 
 ## [**2021**](/blog/2021/)
+
 [Video hardware acceleration on Arch Linux](/blog/2021/hwaccel/)  
 [I got a new software development job](/blog/2021/dev/)  
 [Redis basic commands](/blog/2021/redis/)  
@@ -33,8 +36,10 @@ The blog posts are sorted from most recent (newest first).
 [Pi-Hole ขั้นเทพ](/blog/2021/pihole-th/)  
 [เริ่มต้นกับ WireGuard](/blog/2021/wireguard-th/)  
 [Switching from X11 to Wayland](/blog/2021/sway/)  
-[Switching from Bash to KornShell](/blog/2021/ksh/)  
+[Switching from Bash to KornShell](/blog/2021/ksh/)
+
 ## [**2020**](/blog/2020/)
+
 [Replacing NetworkManager in laptops](/blog/2020/iwd/)  
 [Linux kernel optimization for Zen2](/blog/2020/zen2-kernel/)  
 [I replaced X230 with T14 (AMD)](/blog/2020/t14/)  
@@ -49,8 +54,10 @@ The blog posts are sorted from most recent (newest first).
 [My ThinkStation P330](/blog/2020/tstation/)  
 [How I write this blog](/blog/2020/howblog/)  
 [Do not buy Panasonic CF-SX2](/blog/2020/sx2/)  
-[COVID-19 journals](/blog/2020/covid-19/)  
+[COVID-19 journals](/blog/2020/covid-19/)
+
 ## [**2019**](/blog/2019/)
+
 [Installing Arch Linux on ZFS Root](/blog/2019/zfsarch/)  
 [My X230 Build](/blog/2019/thinkpad/)  
 [Stuff I use](/blog/2019/fave/)  
@@ -58,7 +65,9 @@ The blog posts are sorted from most recent (newest first).
 [FreeBSD 12.0: Enabling Wi-Fi on ThinkPad X230](/blog/2019/bsdwifi/)  
 [FreeBSD 12.0: Installing dwm](/blog/2019/bsddwm/)  
 [FreeBSD 12.0: Dual-booting with GNU/Linux](/blog/2019/bsdlinuxboot/)  
-[Linux: Encrypting a Partition with LUKS](/blog/2019/cryptlinux/)  
+[Linux: Encrypting a Partition with LUKS](/blog/2019/cryptlinux/)
+
 ## **Pre-2019**
+
 [Audio Fidelity](/blog/etc/audiofidel/)  
-[artnoi.wordpress.com](https://artnoi.wordpress.com)  
+[artnoi.wordpress.com](https://artnoi.wordpress.com)

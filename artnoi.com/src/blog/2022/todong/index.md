@@ -6,7 +6,7 @@ During my last feature development, I finished my part early, and so I had a bit
 
 ## Goals
 
-I wanted maximum flexibility with data store and web frameworks, such that *one* line in the config file configures whether this code will use which data store and web frameworks at runtime.
+I wanted maximum flexibility with data store and web frameworks, such that _one_ line in the config file configures whether this code will use which data store and web frameworks at runtime.
 
 ## Results
 

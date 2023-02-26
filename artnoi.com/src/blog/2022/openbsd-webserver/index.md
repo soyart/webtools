@@ -1,6 +1,7 @@
 Aug 13, 2022
 
 # Hosting a HTTPS website with OpenBSD `httpd`, and optionally `relayd`
+
 [After my old servers were compromised](/blog/2022/reset/), the first thing I do is to setup a new OpenBSD webserver. This makes sense, because of how OpenBSD is wonderfully suited for this task. The fact that the operating system ships with HTTP server, a well written `relayd(8)` for level-3 redirection and level-7 relays, a robust firewall (`pf(4)`), a robust VPN driver built into the kernel (`wg(4)`), and finally, a native ACME client `acme-client(1)`!
 
 Out of the box, OpenBSD is perfect right at the beginning for being a secure webserver! Ever since I first wrote the [tutorial to create an OpenBSD webserver in 2020](/blog/2020/bsdbox/), nothing (in the eye of the users) about the software has changed, but one thing has changed - I have more experience now. When I first wrote that article, I was not working in tech industry, did not write any programs other than shitty shell scripts, and tended to overengineer stuff.
@@ -8,6 +9,7 @@ Out of the box, OpenBSD is perfect right at the beginning for being a secure web
 This time, it'll be different. Everything will only be added if needed. Before we dive to the config files, let's first discuss my desired HTTP server behavior.
 
 ## Desired `httpd(8)` behavior
+
 I want only 1 main virtual server, that is, **there'll be only 1 virtual server that does the actual serving of HTML files**. Other virtual servers are for redirecting subdomains **back to the main virtual servers**.
 
 I also want `httpd(8)` to be somewhat more secure than my old front-end reverse proxy, NGINX. In OpenBSD, `httpd(8)` is run as user `www` by default. It does not matter if you run the webserver on the previleged ports or not - `httpd` will (by default) chroot `/var/www`, and will only see files in there. If `httpd` is compromised, then only the files user `www` has write permission to will be affected.
@@ -27,35 +29,36 @@ In the final stage, I want my webserver to
 - For subdomains other that `www`, do redirections like `cheat.artnoi.com/foo` to `artnoi.com/cheat/foo`
 
 ## Using only `httpd(8)` for standard HTTP
+
 You must first setup a simple webserver on your box and obtain ACME certificates/key for your domain and subdomains. To do just that, setup a simple webserver just for ACME auth:
 
     # httpd.conf
-    
+
     prefork 5
-    
+
     # This virtual server can also handle ACME auth in HTTPS
     server "artnoi.com" {
     	alias "www.artnoi.com"
     	alias "cheat.artnoi.com"
     	alias "noob.artnoi.com"
     	alias "zv.artnoi.com"
-    
+
     	listen on * port 80
-    
+
     	location "/.well-known/acme-challenge/*" {
     		root "/acme"
     		request strip 2
     	}
     }
 
-Now, configure `acme-client.conf(5)` such that we can use 1 ACME *fullchain* certificate for all subdomains:
+Now, configure `acme-client.conf(5)` such that we can use 1 ACME _fullchain_ certificate for all subdomains:
 
     # acme-client.conf
     authority letsencrypt {
     	api url "https://acme-v02.api.letsencrypt.org/directory"
     	account key "/etc/acme/letsencrypt-privkey.pem"
     }
-    
+
     domain artnoi.com {
     	alternative names { www.artnoi.com cheat.artnoi.com noob.artnoi.com zv.artnoi.com }
     	domain key "/etc/ssl/private/artnoi.com.key"
@@ -70,7 +73,7 @@ Normally, `relayd` would look for the following keypair: `/etc/ssl/private/$name
 Now, start `httpd(8)` and run `acme-client(1)`:
 
     # httpd -n && rcctl start httpd;
-	# acme-client -v artnoi.com;
+    # acme-client -v artnoi.com;
 
 You can now proceed to setup a full HTTPS webserver if ACME challenge was successful and you got the certificates/key configured in `acme-client.conf` in `/etc/ssl`.
 
@@ -79,10 +82,10 @@ You can now proceed to setup a full HTTPS webserver if ACME challenge was succes
 > Note that the `root` directive is relative to `/var/www`.
 
     prefork 5
-    
+
     public_interface = "vio0"
     public_ip = "139.180.157.32"
-    
+
     types {
     	# uncomment 'include' line below to use all types
     	# include "/usr/share/misc/mime.types"
@@ -93,7 +96,7 @@ You can now proceed to setup a full HTTPS webserver if ACME challenge was succes
     	text/html       html htm
     	text/plain      txt
     }
-    
+
     # This virtual server "artnoi.com" is the main virtual HTTPS server
     # to which all other subdomain virtual servers redirect to.
     #
@@ -102,13 +105,13 @@ You can now proceed to setup a full HTTPS webserver if ACME challenge was succes
     	alias "www.artnoi.com"
     	listen on $public_interface tls port 443
     	root "/htdocs/www.artnoi.com"
-    
+
     	tls {
     		certificate "/etc/ssl/artnoi.com.fullchain.pem"
     		key "/etc/ssl/private/artnoi.com.key"
     	}
     }
-    
+
     # This virtual "artnoi.com" server serves 2 purposes
     # 1. Handle ACME auth for subdomains
     # 2. Redirect non-ACME connection to HTTPS
@@ -118,7 +121,7 @@ You can now proceed to setup a full HTTPS webserver if ACME challenge was succes
     server "artnoi.com" {
     	alias "www.artnoi.com"
     	listen on $public_interface port 80
-    
+
     	location "/.well-known/acme-challenge/*" {
     		root "/acme"
     		request strip 2
@@ -127,7 +130,7 @@ You can now proceed to setup a full HTTPS webserver if ACME challenge was succes
     		block return 301 "https://$HTTP_HOST$REQUEST_URI"
     	}
     }
-    
+
     # These other subdomain virtual webservers are different than the one above,
     # because we want to change the request host and URI too, and that new request
     # should point to our main virtual server "artnoi.com" on 443.
@@ -135,8 +138,8 @@ You can now proceed to setup a full HTTPS webserver if ACME challenge was succes
     # "http://cheat.artnoi.com/foo" should be redirected to 'https://artnoi.com/cheat/foo'
     server "cheat.artnoi.com" {
     	listen on $public_interface port 80
-    
-		# Redirect to the virtual server above for ACME challenges
+
+    	# Redirect to the virtual server above for ACME challenges
     	location "/.well-known/acme-challenge/*" {
     		block return 301 "http://artnoi.com$REQUEST_URI"
     	}
@@ -145,26 +148,26 @@ You can now proceed to setup a full HTTPS webserver if ACME challenge was succes
     		block return 301 "https://artnoi.com/cheat$REQUEST_URI"
     	}
     }
-    
+
     # "http://noob.artnoi.com/foo" should be redirected to 'https://artnoi.com/noob/foo'
     server "noob.artnoi.com" {
     	listen on $public_interface port 80
-    
-		# Redirect to the virtual server above for ACME challenges
+
+    	# Redirect to the virtual server above for ACME challenges
     	location "/.well-known/acme-challenge/*" {
     		block return 301 "http://artnoi.com$REQUEST_URI"
     	}
-    	
+
     	location * {
     		block return 301 "https://artnoi.com/noob$REQUEST_URI"
     	}
     }
-    
+
     # "http://zv.artnoi.com/foo" should be redirected to 'https://artnoi.com/noob/foo'
     server "zv.artnoi.com" {
     	listen on $public_interface port 80
-    
-		# Redirect to the virtual server above for ACME challenges
+
+    	# Redirect to the virtual server above for ACME challenges
     	location "/.well-known/acme-challenge/*" {
     		block return 301 "http://artnoi.com$REQUEST_URI"
     	}
@@ -194,8 +197,8 @@ Let's start with updating our `httpd.conf(5)` virtual server blocks to listen HT
 
     prefork 5
     this_server = "127.0.0.1"
-	internal_httpd_port = "8888"
-    
+    internal_httpd_port = "8888"
+
     types {
     	# uncomment 'include' line below to use all types
     	# include "/usr/share/misc/mime.types"
@@ -206,21 +209,21 @@ Let's start with updating our `httpd.conf(5)` virtual server blocks to listen HT
     	text/html       html htm
     	text/plain      txt
     }
-    
+
     server "artnoi.com" {
     	alias "www.artnoi.com"
     	listen on $this_server port $internal_httpd_port
     	root "/htdocs/html-artnoi.com"
-    
+
     	location "/.well-known/acme-challenge/*" {
     		root "/acme"
     		request strip 2
     	}
     }
-    
+
     server "cheat.artnoi.com" {
     	listen on $this_server port $internal_httpd_port
-    
+
     	location "/.well-known/acme-challenge/*" {
     		block return 301 "http://artnoi.com$REQUEST_URI"
     	}
@@ -228,10 +231,10 @@ Let's start with updating our `httpd.conf(5)` virtual server blocks to listen HT
     		block return 301 "https://artnoi.com/cheat$REQUEST_URI"
     	}
     }
-    
+
     server "noob.artnoi.com" {
     	listen on $this_server port $internal_httpd_port
-    
+
     	location "/.well-known/acme-challenge/*" {
     		block return 301 "http://artnoi.com$REQUEST_URI"
     	}
@@ -239,10 +242,10 @@ Let's start with updating our `httpd.conf(5)` virtual server blocks to listen HT
     		block return 301 "https://artnoi.com/noob$REQUEST_URI"
     	}
     }
-    
+
     server "zv.artnoi.com" {
     	listen on $this_server port $internal_httpd_port
-    
+
     	location "/.well-known/acme-challenge/*" {
     		block return 301 "http://artnoi.com$REQUEST_URI"
     	}
@@ -265,23 +268,23 @@ This will allow us to omit `tls keypair ..` in `relayd.conf(5)`. And after the w
 
     public_interface = "69.69.69.69"
     this_box = "127.0.0.1"
-    
+
     httpd_port = "8888"
-    
+
     table <httpd> { $this_box }
     table <dns_hosts> { $this_box }
-    
+
     http protocol "httpfilter" {
     	# set recommended tcp/tls options
     	tcp { nodelay, sack, socket buffer 65536, backlog 100 }
     	tls { no tlsv1.2 }
-    
+
     	# Return HTTP/HTML error pages to the client
     	return error
     	match header append "X-Forwarded-For" value "$REMOTE_ADDR"
     	match header append "X-Forwarded-By" value "$SERVER_ADDR:$SERVER_PORT"
     	match header append "Keep-Alive" value "$TIMEOUT"
-    
+
     	# See https://securityheaders.com to check and modify headers as needed below
     	match response header remove "Server"
     	match response header set "Content-Security-Policy" value "default-src 'self'; style-src 'self'; img-src 'self'; base-uri 'self'; frame-ancestors"
@@ -289,14 +292,14 @@ This will allow us to omit `tls keypair ..` in `relayd.conf(5)`. And after the w
     	match response header set "X-XSS-Protection" value "1; mode=block"
     	match response header set "X-Content-Type-Options" value "nosniff"
     	match response header set "Referrer-Policy" value "no-referrer"
-    
+
     	match response header set "Feature-Policy" value "accelerometer 'none'; camera 'none'; geolocation 'none'; gyroscope 'none'; magnetometer 'none'; microphone 'none'; payment 'none'; usb 'none'"
     	match response header set "Permissions-Policy" value "fullscreen=(), geolocation=(), microphone()"
     	match response header set "Strict-Transport-Security" value "max-age=31536000; includeSubdomains; preload"
-    
+
     	match query hash "sessid"
     	block path "/cgi-bin/index.cgi" value "*command=*"
-    
+
     	#pass request quick header "Host" value "artnoi.com" forward to <httpd>
     	#pass request quick header "Host" value "www.artnoi.com" forward to <httpd>
     	#pass request quick header "Host" value "cheat.artnoi.com" forward to <httpd>
@@ -304,34 +307,36 @@ This will allow us to omit `tls keypair ..` in `relayd.conf(5)`. And after the w
     	#pass request quick header "Host" value "zv.artnoi.com" forward to <httpd>
     	#pass request quick header "Host" value "chat.example.com" forward to <synapse>
     }
-    
+
     relay "www4secure" {
     	listen on $public_interface port 443 tls
     	protocol httpfilter
     	forward to <httpd> port $httpd_port mode loadbalance check tcp
     }
-    
+
     relay "www4" {
     	listen on $public_interface port 80
     	protocol httpfilter
     	forward to <httpd> port $httpd_port mode loadbalance check tcp
     }
-    
-With these configurations, `relayd(8)` now acts as both TLS accelerator, HTTP headers filter,  and reverse HTTP proxy for `httpd(8)`. We can replicate the backend webservers a lot of times, and all we have to do is to add newer webservers to our `relayd.conf(5)` in the table `<httpd_servers>`.
+
+With these configurations, `relayd(8)` now acts as both TLS accelerator, HTTP headers filter, and reverse HTTP proxy for `httpd(8)`. We can replicate the backend webservers a lot of times, and all we have to do is to add newer webservers to our `relayd.conf(5)` in the table `<httpd_servers>`.
 
 ## Misc.
+
 You can check validity of your configurations with `-n` flag, e.g. `httpd -n`, which will test the default `/etc/httpd.conf`. To test a specific file, you can combine `-n` with `-f`, e.g. `relayd -n -f /etc/relayd-ng.conf`.
 
 ### Wireguard VPN
+
 Since OpenBSD ships with `wg(4)`, we can basically write a `hostname.if(5)` file and create the network interface for our Wireguard connection. In this example, I'll be using `wg1`, so the configuration file is `/etc/hostname.wg1`:
 
     # /etc/hostname.wg1
-	# Interface configuration
+    # Interface configuration
     wgkey 6HTy5ej5gg2nN4rocwhinQx+XtIQ9SDa7vH3dIfTr1E=
     wgport 6969
     inet 192.168.69.1/24
     up
-    
-	# Wireguard peers
+
+    # Wireguard peers
     !ifconfig wg1 wgpeer wizxPD/5eTb0qyEx2uHtWCPDZ9EM4aLVLX4JcW4ui2k= wgendpoint 10.10.0.1 51543 wgaip 192.168.69.2/32
     !ifconfig wg1 wgpeer d4hwbjlHKlUE6kyq/4ZEKnroD6LDfetE8op6bUk6KGo= wgpsk 6ibR/T+WzbztlqdPKVs5Nbho7Q/riD3Hy1rNEKPuD+0= wgaip 192.168.69.3/32
