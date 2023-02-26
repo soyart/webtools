@@ -1,5 +1,6 @@
 Aug 3, [2019](/blog/2019/)
-# FreeBSD 12.0: EFI dual-boot with GNU/Linux 
+
+# FreeBSD 12.0: EFI dual-boot with GNU/Linux
 
 The FreeBSD installation using the live installer was easy and smooth, except the disk partition part where I decided not to create an EFI partition for FreeBSD, because I hated having 2 EFI partitions on the same disk.
 
@@ -12,12 +13,12 @@ So we will use an existing Linux system that you want to dual-boot FreeBSD with 
 Then I edited the `40_custom` file in `/etc/grub.d` to look something like:
 
      # [ /etc/grub.d/40_custom ]
-     
-	 # FreeBSD was installed without creating its own FAT32 EFI partition
-	 # The EFI boot file in this case is located on disk 0, GPT partition 4
-	 # The FreeBSD root filesystem is UFS
 
-	 menuentry "FreeBSD" --class freebsd --class bsd --class os {
+     # FreeBSD was installed without creating its own FAT32 EFI partition
+     # The EFI boot file in this case is located on disk 0, GPT partition 4
+     # The FreeBSD root filesystem is UFS
+
+     menuentry "FreeBSD" --class freebsd --class bsd --class os {
        insmod bsd
        insmod ufs2
        chainloader (hd0,gpt4)/EFI/FreeBSD/BOOTx64.efi

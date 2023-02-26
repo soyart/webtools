@@ -1,4 +1,5 @@
 # Blog posts from 2021
+
 [Video hardware acceleration on Arch Linux](/blog/2021/hwaccel/)
 
 [I got a new software development job](/blog/2021/dev/)

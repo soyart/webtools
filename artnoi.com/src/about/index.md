@@ -1,5 +1,8 @@
 # A bit about your host
-Hello, world! I'm Prem Phansuriyanon, a finance student turned self-taught programmer. I first learned Go and TypeScript, and now I'm learning Rust. I'm an aspiring system programmer, because I like to write code and [setting up my computers](os.html).
+
+Hello, world! I'm Prem Phansuriyanon, a finance student turned self-taught programmer.
+I first learned Go and TypeScript, and now I'm learning Rust. I'm an aspiring
+system programmer, because I like to write code and [setting up my computers](os.html).
 
 ## Contact
 
@@ -12,16 +15,21 @@ Hello, world! I'm Prem Phansuriyanon, a finance student turned self-taught progr
 - [gitlab.com/artnoi](https://gitlab.com/artnoi)
 
 ## Software development
+
 ### Personal projects
-I'm the author of the following Go software
 
-- file encryption utility [gfc](https://github.com/artnoi43/gfc)
+#### Go
 
-- financial market bot [fngobot](https://github.com/artnoi43/fngobot)
+- file encryption utility [gfc, 2021](https://github.com/artnoi43/gfc)
 
-- DoH/DoT stub resolver [stubborn](https://github.com/artnoi43/stubborn)
+- financial market Telegram bot [fngobot, 2021](https://github.com/artnoi43/fngobot)
+
+- DoH/DoT stub resolver [stubborn, 2022](https://github.com/artnoi43/stubborn)
+
+#### Rust
+
+- Simple trie library [soytrie, 2023](https://github.com/artnoi43/soytrie)
+
+- Web-based text sharing app [soydrop, 2023](https://github.com/artnoi43/actix-drop)
 
 and countless other useless programs on [github.com/artnoi43](https://github.com/artnoi43)
-
-### Work
-I write Go Web3 service back-end code for my company. As a result, I have quite grown familiar with CI/CD, DevOps (GitOps), container technologies, and cloud service providers, especially GCP and AWS.

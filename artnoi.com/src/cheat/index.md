@@ -31,9 +31,9 @@ However, when people use shell parameter expansion, they use non-POSIX syntax,
 i.e. `bash`-specific syntax, which is not portable.
 
 > The examples are for POSIX-compliant shell like UNIX `sh(1)` and `dash(1)`.
-If you are using `bash(1)` and don't care about portability,
-see [reference manual for `bash(1)` shell](https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html).
-You can also see `dash` man pages for POSIX parameter expansion.
+> If you are using `bash(1)` and don't care about portability,
+> see [reference manual for `bash(1)` shell](https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html).
+> You can also see `dash` man pages for POSIX parameter expansion.
 
 ### String length
 
@@ -410,11 +410,11 @@ on FreeBSD and NGINX. Now it runs [OpenBSD](https://artnoi.com/blog/2020/bsdbox/
 ## Screenshots on Sway
 
 My prefered way to do this is to use 2 separate programs to take screenshots,
-   (1) `slurp` for selecting a region, (2) `grim` for actually capturing the image:
+(1) `slurp` for selecting a region, (2) `grim` for actually capturing the image:
 
 > The man page suggests that `-o <OUTFILE>` can be used to specify output file,
-however, my experience in October 2022 was that `-o` flag does not work,
-and you can just supply the outfile name as last argument.
+> however, my experience in October 2022 was that `-o` flag does not work,
+> and you can just supply the outfile name as last argument.
 
     $ grim -g "$(slurp -d)" /tmp/scrot.png
 

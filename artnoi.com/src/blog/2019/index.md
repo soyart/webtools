@@ -1,4 +1,4 @@
-<h1>Blog posts from 2019</h1>
+# Blog posts from 2019
 
 [Installing Arch Linux on ZFS Root](/blog/2019/zfsarch/)
 

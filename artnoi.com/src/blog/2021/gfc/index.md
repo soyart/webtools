@@ -23,40 +23,40 @@ Check gfc out on [my Github](https://github.com/artnoi43/gfc) or [GitLab](https:
 ## Usage
 
     -H <bool>
-		Use hex output
-	-d <bool>
-		Use decrypt mode
-	-k <bool>
-		Use keyfile mode
-	-p <bool>
-		Print output to stdout
-	-m <string>
+    	Use hex output
+    -d <bool>
+    	Use decrypt mode
+    -k <bool>
+    	Use keyfile mode
+    -p <bool>
+    	Print output to stdout
+    -m <string>
     	AES modes (GCM or CTR) (default "GCM")
-	-f <string>
-		Keyfile file (default "files/key.key")
-	-i <string>
+    -f <string>
+    	Keyfile file (default "files/key.key")
+    -i <string>
     	Input file (default "files/plain")
-	-o <string>
+    -o <string>
     	Output file (default "/tmp/delete.me")
 
 ## How gfc works
 
-	gfc
-	├── crypt
-	│   ├── ctr.go
-	│   ├── file.go
-	│   ├── gcm.go
-	│   └── key.go
-	├── files
-	│   ├── hex
-	│   ├── key.key
-	│   ├── plain
-	│   └── zeroes
-	├── gfc.go
-	├── go.mod
-	├── go.sum
-	├── README.md
-	└── test.sh
+    gfc
+    ├── crypt
+    │   ├── ctr.go
+    │   ├── file.go
+    │   ├── gcm.go
+    │   └── key.go
+    ├── files
+    │   ├── hex
+    │   ├── key.key
+    │   ├── plain
+    │   └── zeroes
+    ├── gfc.go
+    ├── go.mod
+    ├── go.sum
+    ├── README.md
+    └── test.sh
 
 > gfc will import `gfc/crypt`
 
@@ -69,9 +69,9 @@ This shell script is used to test multiple combinations of command-line argument
 This directory stores files for testing gfc, i.e. a random file, a plaintext file, a hex file, a 256-bit random key, etc. The keyfile from the repository should be replaced with your own random key:
 
     $ cd gfc;
-	$ dd bs=1 count=32 if=/dev/random of=files/key.key;
+    $ dd bs=1 count=32 if=/dev/random of=files/key.key;
 
-gfc will *not* hash keyfiles, because I expect user's keyfile to be more random than its PBKDF2 hash.
+gfc will _not_ hash keyfiles, because I expect user's keyfile to be more random than its PBKDF2 hash.
 
 - `gfc.go`
 
@@ -96,16 +96,19 @@ This file contains code related to encryption key, e.g. reading passphrase from 
 gfc supports 2 AES stream cipher modes; GCM (default) and CTR (optional). GCM mode enables message authentication, which should prevent the encrypted files from being tampered. Both modes are stream ciphers based on counter mode of block mode of operation.
 
 ## GCM (default mode)
-In [AES256-GCM mode](https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation), the file bytes is broken *sequentially* into numbered blocks of 32 octets of bytes (256 bits).
 
-Those block *counter* (block numbers) is then combined with an initialization vector *iv*, and later encrypted with an AES *block* cipher derived from the key.
+In [AES256-GCM mode](https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation), the file bytes is broken _sequentially_ into numbered blocks of 32 octets of bytes (256 bits).
+
+Those block _counter_ (block numbers) is then combined with an initialization vector _iv_, and later encrypted with an AES _block_ cipher derived from the key.
 
 The output from last operation is then used XORed with the underlying plaintext to produce the ciphertext output for the block. That resulting ciphertext is then used to compute the message authentication tag.
 
 ## CTR
+
 Because gfc needs to pass all the bytes to `gcm.Seal()` or `gcm.Open()` to encrypt and decrypt respectively, consuming large amount of memoty. So I provided [AES256-CTR mode](https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation), which encrypts data by fixed-sized chunks in memory, although gfc's **CTR mode does not have any message authentication (e.g. HMAC) built-in**.
 
 ## So we should always use CTR for larger files?
+
 **But because I suck, the method `crypt/ctr.go` uses to read the file actually reads the whole file content** (although in chunks) into memory as read buffer before passing it to the encrypter/decrypter.
 
 Even worse, the way I wrote the write methods for gfc is that the output ciphertext or plaintext is first written to a buffer, so that I can use a reader interface on this buffer later when I encode it (which needs another buffer) to hex, and that buffer is then converted to `[]byte` before it is written to a file.
