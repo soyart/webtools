@@ -48,7 +48,7 @@ You must first setup a simple webserver on your box and obtain ACME certificates
     	}
     }
 
-Now, configure `acme-client.conf(5)` such that we can use 1 ACME certificate for all subdomains:
+Now, configure `acme-client.conf(5)` such that we can use 1 ACME *fullchain* certificate for all subdomains:
 
     # acme-client.conf
     authority letsencrypt {
@@ -59,9 +59,13 @@ Now, configure `acme-client.conf(5)` such that we can use 1 ACME certificate for
     domain artnoi.com {
     	alternative names { www.artnoi.com cheat.artnoi.com noob.artnoi.com zv.artnoi.com }
     	domain key "/etc/ssl/private/artnoi.com.key"
-    	domain full chain certificate "/etc/ssl/artnoi.com.fullchain.pem"
+    	domain full chain certificate "/etc/ssl/artnoi.com.crt"
+    	#domain certificate "/etc/ssl/artnoi.com.crt"
+    	#domain full chain certificate "/etc/ssl/artnoi.com.fullchain.pem"
     	sign with letsencrypt
     }
+
+Normally, `relayd` would look for the following keypair: `/etc/ssl/private/$name.key` and `/etc/ssl/$name.crt`. But if we did not use `domain full chain certificate` as `/etc/ssl/name.crt`, some clients like `curl` might complain that our certificate is not good enough. This is why re omitted `domain certificate`, and use `domain full chain certificate` for our `artnoi.com.crt` file.
 
 Now, start `httpd(8)` and run `acme-client(1)`:
 
