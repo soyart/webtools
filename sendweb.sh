@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# linkweb-jq.sh is a wtjq replacement for linkweb.sh.
 
 # Source jq wrapper functions
 . init-wt.sh
