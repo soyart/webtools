@@ -1,4 +1,5 @@
 May 31, [2021](/blog/2021/)
+
 # Arch Linux and USB audio
 
 > TLDR; install `pulseaudio-alsa`
