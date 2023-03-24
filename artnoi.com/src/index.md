@@ -15,7 +15,7 @@ The website is divided into 4 locations: [/blog](/blog/) blog,
 
 ## FOSS <3
 
-I'm a huge advocate of [free and open-source software](https://fsf.org).
+I'm a huge advocate of [free and open-source software](https://en.wikipedia.org/wiki/Free_software).
 
 The software used to produce and serve this website is 100% free and open source!
 (at least, the one I actually use, not including the drivers or Vultr VM code).
