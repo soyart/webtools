@@ -9,29 +9,32 @@ prog_name = os.path.basename(__file__)
 def loop_dir(dir_name, start_path):
     # Save previous CWD before chdir
     prev = os.getcwd()
-    os.chdir(dir_name)
 
-    files_here = os.listdir(".")
-    for current_file in files_here:
+    os.chdir(dir_name)
+    dir_files = os.listdir(".")
+
+    for current_file in dir_files:
         if os.path.isdir(current_file):
-            prev = f"../{current_file}"
+            prev = "../"+current_file
             loop_dir(current_file, start_path)
+
         if ".html" in current_file:
             read_and_minify(current_file)
 
-    # Try go back to prev.
-    # If there's an error, it means that we have traversed most of the subdirs already, so we should go back to .. and see if that is a start_path
+    # Try go back to parent (prev).
     try:
         os.chdir(prev)
     except FileNotFoundError:
-      # This error should happen when you are finishing processing newyear.html, assuming that this script processes everything as in the order of the tree below.
-
+        # If there's an error, it means that we have traversed most of the subdirs already, so we should go back to parent and see if that is a start_path
+        # This error should happen when you are finishing processing newyear.html, assuming that this script processes everything as in the order of the tree below.
+#
 #        dist
 #        ├── index.html
 #        ├── blog
 #        │   ├── august.html
-#        │   └── newyear.html
+#        │   └── newyear.html << here
 #        ├── porn
+#
 
         if os.path.abspath("..") != start_path:
             os.chdir("..")
@@ -68,10 +71,10 @@ def main():
       root_dir = root_dir[:path_len-1]
     
     root_full_path = os.path.abspath(root_dir)
-    before_cwd = os.path.abspath("..")
+    root_parent = os.path.abspath("..")
     
     # call loop_dir (recursive)
-    loop_dir(root_full_path, before_cwd)
+    loop_dir(root_full_path, root_parent)
 
 if __name__ == "__main__":
     sys.exit(main())
