@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import os
 import sys
@@ -7,40 +7,21 @@ import htmlmin
 prog_name = os.path.basename(__file__)
 
 def loop_dir(dir_name, start_path):
-    # Save previous CWD before chdir
-    prev = os.getcwd()
-
+    # Change cwd to dir_name
     os.chdir(dir_name)
-    dir_files = os.listdir(".")
 
+    dir_files = os.listdir(".")
     for current_file in dir_files:
-        if os.path.isdir(current_file):
-            prev = "../"+current_file
+        current_path = os.path.abspath(current_file)
+
+        if os.path.isdir(current_path):
             loop_dir(current_file, start_path)
 
         if ".html" in current_file:
-            read_and_minify(current_file)
+            read_and_minify(current_path)
 
-    # Try go back to parent (prev).
-    try:
-        os.chdir(prev)
-    except FileNotFoundError:
-        # If there's an error, it means that we have traversed most of the subdirs already, so we should go back to parent and see if that is a start_path
-        # This error should happen when you are finishing processing newyear.html, assuming that this script processes everything as in the order of the tree below.
-#
-#        dist
-#        ├── index.html
-#        ├── blog
-#        │   ├── august.html
-#        │   └── newyear.html << here
-#        ├── porn
-#
+    os.chdir("..")
 
-        if os.path.abspath("..") != start_path:
-            os.chdir("..")
-        else:
-            print("[{prog_name}] > DONE")
-            exit()
 
 def read_and_minify(html_filename):
     full_path = os.path.abspath(html_filename)
