@@ -9,16 +9,14 @@ prog_name = os.path.basename(__file__)
 def loop_dir(dir_name, start_path):
     # Change cwd to dir_name
     os.chdir(dir_name)
-
     dir_files = os.listdir(".")
-    for current_file in dir_files:
-        current_path = os.path.abspath(current_file)
 
-        if os.path.isdir(current_path):
+    for current_file in dir_files:
+        if os.path.isdir(current_file):
             loop_dir(current_file, start_path)
 
         if ".html" in current_file:
-            read_and_minify(current_path)
+            read_and_minify(current_file)
 
     os.chdir("..")
 
