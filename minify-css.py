@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# From https://stackoverflow.com/questions/222581/python-script-for-minifying-css
+# From @Borgar, https://stackoverflow.com/questions/222581/python-script-for-minifying-css
 
 import sys, re
 
@@ -25,7 +25,6 @@ css = re.sub( r'#([0-9a-f])\1([0-9a-f])\2([0-9a-f])\3(\s|;)', r'#\1\2\3\4', css 
 css = re.sub( r':\s*0(\.\d+([cm]m|e[mx]|in|p[ctx]))\s*;', r':\1;', css )
 
 for rule in re.findall( r'([^{]+){([^}]*)}', css ):
-
     # we don't need spaces around operators
     selectors = [re.sub( r'(?<=[\[\(>+=])\s+|\s+(?=[=~^$*|>+\]\)])', r'', selector.strip() ) for selector in rule[0].split( ',' )]
 

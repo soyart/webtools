@@ -9,7 +9,21 @@ static websites with ssg easier by writing a manifest config file [`manifest.jso
 > for some of its features e.g. yes-no prompt. If it is not found on your host,
 > [`netget.sh`](/netget.sh) will download missing dependencies from Github.
 
-## Usage
+## Usage overview
+
+The usual workflow for the 1st run
+
+1. You prepare your source directory and resources
+
+2. You update your site manifest(s) in [`manifest.json`](/manifest.json) to reflect your needs
+
+3. You run a webtools command to perform some task
+
+4. You push the website documents to webserver
+
+After the 1st run, you can now just do tasks 3-4 and your websites will get updated.
+
+## Structuring your website directories
 
 webtools is written to reflect my needs - managing multiple simple static sites
 with shared resources. The convention for webtools is that, each website should live
@@ -23,18 +37,6 @@ Each _website_ has 3 subdirectories under their root:
 2. `dist` is where your ssg output (HTML file tree) live
 
 3. `resc` is where you store this website exclusive resources.
-
-The usual workflow for the 1st run
-
-1. You prepare your source directory and resources
-
-2. You update your site manifest(s) in `manifest.json` to reflect your needs
-
-3. You run a webtools command to perform some task
-
-4. You push the website documents to webserver
-
-After the 1st run, you can now just do tasks 3-4 and your websites will get updated.
 
 ## Client-side components
 
@@ -206,3 +208,15 @@ And now, check your link destinations. You should see all those soft links.
 
 The other scripts are pretty straightforward. If your manifest is correct,
 you should be able to use them without problems.
+
+## Misc scripts
+
+This repo also provides other miscelleneous scripts:
+
+- [`minify-html.py`](/minify-html.py)
+
+  A simple, stupid script for minifying HTML files
+
+- [`minify-css.py`](/minify-css.py)
+
+  A shamelessly stolen Regex-based Python script for minifying CSS files
