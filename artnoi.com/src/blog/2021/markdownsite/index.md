@@ -24,10 +24,12 @@ Jul 11, [2021](/blog/2021/)
 
 สำหรับระบบปฏิบัติการแบบ Unix-like เราสามารถทำการติดตั้งและตั้งค่า permission ได้ด้วยคำสั่งพวกนี้ครับ:
 
-    $ mkdir -p bin
-    $ curl -s https://rgz.ee/bin/ssg6 > bin/ssg6
-    $ curl -s https://rgz.ee/bin/Markdown.pl > bin/Markdown.pl
-    $ chmod +x bin/ssg6 bin/Markdown.pl
+```shell
+mkdir -p bin
+curl -s https://rgz.ee/bin/ssg6 > bin/ssg6
+curl -s https://rgz.ee/bin/Markdown.pl > bin/Markdown.pl
+chmod +x bin/ssg6 bin/Markdown.pl
+```
 
 > เพื่อนๆที่ใช้ Windows สามารถดาวน์โหลด `ssg6` ได้จากเว็บผู้เขียน [rgz.ee](https://rgz.ee/bin/ssg6) ได้เลยครับ เราสามารถก็อปปี้เนื้อหาไฟล์มาวางไว้บนไฟล์บนเครื่องเราได้ครับ
 
@@ -55,7 +57,9 @@ Jul 11, [2021](/blog/2021/)
 
 เพื่อนๆเริ่มเขียน `index.md` ในโฟลเดอร์ `md-mysite` ก่อน หลังจากเขียน Markdown เสร็จ ให้ใช้คำสั่งด้านล่าง เพื่อแปลง Markdown ไปเป็น HTML ด้วย ssg6 ครับ:
 
-    $ ssg6 "md-mysite" "html-mysite" "My site" "https://mysite.com"
+```shell
+ssg6 "md-mysite" "html-mysite" "My site" "https://mysite.com"
+```
 
 > syntax ของ ssg6 คือ `ssg6 src dst title base_url` ครับ src คือโฟลเดอร์ source ส่วน dst คือโฟลเดอร์เป้าหมาย (ไฟล์ HTML ของเรานั่นเองครับ)
 
@@ -69,18 +73,21 @@ Jul 11, [2021](/blog/2021/)
 
 หลังรวมร่างแล้ว ไฟล์ HTML สุดท้าย จะมีส่วนประกอบดังนี้ครับ
 
-    _header.html (จาก md-mysite/_header.html)
-    ++++++++++++
-    index.html (จาก md-mysite/index.md)
-    ++++++++++++
-    _footer.html (จาก md-mysite/_footer.html)
+```
+_header.html (จาก md-mysite/_header.html)
+++++++++++++
+index.html (จาก md-mysite/index.md)
+++++++++++++
+_footer.html (จาก md-mysite/_footer.html)
+```
 
 หากดูภาพแล้วยังไม่เข้าใจ ลองดูตัวอย่างไฟล์ข้างล่างครับ
 
 ตัวอย่าง `_header.html`:
 
-    <!DOCTYPE html>
-    <html>
+```html
+<!DOCTYPE html>
+<html>
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="keywords" content="artnoi, Prem Phansuriyanon">
@@ -92,14 +99,18 @@ Jul 11, [2021](/blog/2021/)
     <body>
         <h1>Artnoi.com!</h1>
         <hr>
+```
 
 ตัวอย่างไฟล์ `index.md`
 
-    # Hello, world!
-    Today is a great day, isn't it boys?
+```markdown
+# Hello, world!
+Today is a great day, isn't it boys?
+```
 
 ตัวอย่าง `_footer.html`
 
+```html
     </body>
     <hr>
     <p><a href="#top">Back to top</a></p>
@@ -108,34 +119,37 @@ Jul 11, [2021](/blog/2021/)
         <p>Copyright (c) 2019 - 2021 Prem Phansuriyanon</p>
         <p>Verbatim copying and redistribution of this entire page are permitted provided this notice is preserved</p>
     </footer>
-    </html>
+</html>
+```
 
 ตัวอย่าง `index.html` ที่ `ssg6` สร้างขึ้น
 
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta name="keywords" content="artnoi, Prem Phansuriyanon">
-        <meta name="author" content="@artnoi">
-        <meta charset="UTF-8">
-        <link rel="stylesheet" type="text/css" href="/style.css">
-        <title>Artnoi.com</title>
-    </head>
-    <body>
-        <h1>Artnoi.com!</h1>
-        <hr>
-        <h1>Hello world!</h1>
-        <p>Today is a great day, isn't it boys?</p>
-    </body>
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="keywords" content="artnoi, Prem Phansuriyanon">
+    <meta name="author" content="@artnoi">
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="/style.css">
+    <title>Artnoi.com</title>
+</head>
+<body>
+    <h1>Artnoi.com!</h1>
     <hr>
-    <p><a href="#top">Back to top</a></p>
-    <hr>
-    <footer>
-        <p>Copyright (c) 2019 - 2021 Prem Phansuriyanon</p>
-        <p>Verbatim copying and redistribution of this entire page are permitted provided this notice is preserved</p>
-    </footer>
-    </html>
+    <h1>Hello world!</h1>
+    <p>Today is a great day, isn't it boys?</p>
+</body>
+<hr>
+<p><a href="#top">Back to top</a></p>
+<hr>
+<footer>
+    <p>Copyright (c) 2019 - 2021 Prem Phansuriyanon</p>
+    <p>Verbatim copying and redistribution of this entire page are permitted provided this notice is preserved</p>
+</footer>
+</html>
+```
 
 เท่านี้เว็บที่เรียบง่ายของเราก็เสร็จแล้วครับเพื่อนๆ เราสามารถก็อปโฟลเดอร์ `html-mysite` ของเราไปไว้บนเซิฟเวอร์ ที่มีซอฟต์แวร์ webserver แล้วเสริฟเว็บได้ทันทีครับ
 

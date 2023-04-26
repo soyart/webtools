@@ -36,11 +36,15 @@ OpenBSD is, to me, a perfect operating system to build simple and secure UNIX ne
 
 At the installer, select `shell` (only the original `sh` shell is available on the installer, although OpenBSD's default shell is `ksh`) to prepare the system for installation. Let's first initialize `sd0`:
 
-    # cd /dev && sh MAKEDEV sd0
+```shell
+cd /dev && sh MAKEDEV sd0;
+```
 
 and fill it with random data to randomize the whole disk:
 
-    # dd if=/dev/urandom of=/dev/disk/rsd0c bs=1M
+```shell
+dd if=/dev/urandom of=/dev/disk/rsd0c bs=1M;
+```
 
 Note that, `c` is a special partition identifier that points to whole disk. On OpenBSD, the `a` partition is always the root, `b` the swap, and `c` the whole disk.
 
@@ -50,27 +54,37 @@ Note that, `c` is a special partition identifier that points to whole disk. On O
 
 I first used `fdisk(8)` to write to the partition table:
 
-    # fdisk -iy sd0
+```shell
+fdisk -iy sd0;
+```
 
 And then used `disklabel(8)` (in interactive-editor mode) to partition the disk:
 
-    # disklabel -E sd0
+```shell
+disklabel -E sd0;
+```
 
 We can now add `a` partition on `sd0` that will occupy all (hence `*` size) available space left on `sd0`. The resulting `sd0a` will be used to house our encrypted "softraid" FS in the `disklabel` prompt:
 
-    a a
-    size: [2490031] *
-    FS type: [4.2BSD] RAID
-    sd0*> w
-    sd0> q
+```
+a a
+size: [2490031] *
+FS type: [4.2BSD] RAID
+sd0*> w
+sd0> q
+```
 
 Now that `sd0a` `disklabel` partition is created, we can now use `bioctl(8)` to configure and create RAID out of `sd0a`:
 
-    # bioctl -c C -r 8192 -l /dev/sd0a softraid0
+```shell
+bioctl -c C -r 8192 -l /dev/sd0a softraid0;
+```
 
 This should create `sd1` softraid device `softraid0`. The `bioctl(8)` option `-c C` denotes that our RAID will use `crypto` cypher instead of the traditional RAID level. We can now exit the shell so as to return to the installer:
 
-    # exit
+```shell
+exit;
+```
 
 At the installer prompt, don't forget to choose `sd1` RAID device instead of `sd0` raw disk. Now you can continue with basic OpenBSD installation.
 

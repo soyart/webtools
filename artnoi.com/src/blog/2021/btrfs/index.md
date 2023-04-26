@@ -71,19 +71,25 @@ If you have multiple root filesystems that you can boot to to convert the target
 
 Now that you have `btrfs-progs`, convert EXT4 to Btrfs with `btrfs-convert`:
 
-    # btrfs-convert <block device path>;
+```shell
+btrfs-convert <BLOCK_DEV_PATH>;
+```
 
 Test mounting the converted Btrfs filsystem and determine if the conversion went cleanly.
 
 If it went well, you can safely destroy the backup EXT2 subvolume `/ext2_saved` with `subvolume delete`:
 
-    # btrfs subvolume delete /ext2_saved;
+```shell
+btrfs subvolume delete /ext2_saved;
+```
 
 ## Booting into Btrfs root
 
 Btrfs is not supported by `fsck(8)`, so you may want to embed `btrfs` binary to perform filesystem check during boot. On Arch Linux, simply add this `BINARIES` line in `mkinitcpio.conf(5)`:
 
-    BINARIES=('/usr/bin/btrfs')
+```shell
+BINARIES=('/usr/bin/btrfs')
+```
 
 And `fsck` hook may be removed in `HOOKS` section.
 
@@ -101,43 +107,57 @@ In my experience, `zstd` works _best_; the root filesystem shrank from ~4-5GB to
 
 Mounting with `zstd` compress option:
 
-    # mount -o compress=zstd <device> <mountpoint>;
+```shell
+mount -o compress=zstd <DEVICE> <MOUNTPOINT>;
+```
 
 Note that only new files written after mounting with `compress=`_alg_ will be compressed. To compress the whole (previously uncompressed) filesystem with `zstd`, use `filesystem defragment -czstd` command:
 
-    # btrfs filesystem defragment -r -v -czstd <mountpoint>;
+```shell
+btrfs filesystem defragment -r -v -czstd <MOUNTPOINT>;
+```
 
 This should rewrites the blocks with `zstd` compression enabled.
 
 After the compression processes, we can use `compsize(8)` to view compression ratio (an equivalent `$ zfs get ratio;`):
 
-    # compsize -x <mountpoint>;
+```shell
+compsize -x <mountpoint>;
+```
 
 This is the `compsize(8)` output for my laptop Btrfs root:
 
-    # compsize -x /;
-    Processed 92883 files, 56460 regular extents (58681 refs), 55854 inline.
-    Type       Perc     Disk Usage   Uncompressed Referenced
-    TOTAL       40%      1.5G         3.8G         4.1G
-    none       100%      332M         332M         367M
-    zstd        35%      1.2G         3.5G         3.8G
-    prealloc   100%      9.9M         9.9M          10M
+```
+# compsize -x /;
+Processed 92883 files, 56460 regular extents (58681 refs), 55854 inline.
+Type       Perc     Disk Usage   Uncompressed Referenced
+TOTAL       40%      1.5G         3.8G         4.1G
+none       100%      332M         332M         367M
+zstd        35%      1.2G         3.5G         3.8G
+prealloc   100%      9.9M         9.9M          10M
+```
 
 ### fstab(5) entry for Btrfs on SSD
 
 This is my `fstab(5)` option for Btrfs root on SSD:
 
-    rw,compress=zstd,noatime,discard=async,ssd,space_cache,subvolid=5,subvol=/
+```
+rw,compress=zstd,noatime,discard=async,ssd,space_cache,subvolid=5,subvol=/
+```
 
 ## Labelling Btrfs
 
 You can rename (label) your Btrfs root with `btrfs filesystem label`:
 
-    # btrfs filesystem label <mountpoint> <newlabel>;
+```
+# btrfs filesystem label <mountpoint> <newlabel>;
+```
 
 Or, if it's unmounted:
 
-    # btrfs filesystem label <device> <newlabel>;
+```
+# btrfs filesystem label <device> <newlabel>;
+```
 
 ## Btrfs snapshots
 
@@ -145,21 +165,29 @@ In Btrfs, a snapshot is a subvolume sharing data with other subvolume using Btrf
 
 Create a Btrfs CoW snapshot with:
 
-    # btrfs subvolume snapshot <src> <dst/name>;
+```shell
+btrfs subvolume snapshot <SRC> <DST/NAME>;
+```
 
 Example: a read-only (`-r`) snapshot taken from root subvolume `/` stored at `/rootbak`:
 
-    # btrfs subvolume snapshot -r / /rootbak;
+```shell
+btrfs subvolume snapshot -r / /rootbak;
+```
 
 [Just like ZFS snapshots](/cheat/zfs/), Btrfs snapshots can be sent and received. However, **only read-only Btrfs snapshots** can be sent and received.
 
 To send a snapshot, use `send` command. For example, sending and receiving snapshots locally on the same computer:
 
-    # btrfs send /rootbak | btrfs receive /backup;
+```shell
+btrfs send /rootbak | btrfs receive /backup;
+```
 
 Also just like ZFS, Btrfs can also send incremental snapshots (with `-p` _parent_):
 
-    # btrfs send -p /rootbak /rootbak_new | btrfs receive /backup;
+```shell
+btrfs send -p /rootbak /rootbak_new | btrfs receive /backup;
+```
 
 ## Disabling Copy-on-Write
 
@@ -169,6 +197,8 @@ To disable CoW on specific files or directories, add `C` to their attributes:
 
 > Note that on Btrfs you should only perform this on empty directories. You have been warned.
 
-    # chattr +C <path>;
+```shell
+chattr +C <path>;
+```
 
 That's it frens, good luck!

@@ -39,23 +39,31 @@ Jan 30, [2021](/blog/2021/)
 
 ติดตั้ง `stubby(1)` ด้วย package manager ในตัวอย่างนี้ผมจะใช้ `pacman` ของ Arch Linux
 
-    # pacman -S stubby;
+```shell
+pacman -S stubby;
+```
 
 ตั้งค่า `stubby(1)` ที่ `/etc/stubby/stubby.yml` โดยเราสามารถแก้ไขตามที่ต้องการ [ตามที่ Arch Wiki แนะนำ](https://wiki.archlinux.org/index.php/Stubby)ได้เลยครับ ผมมักจะตั้งค่า DNSSEC และ policy ให้ strict ครับ แต่คุณเลือกได้ตามใจเลย แค่อย่าลืมแก้ไข `listen_address` ใน `stubby.yml` ให้ `stubby` ฟัง DNS requests ที่ loopback address (inet = `127.0.0.1`, inet6=`::1`) port อื่นที่ไม่ใช่ `53` นะครับ เพราะ Pi-Hole จะฟังที่พอร์ต `53` พอดีครับ **แล้วก็ต้องปิดเซอร์วิสอื่นๆที่ฟังอยู่ที่พอร์ต `53` ด้วยครับไม่งั้น Pi-Hole จะสตาร์ทไม่ติดเพราะพอร์ตไม่ว่าง**
 
 ในตัวอย่างนี้จะใช้พอร์ต `5369` สำหรับ `stubby(1)` จึงต้องแก้ฟิล์ด `listen_address` ให้เป็น:
 
-    listen_addresses:
-      - 127.0.0.1@5369
-      -  0::1@5369
+```
+listen_addresses:
+  - 127.0.0.1@5369
+  -  0::1@5369
+```
 
 อย่าลืมเว้นวรรค indent ให้ถูกต้องนะครับ ไม่งั้นไฟล์ `.yml` จะใช้งานไม่ได้ หลังจากเขียนไฟล์เสร็จ ลองเทสต์ว่าใช้ได้รึป่าวด้วยการรัย `$ stubby;` ครับ หากไม่มี error ก็ enable หรือ start `stubby.service` ได้เลยครับ:
 
-    # systemctl enable --now stubby;
+```shell
+systemctl enable --now stubby;
+```
 
 หลังจากนั้น ให้ทดสอบการเชื่อมต่อแบบ DNS-over-TLS ด้วยการ query ไปที่ listen address ของ `stubby.service` ครับ:
 
-    $ dig @localhost -p 53690 artnoi.com;
+```shell
+dig @localhost -p 53690 artnoi.com;
+```
 
 แล้วรอดูว่าได้ answer ถูกต้องไหม หากถูกต้องก็ข้ามไปสเตปต่อไปได้เลยครับ
 
@@ -63,7 +71,9 @@ Jan 30, [2021](/blog/2021/)
 
 ติดตั้ง `php(1)` และ `php-fpm(8)` และ `nginx(8)`:
 
-    # pacman -S php php-fpm nginx-mainline;
+```shell
+pacman -S php php-fpm nginx-mainline;
+```
 
 จากนั้น ให้แก้ไขไฟล์ตั้งค่า `/etc/php.ini` `/etc/nginx/nginx.conf`
 
@@ -71,15 +81,17 @@ Jan 30, [2021](/blog/2021/)
 
 ตามที่ Arch Wiki แนะนำ โดยย่อๆ คือเพิ่ม `extensions` (จำเป็น) และ `open_basedir` (ไม่ใส่ก็ได้แต่ผมใส่เพื่อความปลอดภัยครับ และถ้าคิดจะใส่แล้วก็ควรใส่ให้ครบครับ) ในไฟล์ `php.ini`
 
-    # /etc/php/php.ini
+```
+# /etc/php/php.ini
 
-    [...]
-    extension=pdo_sqlite
-    [...]
-    extension=sockets
-    extension=sqlite3
-    [...]
-    open_basedir = /srv/http/pihole:/run/pihole-ftl/pihole-FTL.port:/run/log/pihole/pihole.log:/run/log/pihole-ftl/pihole-FTL.log:/etc/pihole:/etc/hosts:/etc/hostname:/etc/dnsmasq.d/02-pihole-dhcp.conf:/etc/dnsmasq.d/03-pihole-wildcard.conf:/etc/dnsmasq.d/04-pihole-static-dhcp.conf:/var/log/lighttpd/error.log:/proc/meminfo:/proc/cpuinfo:/sys/class/thermal/thermal_zone0/temp:/tmp
+[...]
+extension=pdo_sqlite
+[...]
+extension=sockets
+extension=sqlite3
+[...]
+open_basedir = /srv/http/pihole:/run/pihole-ftl/pihole-FTL.port:/run/log/pihole/pihole.log:/run/log/pihole-ftl/pihole-FTL.log:/etc/pihole:/etc/hosts:/etc/hostname:/etc/dnsmasq.d/02-pihole-dhcp.conf:/etc/dnsmasq.d/03-pihole-wildcard.conf:/etc/dnsmasq.d/04-pihole-static-dhcp.conf:/var/log/lighttpd/error.log:/proc/meminfo:/proc/cpuinfo:/sys/class/thermal/thermal_zone0/temp:/tmp
+```
 
 > `open_basedir` จะจำกัดการเข้าถึงไฟล์ซิสเต็มของ PHP ทำให้อุ่นใจว่าจะไม่มีโปรแกรม PHP ไปอ่านหรือเขียนไฟลฺ์นอกเหนือจาก path ที่กำหนดไว้ใน `open_basedir` ครับ
 
@@ -95,19 +107,21 @@ Jan 30, [2021](/blog/2021/)
 
 แก้ไข (override) `php-fpm.service` ด้วยการเติม `ReadWritePaths` ไปในช่วง `[Service]` ซึ่งจะสัมพันธ์กับ `open_basedir` ใน `php.ini`:
 
-    [Service]
-    ReadWritePaths = /srv/http/pihole
-    ReadWritePaths = /run/pihole-ftl/pihole-FTL.port
-    ReadWritePaths = /run/log/pihole/pihole.log
-    ReadWritePaths = /run/log/pihole-ftl/pihole-FTL.log
-    ReadWritePaths = /etc/pihole
-    ReadWritePaths = /etc/hosts
-    ReadWritePaths = /etc/hostname
-    ReadWritePaths = /etc/dnsmasq.d/
-    ReadWritePaths = /proc/meminfo
-    ReadWritePaths = /proc/cpuinfo
-    ReadWritePaths = /sys/class/thermal/thermal_zone0/temp
-    ReadWritePaths = /tmp
+```
+[Service]
+ReadWritePaths = /srv/http/pihole
+ReadWritePaths = /run/pihole-ftl/pihole-FTL.port
+ReadWritePaths = /run/log/pihole/pihole.log
+ReadWritePaths = /run/log/pihole-ftl/pihole-FTL.log
+ReadWritePaths = /etc/pihole
+ReadWritePaths = /etc/hosts
+ReadWritePaths = /etc/hostname
+ReadWritePaths = /etc/dnsmasq.d/
+ReadWritePaths = /proc/meminfo
+ReadWritePaths = /proc/cpuinfo
+ReadWritePaths = /sys/class/thermal/thermal_zone0/temp
+ReadWritePaths = /tmp
+```
 
 > บน VPS จะไม่มีโฟลเดอร์ `/sys/class/thermal/*` หากติดตั้ง Pi-Hole และเว็บอินเตอรฺ์เฟซบน VPS ผมไม่แนะนำให้ใส่ `/sys/class/thermal/thermal_zone0/temp` ใน `ReadWritePaths` ครับ
 
@@ -115,8 +129,10 @@ Jan 30, [2021](/blog/2021/)
 
 หลังจากแก้ไขทุกไฟล์เรียบร้อยครบทุกไฟล์ตาม Arch Wiki แล้ว เราก็ enable เซอร์วิสต่างๆทิ้งไว้ แล้วรีบูทครับ:
 
-    # systemctl enable pihole-FTL.service nginx.service php-fpm.service;
-    # reboot;
+```shell
+systemctl enable pihole-FTL.service nginx.service php-fpm.service;
+reboot;
+```
 
 > ไม่ต้องรีบูทก็ได้นะครับ ใช้ `systemctl enable --now` แทนได้ หากไม่สามารถเริ่มเซอร์วิสได้ ให้ลองเช็ค Arch Wiki ซ้ำอีกรอบครับ ส่วนมากที่ผมพลาดจะเป็นการตั้งค่า PHP
 
@@ -124,19 +140,27 @@ Jan 30, [2021](/blog/2021/)
 
 พอบูทขึ้นมาเสร็จแล้ว ตั้งค่าพาสเวิร์ดของ admin web interface ด้วย:
 
-    $ pihole -a -p;
+```shell
+pihole -a -p;
+```
 
 แล้วตั้งค่า default DNS upstream ไปที่ listen address ของ `stubby`:
 
-    $ pihole -a setdns '127.0.0.1#53690';
+```shell
+pihole -a setdns '127.0.0.1#53690';
+```
 
 แล้วอัพเดทบล็อคลิสต์ (gravity)
 
-    $ pihole -g;
+```shell
+pihole -g;
+```
 
 แก้ `/etc/resolv.conf` บนเครื่อง Pi-Hole ของเรา ให้ใช้ localhost พอร์ต 53 สำหรับ resolve โดเมน (address สำหรับเครื่องเราเองคือ `127.0.0.1` หรือ loopback address สำหรับเครื่อง Pi-Hole เองครับ):
 
-    # echo '127.0.0.1' > /etc/resolv.conf;
+```shell
+echo '127.0.0.1' > /etc/resolv.conf;
+```
 
 หากคุณใช้ `openresolv` ผมคงไม่ต้องอธิบายว่าต้องทำยังไง ถูกไหมครับ? 5555
 
@@ -146,17 +170,23 @@ Jan 30, [2021](/blog/2021/)
 
 พอเสร็จแล้วก็ลอง query ไปที่ Pi-Hole ของเรา:
 
-    $ dig @localhost artnoi.com;
+```shell
+dig @localhost artnoi.com;
+```
 
 หรือคิวรี่ผ่าน VPN ในที่นี่ขอสมมติว่า WireGuard IP ของ Pi-Hole คือ `10.0.0.1`
 
-    $ dig @10.0.0.1 artnoi.com;
+```shell
+dig @10.0.0.1 artnoi.com;
+```
 
 โดยเราสามารถตั้งค่า WireGuard บนเครื่อง client ให้ใช้ DNS server เป็น Pi-Hole ได้ด้วยการเปลี่ยน `[Interface]: DNS = $PiHoleWGIP` เช่นในกรณีนี้ที่สมมติว่า WireGuard VPN network มี IP address เท่ากับ `10.0.0.0/24`:
 
-    [Interface]
-    PrivateKey = eNf8P2Jx8UvBYLOmK2ToaUBrLNOpaByqWcv+GeWQ/20=
-    Address = 10.0.0.2/24
-    DNS = 10.0.0.1
+```
+[Interface]
+PrivateKey = eNf8P2Jx8UvBYLOmK2ToaUBrLNOpaByqWcv+GeWQ/20=
+Address = 10.0.0.2/24
+DNS = 10.0.0.1
+```
 
 เพียงเท่านี้ ทุกครั้งที่คุณเชื่อมต่อเครือข่าย VPN ของคุณ เครื่องคุณก็จะใช้โฮสต์ 10.0.0.1 ที่มี Pi-Hole อยู่แล้ว ไว้ใช้เป็น Ad-blocking DNS sinkhole over VPN ครับ

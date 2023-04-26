@@ -1,7 +1,5 @@
 Feb 3, [2021](/blog/2021/)
 
-Dear readers, you may have noticed that recently a strange Searx link has been added the website header. Yup, that is my public Searx instance - and you can use it, or even host your own too! My Searx instance is properly set up, with `filtron` and `morty` hardening the instance.
-
 # Replace Google Search with [Searx](https://searx.me)
 
 I have never had good search results from DuckDuckGo, and after operating my own website, could not bring myself to trust DuckDuckGo, so I decided to try to host my own instance of Searx.
@@ -14,11 +12,15 @@ Searx is a privacy-centric metasearch engine used by many boomer nerds. You shou
 
 I have a spare Arch Linux VPS with [WireGuard VPN](/blog/2020/wireguard/) configured, so I figured I could use that VPS to host my private search engine. On Arch Linux, Searx is available from the [AUR](https://aur.archlinux.org) so we can simply install it with any AUR helper (in this case, `yay`, but I had moved to `paru`):
 
-    $ yay -S searx;
+```shell
+yay -S searx;
+```
 
 My Searx setup uses `UWSGI` to run its webapp instance. Edit `/etc/uwsgi/searx.ini` to configure system settings like listen ports, UID and GID, CPU count, etc. Also, edit `/etc/searx/setting.yml` to configure Searx settings. After you are done with configuration, start and enable it with:
 
-    # systemctl enable --now uwsgi@searx;
+```shell
+systemctl enable --now uwsgi@searx;
+```
 
 Now you can privately search the web by accessing your private search engine at the address, for example, `10.0.1.1:8888` (default HTTP port for UWSGI Searx is 8888). Now this should work for private networks.
 

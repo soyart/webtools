@@ -4,17 +4,23 @@
 
 Listing explicitly installed packages
 
-    $ pacman -Qqe;  # Any marked explicitly installed
-    $ pacman -Qqen; # Native only (non-AUR)
+```shell
+pacman -Qqe;  # Any marked explicitly installed
+pacman -Qqen; # Native only (non-AUR)
+```
 
 Listing explicitly installed AUR packages
 
-    $ pacman -Qqem;
+```shell
+pacman -Qqem;
+```
 
 Marking a package as explicitly installed, or as dependencies
 
-    $ pacman -D --asexplicit <package> [..packages];
-    $ pacman -D --asdeps <package> [..packages];
+```shell
+pacman -D --asexplicit <package> [..packages];
+pacman -D --asdeps <package> [..packages];
+```
 
 ## Broken Pacman
 
@@ -24,13 +30,17 @@ In this example, package `glibc` wasn't upgraded properly, so `libalpm` breaks (
 
 > Omit `-w` if you don't want interactive prompt for every file.
 
-    $ tar -xvpwf glibc-xxx.tar.zst -C / --exclude '.PKGINFO' --exclude '.INSTALL' --exclude '.MTREE' --exclude '.BUILDINFO';
+```shell
+tar -xvpwf glibc-xxx.tar.zst -C / --exclude '.PKGINFO' --exclude '.INSTALL' --exclude '.MTREE' --exclude '.BUILDINFO';
+```
 
 This will extract `glibc-xxx.zst` to root, and hopefully fixes `pacman` at runtime. If there are more breakages, you may want to repeat the process until you satisfy _all_ of `pacman`'s dependencies.
 
 You can use a healthy Arch system to see full `pacman` depedencies with:
 
-    $ pacman -Q $(pactree pacman);
+```shell
+pacman -Q $(pactree pacman);
+````
 
 After `pacman` works, remember to sync your local packages with the mirrors and upgrade regularly.
 
@@ -42,7 +52,9 @@ With a proper swap partition, `resume` value can be any type of path to the swap
 
 Now let's add `resume` hook in `mkinitcpio.conf`'s HOOKS sections. I made it run late, just before `filesystems`. And now, generate a new image:
 
-    # mkinitcpio -P;
+```shell
+mkinitcpio -P;
+```
 
 ### Kernel parameters: with swapfile
 
@@ -56,26 +68,25 @@ So if you want CoW on your root system, but also want to use swapfile on the roo
 
 > Users of other popular Linux non-CoW filesystems such as EXT4 can skip (1) and (2), and they don't need `../swapvolume/..`, they can just use `/swapfile`.
 
-    ## 1. New subv
-    #
-    # btrfs subv create /swapvolume;
+```shell
+## 1. New subv
+btrfs subv create /swapvolume;
 
-    ## 2. Disable CoW
-    #
-    # chattr +C /swapvolume;
+## 2. Disable CoW
+chattr +C /swapvolume;
 
-    ## 3. Create file and format to swap
-    #
-    # SWAPFILE='/swapvolume/swapfile';
-    #
-    # dd if=/dev/zero of="$SWAPFILE";
-    #
-    # mkswap -U clear "$SWAPFILE";
+## 3. Create file and format to swap
+SWAPFILE='/swapvolume/swapfile';
 
-    ## 4. Try swapon and, if OK, update fstab
-    # swapon "$SWAPFILE";
-    #
-    # echo "$SWAPFILE none swap defaults 0 0" >> /etc/fstab;
+dd if=/dev/zero of="$SWAPFILE";
+
+mkswap -U clear "$SWAPFILE";
+
+## 4. Try swapon and, if OK, update fstab
+swapon "$SWAPFILE";
+
+echo "$SWAPFILE none swap defaults 0 0" >> /etc/fstab;
+```
 
 Now we have a good swapfile, now let's tell our bootloader to pass the new `resume` and `resume_offset`.
 
@@ -85,38 +96,50 @@ This time, `resume` is the UUID of the device on which the filesystem with the s
 
 Getting file offset on a filesystems **other than Btrfs** can use this command to find the value for `resume_offset` of file `/swapfile`:
 
-    # filefrag -v '/swapfile';
-    Filesystem type is: fb69
-    File size of /swapfile is 4294967296 (1048576 blocks of 4096 bytes)
-     ext:     logical_offset:        physical_offset: length:   expected: flags:
-       0:        0..       0:      38912..     38912:      1:
-       1:        1..   22527:      38913..     61439:  22527:             unwritten
-       2:    22528..   53247:     899072..    929791:  30720:      61440: unwritten
+```shell
+    filefrag -v '/swapfile';
+```
 
-    In this case, the `resume_offset` is 38912.
+And this is the output of the above command:
 
-    With Btrfs, the whole thing is a mess, and `filefrag` won't help you. Instead, you'll need to grab a small C program source code off GitHub, and use it to determine your `resume_offset`:
+```
+Filesystem type is: fb69
+File size of /swapfile is 4294967296 (1048576 blocks of 4096 bytes)
+ext:     logical_offset:        physical_offset: length:   expected: flags:
+0:        0..       0:      38912..     38912:      1:
+1:        1..   22527:      38913..     61439:  22527:             unwritten
+2:    22528..   53247:     899072..    929791:  30720:      61440: unwritten
+```
 
+In this case, the `resume_offset` is 38912.
+With Btrfs, the whole thing is a mess, and `filefrag` won't help you. Instead, you'll need to grab a small C program source code off GitHub, and use it to determine your `resume_offset`:
+
+```shell
     ## You should review the source code before proceeding :)
-    # URL="https://github.com/osandov/osandov-linux/blob/master/scripts/btrfs_map_physical.c";
+    URL="https://github.com/osandov/osandov-linux/blob/master/scripts/btrfs_map_physical.c";
     #
-    # PROGNAME='btrfs_map_physical';
-    # cd /tmp;
-    # curl $URL > $PROGNAME;
-    # gcc -O2 -o "$PROGNAME" "${PROGNAME}.c";
-    # chmod +x $PROGNAME
-    # mv $PROGNAME /usr/local/sbin/;
-    # "$PROGNAME" /swapvolume/swapfile
+    PROGNAME='btrfs_map_physical';
+    cd /tmp;
+    curl $URL > $PROGNAME;
+    gcc -O2 -o "$PROGNAME" "${PROGNAME}.c";
+    chmod +x $PROGNAME
+    mv $PROGNAME /usr/local/sbin/;
+    "$PROGNAME" /swapvolume/swapfile
+```
 
-ILE OFFSET EXTENT TYPE LOGICAL SIZE LOGICAL OFFSET PHYSICAL SIZE DEVID PHYSICAL OFFSET
-0 regular 4096 2927632384 268435456 1 4009762816
-4096 prealloc 268431360 2927636480 268431360 1 4009766912
-268435456 prealloc 268435456 3251634176 268435456 1 4333764608
-536870912 prealloc 268435456 3520069632 268435456 1 4602200064
-805306368 prealloc 268435456 3788505088 268435456 1 4870635520
+The last command should produce the following output:
+
+```
+FILE OFFSET EXTENT TYPE LOGICAL SIZE LOGICAL OFFSET PHYSICAL SIZE DEVID PHYSICAL OFFSET
+0          regular  4096      2927632384 268435456 1 4009762816
+4096       prealloc 268431360 2927636480 268431360 1 4009766912
+268435456  prealloc 268435456 3251634176 268435456 1 4333764608
+536870912  prealloc 268435456 3520069632 268435456 1 4602200064
+805306368  prealloc 268435456 3788505088 268435456 1 4870635520
 1073741824 prealloc 268435456 4056940544 268435456 1 5139070976
 1342177280 prealloc 268435456 4325376000 268435456 1 5407506432
 1610612736 prealloc 268435456 4593811456 268435456 1 5675941888
+```
 
 This time, `resume_offset` boot parameter is the `PHYSICAL_OFFSET` of `FILE OFFSET 0`, which is 4009762816. After you put both kernel parameters in your bootloader entry, you're done. That should be it for resuming to swapfile.
 
@@ -142,54 +165,60 @@ We can use a basic systemd service to execute a screen locker before `suspend.ta
 
 Below is an example I copied from the Arch Wiki [slock page](https://wiki.archlinux.org/index.php/Slock) and my `swaylock@.service` for Sway (a Wayland window manager):
 
-    #/etc/systemd/system/slock@.service
-    [Unit]
-    Description=Lock X session using slock for user %i
-    Before=sleep.target
+```
+#/etc/systemd/system/slock@.service
+[Unit]
+Description=Lock X session using slock for user %i
+Before=sleep.target
 
-    [Service]
-    User=%i
-    Environment=DISPLAY=:0
-    ExecStartPre=/usr/bin/xset dpms force suspend
-    ExecStart=/usr/bin/slock
+[Service]
+User=%i
+Environment=DISPLAY=:0
+ExecStartPre=/usr/bin/xset dpms force suspend
+ExecStart=/usr/bin/slock
 
-    [Install]
-    WantedBy=sleep.target
+[Install]
+WantedBy=sleep.target
 
-    #/etc/systemd/system/swaylock@.service
-    [Unit]
-    Description=Lock X session using slock for user %i
-    Before=sleep.target
+#/etc/systemd/system/swaylock@.service
+[Unit]
+Description=Lock X session using slock for user %i
+Before=sleep.target
 
-    [Service]
-    User=%i
-    Environment=DISPLAY=:0
-    ExecStartPre=swaymsg "output * dpms off"
-    ExecStart=/usr/bin/swaylock
+[Service]
+User=%i
+Environment=DISPLAY=:0
+ExecStartPre=swaymsg "output * dpms off"
+ExecStart=/usr/bin/swaylock
 
-    [Install]
-    WantedBy=sleep.target
+[Install]
+WantedBy=sleep.target
+```
 
 And this is my own similar service, albeit with `swaylock`:
 
-    # /etc/systemd/system/swaylock@.service
-    [Unit]
-    Description=Lock X session using slock for user %i
-    Before=sleep.target
+```
+# /etc/systemd/system/swaylock@.service
+[Unit]
+Description=Lock X session using slock for user %i
+Before=sleep.target
 
-    [Service]
-    User=%i
-    Environment=DISPLAY=:0
-    ExecStartPre=swaymsg "output * dpms off"
-    ExecStart=/usr/bin/swaylock
+[Service]
+User=%i
+Environment=DISPLAY=:0
+ExecStartPre=swaymsg "output * dpms off"
+ExecStart=/usr/bin/swaylock
 
-    [Install]
-    WantedBy=sleep.target
+[Install]
+WantedBy=sleep.target
+```
 
 And enable the service(s):
 
-    # systemctl enable slock@username.service;
-    # systemctl enable swaylock@username.service;
+```shell
+systemctl enable slock@username.service;
+systemctl enable swaylock@username.service;
+```
 
 Substitute _username_ with user running the desktop.
 
@@ -203,82 +232,81 @@ It should now output 48KHz when watching videos, and 44.1KHz for CD audio.
 
 My usually installed packages. Package names prepended '#' indicate that the packages are no longer relevant **to me**, i.e. I no longer want to use them. The X and graphics section needs some revision.
 
-    $ cat pkg-list
-    # for: Arch Linux x86-64
+```
+# base+boot
+base base-devel man-db vim mkinitcpio efibootmgr
 
-    # base+boot
-    base base-devel man-db vim mkinitcpio efibootmgr
+# disks
+lvm2 dosfstools #parted #cfdisk
 
-    # disks
-    lvm2 dosfstools #parted #cfdisk
+# hardware
+crda lm_sensors smartmontools #tlp #acpi #acpid
 
-    # hardware
-    crda lm_sensors smartmontools #tlp #acpi #acpid
+# networking
+iwd stubby dnsmasq ufw wireguard-tools #wireguard-dkms
 
-    # networking
-    iwd stubby dnsmasq ufw wireguard-tools #wireguard-dkms
+# networking utils
+dnsutils openresolv nfs-utils nmap speedtest-cli #iperf3
 
-    # networking utils
-    dnsutils openresolv nfs-utils nmap speedtest-cli #iperf3
+# classics
+make git bash-completion patch mlocate rsync openssh #lsof #lshw #which #tree
 
-    # classics
-    make git bash-completion patch mlocate rsync openssh #lsof #lshw #which #tree
+# kernels
+linux-firmware linux* linux*-firmware linux*-headers
 
-    # kernels
-    linux-firmware linux* linux*-firmware linux*-headers
+# security
+gnupg #arch-audit #clamav #lynis
 
-    # security
-    gnupg #arch-audit #clamav #lynis
+# basic X (gui)
+xorg-server xorg-xinit xorg-xrdb xorg-xsetroot
 
-    # basic X (gui)
-    xorg-server xorg-xinit xorg-xrdb xorg-xsetroot
+# OpenGL # see below for compatible driver packages
+mesa
 
-    # OpenGL # see below for compatible driver packages
-    mesa
+# OpenGL X drivers (AMDGPU)
+xf86-video-amdgpu mesa-driver
+# OpenGL X drivers (Intel iGPU)
+xf86-video-intel
+# OpenGL X drivers (Nvidia)
+xf86-video-nouveau #nvidia #nvidia-utils
 
-    # OpenGL X drivers (AMDGPU)
-    xf86-video-amdgpu mesa-driver
-    # OpenGL X drivers (Intel iGPU)
-    xf86-video-intel
-    # OpenGL X drivers (Nvidia)
-    xf86-video-nouveau #nvidia #nvidia-utils
+# VA/VDPAU
+libvdpau libva-libvdpau-driver libvdpau-va-gl
 
-    # VA/VDPAU
-    libvdpau libva-libvdpau-driver libvdpau-va-gl
+# AMDGPU VA/VDPAU
+libva-mesa-driver libvdpau mesa-vdpau
+# Intel iGPU VA/VDPAU
+libva-intel-driver #intel-media-driver
+# Nvidia VA/VDPAU
+libva-mesa-driver nvidia-utils
 
-    # AMDGPU VA/VDPAU
-    libva-mesa-driver libvdpau mesa-vdpau
-    # Intel iGPU VA/VDPAU
-    libva-intel-driver #intel-media-driver
-    # Nvidia VA/VDPAU
-    libva-mesa-driver nvidia-utils
+# basic X WMs and menu bar
+bspwm sxhkd tint2 #openbox
 
-    # basic X WMs and menu bar
-    bspwm sxhkd tint2 #openbox
+# X applets
+xfce4-power-manager volumeicon pavucontrol pulseaudio-alsa
 
-    # X applets
-    xfce4-power-manager volumeicon pavucontrol pulseaudio-alsa
+# NetworkManager (deprecated - use iwd instead)
+#NetworkManager #networkmanager-applet
 
-    # NetworkManager (deprecated - use iwd instead)
-    #NetworkManager #networkmanager-applet
+# X utils
+dmenu alacritty slock
 
-    # X utils
-    dmenu alacritty slock
+# X fonts
+ttf-dejavu ttf-liberation ttf-inconsolata
 
-    # X fonts
-    ttf-dejavu ttf-liberation ttf-inconsolata
+# post-install
+pkgconf newsboat scrot stress w3m syncthing bc #calc
 
-    # post-install
-    pkgconf newsboat scrot stress w3m syncthing bc #calc
+# post-install (essential desktop apps)
+firefox mpv sxiv mupdf #vlc
 
-    # post-install (essential desktop apps)
-    firefox mpv sxiv mupdf #vlc
+# ios
+libimobiledevice #ifuse
 
-    # ios
-    libimobiledevice #ifuse
-
-    # aur
-    ttf-sipa-dip gotop #htop-temperature #ttf-th-sarabun-new
+# aur
+ttf-sipa-dip gotop #htop-temperature #ttf-th-sarabun-new
+```
 
 ## DNS-over-TLS and DNSSEC
 
@@ -294,40 +322,36 @@ I use `stubby` as a DNS-over-TLS stub resolver (listens on 127.0.0.1 port 53535)
 
 First, let's configure `stubby` to **listen on port `53535`** and **enable DNSSEC**:
 
-    # /etc/stubby/stubby.yml
-    #
-    #
+```yaml
+# /etc/stubby/stubby.yml
 
-    listen_addresses:
-      - 127.0.0.1@53535
-      - 0::1@53535
+listen_addresses:
+    - 127.0.0.1@53535
+    - 0::1@53535
 
-    #
-    #
-
-    dnssec: GETDNS_EXTENSION_TRUE
-
-    #
-    #
+dnssec: GETDNS_EXTENSION_TRUE
+```
 
 ### `dnsmasq` configuration
 
 Then, let's configure `dnsmasq` to use `stubby` as the stub resolver:
 
-    # /etc/dnsmasq.conf
+```
+# /etc/dnsmasq.conf
 
-    no-resolv
-    #proxy-dnssec
-    listen-address=::1,127.0.0.1
+no-resolv
+#proxy-dnssec
+listen-address=::1,127.0.0.1
 
-    # stubby listen address (localhost:53535)
-    server=127.0.0.1#53535
+# stubby listen address (localhost:53535)
+server=127.0.0.1#53535
 
-    # other servers
-    server=10.8.0.2
-    server=10.8.0.69
+# other servers
+server=10.8.0.2
+server=10.8.0.69
 
-    all-servers
+all-servers
+```
 
 ### Using NetworkManager+dnsmasq with stubby on Arch Linux
 
@@ -335,26 +359,34 @@ As a _laptop_ NetworkManager Arch user, I found that `stubby+dnsmasq` solution d
 
 To have NetworkManager manage `dnsmasq`, edit the following files in `/etc/NetworkManager`:
 
-    # /etc/NetworkManager/conf.d/dns.conf
-    [main]
-    dns=dnsmasq
+```
+# /etc/NetworkManager/conf.d/dns.conf
+[main]
+dns=dnsmasq
+```
 
-    # /etc/NetworkManager/dnsmasq.d/dnsmasq-stubby.conf
-    no-resolv
-    all-servers
-    #proxy-dnssec
-    server=10.9.0.2
-    server=10.9.0.1
-    server=127.0.0.1#5300
-    listen-address=::1,127.0.0.1
+```
+# /etc/NetworkManager/dnsmasq.d/dnsmasq-stubby.conf
+no-resolv
+all-servers
+#proxy-dnssec
+server=10.9.0.2
+server=10.9.0.1
+server=127.0.0.1#5300
+listen-address=::1,127.0.0.1
+```
 
 Now test `dnsmasq` config file(s) with:
 
-    $ dnsmasq --test --conf-file=/dev/null --conf-dir=/etc/NetworkManager/dnsmasq.d;
+```shell
+dnsmasq --test --conf-file=/dev/null --conf-dir=/etc/NetworkManager/dnsmasq.d;
+```
 
 If it is OK, we are safe to start the services:
 
-    # nmcli general reload;
-    # systemctl enable stubby --now;
+```shell
+nmcli general reload;
+systemctl enable stubby --now;
+```
 
 Enjoy!

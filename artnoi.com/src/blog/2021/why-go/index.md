@@ -34,31 +34,41 @@ When using a switch case, I almost always `break`. So it is nice that I don't ha
 
 We read code more than we write it - that's just a fact. And the fact that Go reads very easily and features limited syntactic sugar has helped me read Go. Compared to JavaScript, Go syntax is much cleaner and less confusing. In Go, you can declare a function like:
 
-    func sum(a int, b int) int {
-        return a + b
-    }
+```go
+func sum(a int, b int) int {
+    return a + b
+}
+```
 
 Or
 
-    var sum = func(a int, b int) int {
-        return a + b
-    }
+```go
+var sum = func(a int, b int) int {
+    return a + b
+}
+```
 
 These 2 ways are similar enough not to cause any confusion, and the function signature also give us just enough information about the function. Compare this to JavaScript, where you can write a function in many ways, for example:
 
-    function sum(a, b) {
-        return a + b;
-    }
+```js
+function sum(a, b) {
+    return a + b;
+}
+```
 
 Or
 
-    const sum = (a, b) => {
-        return a + b;
-    }
+```js
+const sum = (a, b) => {
+    return a + b;
+}
+```
 
 Or
 
-    const sum = (a, b) => a + b
+```js
+const sum = (a, b) => a + b
+```
 
 Because there are many ways to write the same function, different developers will use different styles - **and that makes it a little bit more difficult to read other people's JavaScript code**. This is why I prefer Go's syntax - because it has minimum syntactic sugar.
 
@@ -68,27 +78,34 @@ Because there are many ways to write the same function, different developers wil
 
 Go is notorious for its poor error handling. Most of my error handling in Go goes like this:
 
-    result, err := someFunc(someInput) {
-        panic(err)
-    }
+```go
+result, err := someFunc(someInput) {
+    panic(err)
+}
+```
 
 Yes, you can return the error to propagate the error with something like:
 
-    result, err := sumFunc(someInput)
-    if err != nil {
-        return err
-    }
+```go
+result, err := sumFunc(someInput)
+if err != nil {
+    return err
+}
+```
 
 But this is nothing like JavaScript, where you can do things like:
 
-    try {
-        doSomething();
-        doSomethingAgain();
-        doSomethangAgain();
-    } catch (err) {
-        // Do your error handling here
-        console.error(err);
-    };
+```js
+try {
+    doSomething();
+    doSomethingAgain();
+    doSomethangAgain();
+
+} catch (err) {
+    // Do your error handling here
+    console.error(err);
+};
+```
 
 ### Compiler not as informative vs Rust's
 

@@ -42,34 +42,38 @@ So I have to use NGINX as my internet-facing reverse proxy for now, though I sti
 
 This configuration is for serving simple HTTP website on non-standard port 8080
 
-    ## GLOBAL configuration
+```
+## GLOBAL configuration
 
-    httpd_ip = "127.0.0.1"
+httpd_ip = "127.0.0.1"
 
-    # Content types
-    types {
+# Content types
+types {
 
-      # uncomment 'include' line below to use all types
-      # include "/usr/share/misc/mime.types"
-      application/pdf pdf
-      image/png       png
-      image/svg+xml   svg ico
-      text/css        css
-      text/html       html htm
-      text/plain      txt
+  # uncomment 'include' line below to use all types
+  # include "/usr/share/misc/mime.types"
+  application/pdf pdf
+  image/png       png
+  image/svg+xml   svg ico
+  text/css        css
+  text/html       html htm
+  text/plain      txt
 
-    }
+}
 
-    ## Virtual servers
-    server "artnoi.com" {
-      alias "www.artnoi.com"
-      listen on $httpd_ip port 8080
-      root "/htdocs/html-artnoi.com"
-    }
+## Virtual servers
+server "artnoi.com" {
+  alias "www.artnoi.com"
+  listen on $httpd_ip port 8080
+  root "/htdocs/html-artnoi.com"
+}
+```
 
 Check `httpd(8)` configuration `/etc/httpd.conf` with:
 
-    # httpd -n -f /etc/httpd.conf;
+```shell
+httpd -n -f /etc/httpd.conf;
+```
 
 If you want to run `httpd(8)` as daemon, configure `rc(8)`.
 
@@ -83,18 +87,20 @@ services/webserver/ssl) on how to do this. In short, you first set up `httpd(8)`
 
 We will be using _production_ server here
 
-    authority letsencrypt {
-      api url "https://acme-v02.api.letsencrypt.org/directory"
-      account key "/etc/acme/letsencrypt-privkey.pem"
-    }
+```
+authority letsencrypt {
+  api url "https://acme-v02.api.letsencrypt.org/directory"
+  account key "/etc/acme/letsencrypt-privkey.pem"
+}
 
-    domain artnoi.com {
-      alternative names { www.artnoi.com }
-      domain key "/etc/ssl/private/artnoi.com.key"
-      domain certificate "/etc/ssl/artnoi.com.crt"
-      domain full chain certificate "/etc/ssl/artnoi.com.fullchain.pem"
-      sign with letsencrypt
-    }
+domain artnoi.com {
+  alternative names { www.artnoi.com }
+  domain key "/etc/ssl/private/artnoi.com.key"
+  domain certificate "/etc/ssl/artnoi.com.crt"
+  domain full chain certificate "/etc/ssl/artnoi.com.fullchain.pem"
+  sign with letsencrypt
+}
+```
 
 ### Configuring httpd(8) for ACME challenges
 
@@ -102,17 +108,19 @@ Now, configure `httpd(8)` to properly handle ACME challenge connection when we l
 
 > Only `server` directive (block) is shown
 
-    server "artnoi.com" {
-      alias "www.artnoi.com"
-      listen on $httpd_ip port 80
-      root "/htdocs/html-artnoi.com"
+```
+server "artnoi.com" {
+  alias "www.artnoi.com"
+  listen on $httpd_ip port 80
+  root "/htdocs/html-artnoi.com"
 
-      # acme challenge
-      location "/.well-known/acme-challenge/$ext_if" {
-        root "/acme"
-        request strip 2
-      }
-    }
+  # acme challenge
+  location "/.well-known/acme-challenge/$ext_if" {
+    root "/acme"
+    request strip 2
+  }
+}
+```
 
 ### Obtaining Let's Encrypt Certificate
 
@@ -130,32 +138,34 @@ We now need 2 servers in `httpd.conf(5)`, first is the main server listening on 
 
 > Only `server` directives (blocks) are shown, and note the `tls` option on HTTPS `listen` line.
 
-    server "artnoi.com" {
-      alias "www.artnoi.com"
-      listen on $httpd_ip tls port 443
+```
+server "artnoi.com" {
+  alias "www.artnoi.com"
+  listen on $httpd_ip tls port 443
 
-      tls {
-        certificate "/etc/ssl/artnoi.com.fullchain.pem"
-        key "/etc/ssl/private/artnoi.com.key"
-      }
+  tls {
+    certificate "/etc/ssl/artnoi.com.fullchain.pem"
+    key "/etc/ssl/private/artnoi.com.key"
+  }
 
-root "/htdocs/html-artnoi.com"
+  root "/htdocs/html-artnoi.com"
 
-      # acme challenge
-      location "/.well-known/acme-challenge/$ext_if" {
-        root "/acme"
-        request strip 2
-      }
+  # acme challenge
+  location "/.well-known/acme-challenge/$ext_if" {
+    root "/acme"
+    request strip 2
+  }
 
-    }
+}
 
-    server "artnoi.com" {
-      alias "www.artnoi.com"
-      listen on $httpd_ip port 80
+server "artnoi.com" {
+  alias "www.artnoi.com"
+  listen on $httpd_ip port 80
 
-      # redirect to https
-      block return 301 "https://artnoi.com$REQUEST_URI"
-    }
+  # redirect to https
+  block return 301 "https://artnoi.com$REQUEST_URI"
+}
+```
 
 Right now, httpd(8) should spawn 2 virtual servers, one on port 443 for HTTPS, and one on port 80 for HTTP. The one on port 80 will actually redirect to HTTPS port 443, if the request location is not `.well-known`, which is challenged by ACME certificate servers.
 

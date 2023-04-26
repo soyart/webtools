@@ -20,43 +20,59 @@ When LVM and LUKS are used together, the device mapper framework is able to prov
 
 Create a LUKS device:
 
-    # cryptsetup luksFormat <device>;
-    # cryptsetup luksFormat /dev/sdXY;
+```shell
+cryptsetup luksFormat <DEVICE>;
+cryptsetup luksFormat /dev/sdXY;
+```
 
 Opening a LUKS device
 
-    # cryptsetup luksOpen <device> <device mapper name>;
-    # cryptsetup luksOpen /dev/sdXY myluks;
+```shell
+cryptsetup luksOpen <DEVICE> <DEVICE MAPPER NAME>;
+cryptsetup luksOpen /dev/sdXY myluks;
+```
 
 Closing a LUKS device
 
-    # cryptsetup luksClose <device mapper name>;
-    # cryptsetup luksClose myluks;
+```shell
+cryptsetup luksClose <DEVICE MAPPER NAME>;
+cryptsetup luksClose myluks;
+```
 
 Dump LUKS information (e.g. key slots):
 
-    # cryptsetup luksDump <device>;
-    # cryptsetup luksDump /dev/sdXY;
+```shell
+cryptsetup luksDump <DEVICE>;
+cryptsetup luksDump /dev/sdXY;
+```
 
 Backup LUKS header to a file:
 
-    # cryptsetup luksHeaderBackup <device> --header-backup-file <header file>;
-    # cryptsetup luksHeaderBackup /dev/sdXY --header-backup-file sdXY.header;
+```shell
+cryptsetup luksHeaderBackup <DEVICE> --header-backup-file <HEADER FILE>;
+cryptsetup luksHeaderBackup /dev/sdXY --header-backup-file sdXY.header;
+```
 
 Restore LUKS header:
 
-    # cryptsetup luksHeaderRestore <device> --header-backup-file <header file>;
-    # cryptsetup luksHeaderRestore /dev/sdXY --header-backup-file sdXY.header;
+```shell
+cryptsetup luksHeaderRestore <DEVICE> --header-backup-file <HEADER FILE>;
+cryptsetup luksHeaderRestore /dev/sdXY --header-backup-file sdXY.header;
+```
 
 Adding LUKS key:
 
-    # cryptsetup luksAddKey <device>;
-    # cryptsetup luksAddKey /dev/sdXY;
+```shell
+cryptsetup luksAddKey <DEVICE>;
+cryptsetup luksAddKey /dev/sdXY;
+```
 
 Removing LUKS key (in this example, slot 12):
 
-    # cryptsetup luksKillSlot <device> <key slot>;
-    # cryptsetup luksKillSlot /dev/sdXY 12;
+```shell
+cryptsetup luksKillSlot <DEVICE> <KEY SLOT>;
+cryptsetup luksKillSlot /dev/sdXY 12;
+```
 
 <a name="install"></a>
 
@@ -68,39 +84,53 @@ Removing LUKS key (in this example, slot 12):
 
 First, we create physical partitions with `fdisk`. You can use any partition editing tools you like though. We will use `sda` in this example, and `sda1` will be for our EFI System Partition, and `sda2` for LVM:
 
-    # fdisk /dev/sdX;
+```shell
+fdisk /dev/sdX;
+```
 
 Create unencrypted `FAT32` for EFI (will be mounted at `/boot`):
 
-    # mkfs.vfat -F32 -L "BOOT" /dev/sda1
+```shell
+mkfs.vfat -F32 -L "BOOT" /dev/sda1
+```
 
 Create _physical volume_ for LVM. We will later assign a volume group to this physical volume:
 
-    # pvcreate /dev/sda2;
+```shell
+pvcreate /dev/sda2;
+```
 
 Assign _volume group_ to our physical volume:
 
-    # vgcreate mylvm /dev/sda2;
+```shell
+vgcreate mylvm /dev/sda2;
+```
 
 Create _logical volumes_:
 
-    # lvcreate -C y -L 16G -n cryptswap mylvm;
-    # lvcreate -l 100%FREE -n cryptroot mylvm;
+```shell
+lvcreate -C y -L 16G -n cryptswap mylvm;
+lvcreate -l 100%FREE -n cryptroot mylvm;
+```
 
 Encrypt the other partition, and then open it in `/dev/mapper`:
 
-    # cryptsetup luksFormat /dev/mylvm/cryptroot;
-    # cryptsetup luksFormat /dev/mylvm/cryptswap;
+```shell
+cryptsetup luksFormat /dev/mylvm/cryptroot;
+cryptsetup luksFormat /dev/mylvm/cryptswap;
 
-    # cryptsetup luksOpen /dev/mylvm/cryptroot root;
-    # cryptsetup luksOpen /dev/mylvm/cryptswap swap;
+cryptsetup luksOpen /dev/mylvm/cryptroot root;
+cryptsetup luksOpen /dev/mylvm/cryptswap swap;
+```
 
 Now we should have our decrypted partition listed at `/dev/mapper/root` and `/dev/mapper/swap`.
 
 Create filesystem(s) (`mkfs`, `mkswap`):
 
-    # mkfs.btrfs -L "ROOT" /dev/mapper/root;
-    # mkswap -L "SWAP" /dev/mapper/swap;
+```shell
+mkfs.btrfs -L "ROOT" /dev/mapper/root;
+mkswap -L "SWAP" /dev/mapper/swap;
+```
 
 ### Installing Linux
 
@@ -114,11 +144,15 @@ Unless my system fails to boot, I don't follow the guides. I simply encrypt a pa
 
 Configure `/boot` accordingly. We will be using `sd-encrypt` (systemd) for Arch Linux:
 
-    HOOKS=(base systemd autodetect keyboard sd-vconsole modconf block sd-encrypt lvm2 filesystems resume fsck)
+```shell
+HOOKS=(base systemd autodetect keyboard sd-vconsole modconf block sd-encrypt lvm2 filesystems resume fsck)
+```
 
 and regenerate the image(s):
 
-    # mkinitcpio -P;
+```shell
+mkinitcpio -P;
+```
 
 Note that you can remove `lvm2` hook in `mkinitcpio.conf` if you only use LUKS, i.e. you don't use any LVM logical volumes. Alternatively, be sure to install `lvm2` package, and add `lvm2` hook in `mkinitcpio`, if you wish to install your root filesystem on logical volumes.
 
@@ -130,52 +164,64 @@ Also, `rd.luks.options=discard` is used in the examples. Read [this Arch Wiki fo
 
 Example 1: LUKS-on-LVM:
 
-    options	loglevel=3
-    options	rd.luks.options=discard
-    options rd.luks.name=<Root LVM UUID>=cryptroot
-    options rd.luks.name=<Swap LVM UUID>=cryptswap
-    options	root=/dev/mapper/cryptroot ro
-    options	resume=/dev/mapper/cryptswap
+```
+options	loglevel=3
+options	rd.luks.options=discard
+options rd.luks.name=<Root LVM UUID>=cryptroot
+options rd.luks.name=<Swap LVM UUID>=cryptswap
+options	root=/dev/mapper/cryptroot ro
+options	resume=/dev/mapper/cryptswap
+```
 
 Example 2: LVM-on-LUKS - in this example, the LVM volumes `root` and `swap` is within LVM volume group `cryptlvm`:
 
-    options loglevel=3
-    options rd.luks.options=discard
-    options rd.luks.name=<PART UUID>=cryptlvm
-    options root=/dev/mapper/cryptlvm-root ro
-    options resume=/dev/mapper/cryptlvm-swap
+```
+options loglevel=3
+options rd.luks.options=discard
+options rd.luks.name=<PART UUID>=cryptlvm
+options root=/dev/mapper/cryptlvm-root ro
+options resume=/dev/mapper/cryptlvm-swap
+```
 
 Let's say from Example 2, the LVM UUID is `dddddd` (d is for disk not dick), and we want to [put the keyfile](https://wiki.archlinux.org/index.php/Dm-crypt/System_configuration#rd.luks.key) to a flashdrive whose UUID is `ffffff` (f is for flash not fuck), then the kernel parameter should be:
 
-    options loglevel=3
-    options rd.luks.options=discard
-    options rd.luks.name=dddddd=cryptlvm
-    options rd.luks.key=dddddd=<Path to key file>:UUID=fffffff
-    options root=/dev/mapper/cryptlvm-root ro
-    options resume=/dev/mapper/cryptlvm-swap
+```
+options loglevel=3
+options rd.luks.options=discard
+options rd.luks.name=dddddd=cryptlvm
+options rd.luks.key=dddddd=<Path to key file>:UUID=fffffff
+options root=/dev/mapper/cryptlvm-root ro
+options resume=/dev/mapper/cryptlvm-swap
 
-    # Fallback to password if keyfile not found
-    #options rd.luks.options=dddddd=keyfile-timeout=10s
+# Fallback to password if keyfile not found
+#options rd.luks.options=dddddd=keyfile-timeout=10s
+```
 
 One important note is that if you choose to have a keyfile on other device, it must be of the same filesystem type as your root filesystem (e.g. EXT4) otherwise you will have to [include the kernel module for it in the initramfs](https://wiki.archlinux.org/index.php/Mkinitcpio#MODULES).
 
 Example 3: Install on LUKS - in this example, the LUKS device has its own raw partition:
 
-    options loglevel=3
-    options rd.luks.options=discard
-    options rd.luks.name=<PART UUID>=cryptroot
-    options rd.luks.name=<PART UUID>=cryptswap
-    options root=/dev/mapper/cryptroot ro
-    options resume=/dev/mapper/cryptswap
+```
+options loglevel=3
+options rd.luks.options=discard
+options rd.luks.name=<PART UUID>=cryptroot
+options rd.luks.name=<PART UUID>=cryptswap
+options root=/dev/mapper/cryptroot ro
+options resume=/dev/mapper/cryptswap
+```
 
 or if you use `grub` ( in `/etc/default/grub`):
 
-    GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3 rd.luks.options=discard rd.luks.name=UUID=cryptlvm \
+```
+GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3 rd.luks.options=discard rd.luks.name=UUID=cryptlvm \
     root=/dev/mapper/arch-root resume=/dev/mapper/arch-swap"
+```
 
 If you use `grub`, **create `grub.cfg` configuration file afterwards with new parameters**, or you will boot to default `grub` loader that doesn't know how to handle your encrypted root fs:
 
-    # grub-mkconfig -o /boot/grub/grub.cfg;
+```shell
+grub-mkconfig -o /boot/grub/grub.cfg;
+```
 
 ## Fedora 32 `fstab`
 
@@ -185,14 +231,20 @@ If your Fedora 32 root option is LUKS-on-LVM option, then the volumes get unlock
 
 Stopping LVM volume group:
 
-    # vgchange -a n ${your_vg_name};
+```shell
+vgchange -a n ${your_vg_name};
+```
 
 You can switch it back on again using:
 
-    # vgchange -a y ${your_vg_name};
+```shell
+vgchange -a y ${your_vg_name};
+```
 
 After switching off the volume group, you can close LUKS device with:
 
-    # cryptsetup luksClose ${your_LVM_name};
+```shell
+cryptsetup luksClose ${your_LVM_name};
+```
 
 Enjoy!
