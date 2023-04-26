@@ -10,7 +10,7 @@ system programmer, because I like to write code and [setting up my computers](os
 
 - [twitter.com/artnoi](https://twitter.com/artnoi)
 
-- [github.com/artnoi](https://github.com/artnoi43)
+- [github.com/artnoi43](https://github.com/artnoi43)
 
 - [gitlab.com/artnoi](https://gitlab.com/artnoi)
 
