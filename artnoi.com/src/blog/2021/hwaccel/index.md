@@ -14,7 +14,9 @@ As always, you should not trust me. Instead, read the [Arch Wiki](https://wiki.a
 
 Your installation might actually have everything properly set up without manual intervention, which is usually the case with Intel graphics. To verify that hardware acceleration is working, run `mpv` with `--hwdec` flag:
 
-    $ mpv --hwdec=auto <FILE>;
+```shell
+mpv --hwdec=auto <FILE>;
+```
 
 ## OpenGL implementation
 
@@ -34,13 +36,17 @@ Install packages `libvdpau`
 
 Add this option to your kernel parameter:
 
-    nvidia-drm.modeset=1
+```
+nvidia-drm.modeset=1
+```
 
 ### Update your initramfs (`/etc/mkinitcpio.conf`)
 
 Add the following modules to hook `MODULE`:
 
-    MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm)
+```shell
+MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm)
+```
 
 ## AMD graphics
 
@@ -72,7 +78,9 @@ Install package `libva-vdpau-driver`
 
 Add the following modules to hook `MODULE`:
 
+```shell
     MODULES=(amdgpu radeon)
+```
 
 IIRC, these kernel modules are already in the default kernel. For more info on AMDGPU, see [this wiki page](https://wiki.archlinux.org/title/AMDGPU#Video_acceleration)
 

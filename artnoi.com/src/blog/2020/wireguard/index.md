@@ -16,8 +16,10 @@ OpenBSD is [my webserver operating system](/blog/2020/bsdbox/) - **it comes comp
 
 Note: WireGuard servers which act as VPN routers must have IP routing enabled, if you are only using Wireguard to connect peers, then you can skip this step:
 
-    # touch /etc/sysctl.conf
-    # echo 'net.inet.ip.forwarding=1' >> /etc/sysctl.conf
+```shell
+touch /etc/sysctl.conf
+echo 'net.inet.ip.forwarding=1' >> /etc/sysctl.conf
+```
 
 This should make the configuration persistent on next boots.
 
@@ -29,23 +31,27 @@ I upgraded to 6.8 a few days ago, and promptly removed `wireguard-go` and `wireg
 
 In this example, **we will NOT use any WireGuard packages, so `wg genkey`, `wg pubkey`, etc. must be done on other machines**. The example will use 10.9.0.0/24 network. The `hostname.wg0` interface configuration ([see `hostname.if(5)`](https://man.openbsd.org/hostname.if.5)) file for OpenBSD 6.8 should look like this:
 
-    # /etc/hostname.wg0
+```
+# /etc/hostname.wg0
 
-    # Interface configuration
-    wgkey yourPrivateKey=
-    wgport yourListenPort
-    inet 10.9.0.1/24
-    up
+# Interface configuration
+wgkey yourPrivateKey=
+wgport yourListenPort
+inet 10.9.0.1/24
+up
 
-    # Adding WireGuard peers
-    !ifconfig wg0 wgpeer dfjsldkfldsk=  wgendpoint example.com 11210 wgaip 10.9.0.2/32
-    !ifconfig wg0 wgpeer adfjdksjdsdf=  wgaip 10.9.0.3/32 # this peer doesn't have endpoint
+# Adding WireGuard peers
+!ifconfig wg0 wgpeer dfjsldkfldsk=  wgendpoint example.com 11210 wgaip 10.9.0.2/32
+!ifconfig wg0 wgpeer adfjdksjdsdf=  wgaip 10.9.0.3/32 # this peer doesn't have endpoint
+```
 
 **Note that `wgpeer` values are the peer public keys**. For the lines starting with `!`, [`netstart(8)`](https://man.openbsd.org/netstart) will run the command after the `!`. See the man pages for `wg(4)`.
 
 After you are done with `hostname.wg0` file, try bringing up the interface with
 
-    # sh /etc/netstart wg0;
+```shell
+sh /etc/netstart wg0;
+```
 
 After editting the file, reboot, and at the next boot we can check the `wg0` interface by using `ifconfig(8)`: `# ifconfig -A`. If `ifconfig -A` is not run as root, you will not see the public keys. OpenBSD with WireGuard included in the kernel is surely a bless for me.
 
@@ -55,8 +61,10 @@ The VPS I use to run this website is on OpenBSD ([originally 6.7](/blog/2020/bsd
 
 With the packages, we can generate our keys locally:
 
-    # wg genkey | tee foo.key | wg pubkey > foo.pub
-    # wg genpsk > foo.psk
+```shell
+wg genkey | tee foo.key | wg pubkey > foo.pub;
+wg genpsk > foo.psk;
+```
 
 To configure the VPN interface on OpenBSD 6.7 where WireGuard is not yet available in the kernel, we will have to write both [`hostname.tunX` (`hostname.if(5)`)](https://man.openbsd.org/hostname.if.5) file to configure the [`tun(4)`](https://man.openbsd.org/tun.4) interface as well as a WireGuard configuration file (i.e. the file in `/etc/wireguard`), and also `rc.conf.local(8)` to start the `wireguard_go` service. [This is the guide by Jasper (the porter)](https://jasper.la/posts/wireguard-on-openbsd/) to WireGuard I followed when I was running 6.7. I personally prefer OpenBSD 6.8's approach to WireGuard which is much simpler.
 
@@ -68,49 +76,59 @@ It took me a few hours until I could figure out the filter rules for WireGuard (
 
 My goal is to have a firewall that silently drops all non-WireGuard packets other than the ones I explicitly allow. I first determine which interfaces would be skipped by `pf(4)` in `pf.conf(5)`:
 
-    # /etc/pf.conf
-    wgif = "{ wg0, wg1 }" # maybe 'tunX' on OpenBSD pre-6.8
-    skif = "{ lo0, $wgif }"
+```
+# /etc/pf.conf
+wgif = "{ wg0, wg1 }" # maybe 'tunX' on OpenBSD pre-6.8
+skif = "{ lo0, $wgif }"
 
-    # skip packet filtering on these
-    set skip on $skif
+# skip packet filtering on these
+set skip on $skif
+```
 
 Then I set the default block policy to `drop`, and enter my first two rules `block all`, and `block in quick urpf-failed`. This should set our default policy to block all traffic on all interfaces sans the skip inferfaces `$skif` (which expands to `lo0`, `wg0`, and `wg1`), and all incoming traffic that failed URPF (Unicast reverse path forwarding) test.
 
 In `pf.conf(5)`, _last matching rule wins_, so it's nice to put the `block all` line before any `pass` rules:
 
-    # silently drop traffic
-    set block-policy drop
+```
+# silently drop traffic
+set block-policy drop
 
-    # default is to block all traffic
-    block all
+# default is to block all traffic
+block all
 
-    # block incoming traffic that failed urpf
-    block in quick urpf-failed
+# block incoming traffic that failed urpf
+block in quick urpf-failed
+```
 
 I then open some external ports for WireGuard (`wgports` 32624 and 42836) to all UDP traffic for WireGuard, and also other rules I want to apply to non-WireGuard interfaces:
 
-    # wireguard needs open udp port(s) for listening
-    wgports = "{ 32624, 42836 }"
-    pass quick log proto udp to port $wgports
+```
+# wireguard needs open udp port(s) for listening
+wgports = "{ 32624, 42836 }"
+pass quick log proto udp to port $wgports
 
-    # open tcp ports, such as ssh and webserver
-    tcpports = "{ 22, 80, 443 }"
-    pass quick log proto tcp to port $tcpports
+# open tcp ports, such as ssh and webserver
+tcpports = "{ 22, 80, 443 }"
+pass quick log proto tcp to port $tcpports
 
-    # dns lookups
-    pass quick out proto udp to port 53
+# dns lookups
+pass quick out proto udp to port 53
+```
 
 Then, I added the following line for `pf(4)` to properly handle WireGuard traffic, as well as NAT. Although most of the times `pf.conf` _actions_ can be arbitarily positioned, this time `proto udp` must come after `pass in on egress inet`:
 
-    # pf config for WireGuard
-    pass in on egress inet proto udp from any to any port $wgports
-    pass out on egress inet from ($wgif:network) nat-to (egress:0)
+```
+# pf config for WireGuard
+pass in on egress inet proto udp from any to any port $wgports
+pass out on egress inet from ($wgif:network) nat-to (egress:0)
+```
 
 And test the configuration, as well as actually reload the firewall rules with `pfctl(8)`:
 
-    # pfctl -n -f /etc/pf.conf # dry-run
-    # pfctl -f /etc/pf.conf
+```shell
+pfctl -n -f /etc/pf.conf; # dry-run
+pfctl -f /etc/pf.conf;
+```
 
 Now you can try the connection by pinging other hosts in the WireGuard network.
 
@@ -118,13 +136,17 @@ Now you can try the connection by pinging other hosts in the WireGuard network.
 
 Because WireGuard is originally designed for the Linux kernel, and is now part of the kernel since version 5.7, we only need to install `wireguard-tools` which provide `wg(8)` and `wg-quick(8)`:
 
-    # pacman -S wireguard-tools
+```shell
+pacman -S wireguard-tools;
+```
 
 If you use non-default Linux kernel, you may have to install a corresponding WireGuard kernel module, e.g. `wireguard-dkms` or `wireguard-lts`.
 
 Then, we simply write a text configuration file (for example, `wg0.conf` in `/etc/wireguard`). You can just follow the guide on the [Arch Wiki](https://wiki.archlinux.org/index.php/WireGuard). After the connection is working, we can persistently enable the connection as a `systemd(1)` service like so:
 
-    # systemctl enable --now wg-quick@wg0.service
+```shell
+systemctl enable --now wg-quick@wg0.service
+```
 
 Note that on Arch, `@wg0.service` part refers to `/etc/wireguard/wg0.conf` file, i.e. if you have `/etc/wireguard/server.conf` the service name is `wg-quick@server.service`. After the service is running, we can check the connection status by issuing: `# wg`.
 
@@ -132,29 +154,33 @@ Note that on Arch, `@wg0.service` part refers to `/etc/wireguard/wg0.conf` file,
 
 Also, we need to put the commands to set firewall rules for both IPv4 and IPv6 in `PostUp` and `PostDown` section in your WireGuard configuration in order to properly set up the connection (note that the following configuration features 2 example interfaces `em0` and `em1`):
 
-    # Adding iptables rules (-A) for wg0 after bringing the interface up
-    PostUp = iptables -A FORWARD -i wg0 -j ACCEPT; \
-    iptables -t nat -A POSTROUTING -o em0 -j MASQUERADE; \
-    ip6tables -A FORWARD -i wg0 -j ACCEPT; \
-    ip6tables -t nat -A POSTROUTING -o em0 -j MASQUERADE; \
-    iptables -A FORWARD -i wg0 -j ACCEPT; \
-    iptables -t nat -A POSTROUTING -o em1 -j MASQUERADE; \
-    ip6tables -A FORWARD -i wg0 -j ACCEPT; \
-    ip6tables -t nat -A POSTROUTING -o em1 -j MASQUERADE
+```
+# Adding iptables rules (-A) for wg0 after bringing the interface up
+PostUp = iptables -A FORWARD -i wg0 -j ACCEPT; \
+iptables -t nat -A POSTROUTING -o em0 -j MASQUERADE; \
+ip6tables -A FORWARD -i wg0 -j ACCEPT; \
+ip6tables -t nat -A POSTROUTING -o em0 -j MASQUERADE; \
+iptables -A FORWARD -i wg0 -j ACCEPT; \
+iptables -t nat -A POSTROUTING -o em1 -j MASQUERADE; \
+ip6tables -A FORWARD -i wg0 -j ACCEPT; \
+ip6tables -t nat -A POSTROUTING -o em1 -j MASQUERADE
 
-    # Deleteing iptables rules (-D) for wg0 after bringing the interface down
-    PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; \
-    iptables -t nat -D POSTROUTING -o em0 -j MASQUERADE; \
-    ip6tables -D FORWARD -i wg0 -j ACCEPT; \
-    ip6tables -t nat -D POSTROUTING -o em0 -j MASQUERADE; \
-    iptables -D FORWARD -i wg0 -j ACCEPT; \
-    iptables -t nat -D POSTROUTING -o em1 -j MASQUERADE; \
-    ip6tables -D FORWARD -i wg0 -j ACCEPT; \
-    ip6tables -t nat -D POSTROUTING -o em1 -j MASQUERADE
+# Deleteing iptables rules (-D) for wg0 after bringing the interface down
+PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; \
+iptables -t nat -D POSTROUTING -o em0 -j MASQUERADE; \
+ip6tables -D FORWARD -i wg0 -j ACCEPT; \
+ip6tables -t nat -D POSTROUTING -o em0 -j MASQUERADE; \
+iptables -D FORWARD -i wg0 -j ACCEPT; \
+iptables -t nat -D POSTROUTING -o em1 -j MASQUERADE; \
+ip6tables -D FORWARD -i wg0 -j ACCEPT; \
+ip6tables -t nat -D POSTROUTING -o em1 -j MASQUERADE
+```
 
 I then use `ufw` to easily configure open UDP port (in this example `42836`) for WireGuard:
 
-    # ufw allow 42836/udp
+```shell
+ufw allow 42836/udp;
+```
 
 With this configuration, your Arch WireGuard should be able to do crypto routing and NAT-ing.
 

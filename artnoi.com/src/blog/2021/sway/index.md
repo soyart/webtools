@@ -54,45 +54,53 @@ And because I already have my trusty `dmenu`- scripts to do various things acros
 
 First, I have this line in my shell initialization scripts (e.g. `.profile` or `.kshrc`):
 
-    [ "$XDG_SESSION_TYPE" = 'wayland' ]\
+```shell
+[ "$XDG_SESSION_TYPE" = 'wayland' ]\
     && export WAYLAND=1\
     && export MOZ_ENABLE_WAYLAND=1;
+```
 
 And then, in my shell `aliases` file:
 
-    [ -n "$WAYLAND" ]\
+```shell
+[ -n "$WAYLAND" ]\
     && alias dmenu='/usr/bin/wofi -d'\
 
-    alias sway='export WAYLAND=1 && MOZ_ENABLE_WAYLAND=1 && sway';
+alias sway='export WAYLAND=1 && MOZ_ENABLE_WAYLAND=1 && sway';
+```
 
 Which should assign alias `dmenu` to `wofi -d` (`dmenu`-compatible mode for `wofi`).
 
 The alias tweak above should work just fine, but to be safe, I also edit my `dmenu` scripts to source the alias file just before the line containing `dmenu`. An example is my `dmenufirefox.sh`:
 
-    #!/bin/sh
+```shell
+#!/bin/sh
 
-    aliases="$HOME/.config/shell/aliases";
-    [ -r $aliases ]\
+aliases="$HOME/.config/shell/aliases";
+[ -r $aliases ]\
     && . $aliases;
 
-    bookmark="$HOME/bin/priv/firefox.bookmarks";
-    url="$(dmenu -i -p 'Enter URL or file' < "$bookmark")";
+bookmark="$HOME/bin/priv/firefox.bookmarks";
+url="$(dmenu -i -p 'Enter URL or file' < "$bookmark")";
 
-    [ -n "$url" ]\
+[ -n "$url" ]\
     && firefox.sh "$url";
+```
 
 Another example is my dmenugoogle.sh, which now does not work as expected due to `wofi` lacking stdin input:
 
-    #!/bin/sh
+```shell
+#!/bin/sh
 
-    aliases="$HOME/.config/shell/aliases";
-    [ -r $aliases ]\
+aliases="$HOME/.config/shell/aliases";
+[ -r $aliases ]\
     && . $aliases;
 
-    search_term="$(dmenu -i -p 'Google search:' | tr ' ' '+')";
+search_term="$(dmenu -i -p 'Google search:' | tr ' ' '+')";
 
-    [ -n "$search_term" ]\
+[ -n "$search_term" ]\
     && firefox.sh "https://google.com/search?q=$search_term";
+```
 
 All this should enable the scripts to have correct aliases to `wofi -d` _only_ when on Wayland.
 
@@ -100,57 +108,65 @@ All this should enable the scripts to have correct aliases to `wofi -d` _only_ w
 
 Wayland ships with a simple Wayland-only status bar `swaybar`. I was too lazy to install and setup a new Wayland status bar programs (e.g. `waybar`), so I tweaked my `dwmbar.sh` (for `dwm`, a suckless X window manager) to work under `swaybar` too! This is my _bar_ (`swaybar`) configuration in `.config/sway/config`:
 
-    bar {
-      position top
-      status_command dash ${HOME}/.config/dwm/dwmbar.sh
-      colors {
-        background #111111
-        inactive_workspace #32323200 #32323200 #5c5c5c
-      }
-    }
+```
+bar {
+  position top
+  status_command dash ${HOME}/.config/dwm/dwmbar.sh
+  colors {
+    background #111111
+    inactive_workspace #32323200 #32323200 #5c5c5c
+  }
+}
+```
 
 And this is how the main() function in `dwmbar.sh` that will run on X11 (`dwm`) or Wayland (`sway`) sessions:
 
-    main() {
+```shell
+main() {
 
-    while true; do
+while true; do
 
-      # $WAYLAND is exported from $HOME/{.kshrc, .bash_profile}
+  # $WAYLAND is exported from $HOME/{.kshrc, .bash_profile}
 
-      [ -z $WAYLAND ]\
+  [ -z $WAYLAND ]\
       && xsetroot -name "$(get_status)"\
       && arg='&'\
       || echo "$(get_status)";
 
-      # Status update interval
-      sleep 5;
+  # Status update interval
+  sleep 5;
 
-    done;
+done;
 
-    }
+}
 
-    main ${arg};
+main ${arg};
+```
 
 ### Sway: screen lock with `swaylock`
 
 I have settings in `logind.conf(5)` to have my laptop suspended when lid is closed. I then created a Systemd service `swaylock@.service` to lock the Wayland screen after system suspense, which looks something like this:
 
-    [Unit]
-    Description=Lock Wayland screen after sleep using swaylock for user %i
-    Before=sleep.target
+```
+[Unit]
+Description=Lock Wayland screen after sleep using swaylock for user %i
+Before=sleep.target
 
-    [Service]
-    User=%i
-    Environment=DISPLAY=:0
-    ExecStartPre=swaymsg "output * dpms off"
-    ExecStart=/usr/bin/swaylock
+[Service]
+User=%i
+Environment=DISPLAY=:0
+ExecStartPre=swaymsg "output * dpms off"
+ExecStart=/usr/bin/swaylock
 
-    [Install]
-    WantedBy=sleep.target
+[Install]
+WantedBy=sleep.target
+```
 
 To enable it for _user_ `foo`, run:
 
-    # systemctl enable swaylock@foo.service;
+```shell
+systemctl enable swaylock@foo.service;
+```
 
 All of the files shown in this blog post are hosted on [my GitLab repo](https://gitlab.com/artnoi-staple/unix).
 

@@ -12,21 +12,25 @@ So we will use an existing Linux system that you want to dual-boot FreeBSD with 
 
 Then I edited the `40_custom` file in `/etc/grub.d` to look something like:
 
-     # [ /etc/grub.d/40_custom ]
+```
+# [ /etc/grub.d/40_custom ]
 
-     # FreeBSD was installed without creating its own FAT32 EFI partition
-     # The EFI boot file in this case is located on disk 0, GPT partition 4
-     # The FreeBSD root filesystem is UFS
+# FreeBSD was installed without creating its own FAT32 EFI partition
+# The EFI boot file in this case is located on disk 0, GPT partition 4
+# The FreeBSD root filesystem is UFS
 
-     menuentry "FreeBSD" --class freebsd --class bsd --class os {
-       insmod bsd
-       insmod ufs2
-       chainloader (hd0,gpt4)/EFI/FreeBSD/BOOTx64.efi
-     }
+menuentry "FreeBSD" --class freebsd --class bsd --class os {
+ insmod bsd
+ insmod ufs2
+ chainloader (hd0,gpt4)/EFI/FreeBSD/BOOTx64.efi
+}
+```
 
 Then, update `grub` configuration file (on Arch Linux) with:
 
-     $ sudo update-grub;
+```shell
+sudo update-grub;
+```
 
 Manjaro-shipped `grub` should detect FreeBSD installation as 'unknown Linux distrobution'. Then reboot, and your `grub` menu should now present you with an entry for FreeBSD.
 

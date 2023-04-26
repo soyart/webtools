@@ -40,54 +40,63 @@ Arch's `xorg-*` packages are sane enough to run on most hardware without configu
 
 ### X config: change input method (languages) with alt+space
 
-    # 00-keybord.conf
-    Section "InputClass"
-      Identifier "system-keyboard"
-      MatchIsKeyboard "on"
-      Option "XkbLayout" "us,th"
-      Option "XkbModel" ""
-      Option "XkbVariant" ""
-      Option "XkbOptions" "grp:alt_space_toggle"
-    EndSection
+```shell
+# 00-keybord.conf
+
+Section "InputClass"
+  Identifier "system-keyboard"
+  MatchIsKeyboard "on"
+  Option "XkbLayout" "us,th"
+  Option "XkbModel" ""
+  Option "XkbVariant" ""
+  Option "XkbOptions" "grp:alt_space_toggle"
+EndSection
+```
 
 ### X config: AMDGPU
 
-    # 20-amdgpu.conf
-    Section "Device"
-      Identifier "AMD"
-      Driver "amdgpu"
-      Option "TearFree" "true"
-      Option "DRI" "3"
-    EndSection
+```shell
+# 20-amdgpu.conf
 
-    Section "Screen"
-      Identifier "MyScreen"
-      DefaultDepth 30
-    EndSection
+Section "Device"
+  Identifier "AMD"
+  Driver "amdgpu"
+  Option "TearFree" "true"
+  Option "DRI" "3"
+EndSection
+
+Section "Screen"
+  Identifier "MyScreen"
+  DefaultDepth 30
+EndSection
+```
 
 ### X config: Synaptics
 
-    # 70-synaptics.conf
-    Section "InputClass"
-      Identifier "touchpad"
-      Driver "synaptics"
-      MatchIsTouchpad "on"
-      Option "TapButton1" "1"
-      Option "TapButton2" "3"
-      Option "TapButton3" "2"
-      Option "VertEdgeScroll" "on"
-      Option "VertTwoFingerScroll" "on"
-      Option "HorizEdgeScroll" "on"
-      Option "HorizTwoFingerScroll" "on"
-      Option "CircularScrolling" "on"
-      Option "CircScrollTrigger" "2"
-      Option "EmulateTwoFingerMinZ" "40"
-      Option "EmulateTwoFingerMinW" "8"
-      Option "CoastingSpeed" "0"
-      Option "FingerLow" "30"
-      Option "FingerHigh" "50"
-      Option "MaxTapTime" "125"
-    EndSection
+```shell
+# 70-synaptics.conf
+
+Section "InputClass"
+  Identifier "touchpad"
+  Driver "synaptics"
+  MatchIsTouchpad "on"
+  Option "TapButton1" "1"
+  Option "TapButton2" "3"
+  Option "TapButton3" "2"
+  Option "VertEdgeScroll" "on"
+  Option "VertTwoFingerScroll" "on"
+  Option "HorizEdgeScroll" "on"
+  Option "HorizTwoFingerScroll" "on"
+  Option "CircularScrolling" "on"
+  Option "CircScrollTrigger" "2"
+  Option "EmulateTwoFingerMinZ" "40"
+  Option "EmulateTwoFingerMinW" "8"
+  Option "CoastingSpeed" "0"
+  Option "FingerLow" "30"
+  Option "FingerHigh" "50"
+  Option "MaxTapTime" "125"
+EndSection
+```
 
 ## Compositor
 
@@ -137,13 +146,16 @@ The applets usually work correctly out-of-the-box, requiring no config to work. 
 
 `volumeicon` does not enable the `XF86Audio*` hotkeys, which made it pretty useless on first run. You can configre it graphically, or edit its config (`~/.config/volumeicon`) with:
 
-    [Hotkeys]
-    up_enabled=true
-    down_enabled=true
-    mute_enabled=true
-    up=XF86AudioRaiseVolume
-    down=XF86AudioLowerVolume
-    mute=XF86AudioMute
+```
+[Hotkeys]
+up_enabled=true
+down_enabled=true
+mute_enabled=true
+
+up=XF86AudioRaiseVolume
+down=XF86AudioLowerVolume
+mute=XF86AudioMute
+```
 
 `xfce4-power-manager` by default does not put laptop in suspense after lid close. This can be easily configured graphically.
 
@@ -161,8 +173,9 @@ The file `~/.xinitrc` is used by `xinit` when it is starting the X server. We us
 
 Let's say the content of `.xinitrc` looks like this:
 
-    [[ -f $HOME/.Xresources ]] && xrdb $HOME/.Xresources &
-    exec bspwm;
+```shell
+[[ -f $HOME/.Xresources ]] && xrdb $HOME/.Xresources & exec bspwm;
+```
 
 The flow of actions will look like this:
 
