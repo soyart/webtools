@@ -16,12 +16,16 @@ In the commit, you can see that [`main` was pretty messy](https://github.com/art
 
 Before the rewrite, gfc took arguments like this:
 
-    $ gfc -m CTR -i plain.txt -o enc.bin
+```shell
+gfc -m CTR -i plain.txt -o enc.bin
+```
 
 This looks fine, however, there's no _long_ flag support in the `flag` package, so the following was impossible:
 
-    $ # Not possible if we used flag package
-    $ gfc --mode CTR --infile plain.txt --outfile enc.bin
+```shell
+# Not possible if we used flag package
+$ gfc --mode CTR --infile plain.txt --outfile enc.bin
+```
 
 And because there's only on big `flags` struct defined in main, this means that both AES and RSA used the same CLI flags, and that we cannot use `-k` for both symmetric and assymetric keys.
 

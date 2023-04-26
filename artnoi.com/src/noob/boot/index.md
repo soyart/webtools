@@ -20,23 +20,33 @@ UEFI systems relies on EFI interface, which is a standardized communication stan
 
 The EFI boot entries can be manipulated on Linux with `efibootmgr`. For example, show the entries with:
 
-    # efibootmgr -v;
+```shell
+efibootmgr -v;
+```
 
 To make next boot `0001`, do:
 
-    # efibootmgr -n 0001;
+```shell
+efibootmgr -n 0001;
+```
 
 To set new boot order, in this case '`0002,0003,0001,0000`', do:
 
-    # efibootmgr -o 0002,0003,0001,0000;
+```shell
+efibootmgr -o 0002,0003,0001,0000;
+```
 
 Removing an entry (`-B`), in this case entry number 0001 (`-b 001`):
 
-    # efibootmgr -b 001 -B;
+```shell
+efibootmgr -b 001 -B;
+```
 
 Adding custom entry (`-c` create, `-d` disk, `-l` location, `-L` label) for `/boot/loader/EFI/systemd/systemd-bootx64.efi`:
 
-    # efibootmgr -c -d /dev/sdX -p Y -l "EFI\systemd\systemd-bootx64.efi" -L "CUSTOMNAME";
+```shell
+efibootmgr -c -d /dev/sdX -p Y -l "EFI\systemd\systemd-bootx64.efi" -L "CUSTOMNAME";
+```
 
 ## UEFI vs legacy
 
@@ -56,7 +66,9 @@ There are biliions of bootloaders for the Linux kernel, but in this article I'm 
 
 `systemd-boot` is a great utility, but it's EFI-only, which is fine on modern machines. Arch Linux ships with `systemd-boot`, so it's convenient to install it to the `/boot` partition on Arch with:
 
-    # bootctl --path=/boot install;
+```shell
+bootctl --path=/boot install;
+```
 
 This should install the EFI bootloader program to `/boot`, or the EFI system partition.
 
@@ -66,15 +78,21 @@ To configure `systemd-boot`, edit `/boot/loader/loader.conf`.
 
 Installing `grub` legacy boot code on an MBR disk:
 
-    # grub-install --target=i386-pc /dev/sdX;
+```shell
+grub-install --target=i386-pc /dev/sdX;
+```
 
 Installing `grub` on an EFI system partition (ESP, in this example mounted on `/boot`):
 
-    # grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB;
+```shell
+grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB;
+```
 
 Configuring `grub` is done mostly on the `/etc/default/grub` template file, which will later be used to produce `grub.cfg` in our `/boot`. After editing `grub` config in `/etc/default`, update the `grub` config in `/boot` with:
 
-    # grub-mkconfig -o /boot/grub/grub.cfg;
+```shell
+grub-mkconfig -o /boot/grub/grub.cfg;
+```
 
 ## Initramfs and initrd
 
@@ -100,11 +118,15 @@ Below are some of my staple, frequently used `mkinitcpio(8) HOOKS` for encrypted
 
 LUKS-on-LVM, and LVM-on-LUKS
 
-    HOOKS=(base systemd autodetect keyboard sd-vconsole modconf block sd-encrypt lvm2 filesystems resume fsck);
+```shell
+HOOKS=(base systemd autodetect keyboard sd-vconsole modconf block sd-encrypt lvm2 filesystems resume fsck);
+```
 
 Encrypted ZFS
 
+```shell
     HOOKS=(base udev autodetect modconf block keyboard zfs filesystems);
+```
 
 You should recheck with the Arch Wiki if your machine fails to boot.
 
@@ -120,21 +142,27 @@ Sysadmins edit the boot parameters to match their kernel/booting needs. Kernel b
 
 Edit `options` field in `/boot/loader/entries/*.conf` for your desired parameters. Examples include
 
-    options	loglevel=3
-    options	rd.luks.options=discard
-    options	rd.luks.name=UUID0=cryptlvm
-    options	root=/dev/mapper/my-root
-    options	resume=/dev/mapper/my-swap"
+```
+options	loglevel=3
+options	rd.luks.options=discard
+options	rd.luks.name=UUID0=cryptlvm
+options	root=/dev/mapper/my-root
+options	resume=/dev/mapper/my-swap"
+```
 
 ### `grub`
 
 `grub` is usually used as the bootloader, and so sysadmins usually edit `grub` config file `/etc/default/grub` to change kernel parameters. An example below would set the same kernel parameter as the example for `systemd-boot`:
 
-    GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3\
+```
+GRUB_CMDLINE_LINUX_DEFAULT="\
+    loglevel=3\
     rd.luks.options=discard\
     rd.luks.name=UUID0=cryptlvm\
     root=/dev/mapper/my-root\
-    resume=/dev/mapper/my-swap"
+    resume=/dev/mapper/my-swap\
+"
+```
 
 ## Linux boot and initramfs
 

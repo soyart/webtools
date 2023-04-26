@@ -7,20 +7,26 @@
 `find(1)` is a very powerful UNIX tool. This example shows how we can find
 and remove unwanted files recursively:
 
-    $ find <path> -name <name> -exec rm -f {} \;
+```shell
+find <PATH> -name <NAME> -exec rm -f {} \;
+```
 
 The example below will recursively remove file(s) `.DS_Store`,
 starting from the working directory:
 
-    $ find . -name '.DS_Store' -exec rm -f {} \;
+```shell
+find . -name '.DS_Store' -exec rm -f {} \;
+```
 
 ## Using `lsof` to discover process running on a port
 
-    # macOS, and probably BSD
-    $ lsof -n -i TCP:6379;
+```shell
+# macOS, and probably BSD
+lsof -n -i TCP:6379;
 
-    # GNU/Linux
-    $ lsof -i :6379;
+# GNU/Linux
+lsof -i :6379;
+```
 
 ## POSIX shell parameter expansion
 
@@ -37,71 +43,95 @@ i.e. `bash`-specific syntax, which is not portable.
 
 ### String length
 
-    ${#string}
+```shell
+FOO="foo";
+
+echo ${#FOO}; # 3
+```
 
 ### Substring: prefix removal with '#' ('##')
 
-    $ string='foobar';
+The variable name used in this demo will be `STR` with value `"foobar"`:
+
+```shell
+STR='foobar';
+```
 
 Remove last 3 characters:
 
-    $ echo ${string#???};
-    bar
+```shell
+echo ${STR#???}; # "bar"
+```
 
 Remove 'foo' from start:
 
-    $ echo ${string#foo};
-    bar
+```shell
+echo ${STR#foo}; # "bar"
+```
 
 Remove 'fo' (smallest pattern):
 
-    $ echo ${string#f*o};
-    obar
+```shell
+echo ${STR#f*o}; # "obar"
+```
 
 Remove 'foo' (largest pattern):
 
-    $ echo ${string##f*o};
-    bar
+```shell
+echo ${STR##f*o}; # "bar"
+```
 
 ### Substring: suffix removal with '%' ('%%')
 
-    $ string='foobar';
+The variable name used in this demo will be `STR` with value `"foobar"`:
+
+```shell
+STR='foobar';
+```
 
 Remove first 2 characters
 
-    $ echo ${string%??};
-    foob
+```shell
+echo ${STR%??}; # "foob"
+```
 
 Remove 'bar' pattern from end:
 
-    $ echo ${string%bar};
-    foo
+```shell
+echo ${string%bar}; # "foo"
+```
 
 Remove pattern expands to 'obar':
 
-    $ echo ${string%o*r};
-    fo
+```shell
+echo ${string%o*r}; # "fo"
+```
 
 Remove pattern expands to 'oobar':
 
-    $ echo ${string%%o*r};
-    f
+```shell
+echo ${string%%o*r}; # "f"
+```
 
 The example below will move (i.e. rename) all files with `.text` extension to
 `.txt` with a shell `for` loop (e.g. `token.text` -> `token.txt`):
 
-    for f in *.text;
-    do
-      mv "${f}" "${f%.text}.txt";
-    done;
+```shell
+for f in *".text";
+do
+    mv "${f}" "${f%.text}.txt";
+done;
+```
 
 The example below will move all files starting with substring `gh` to be
 starting with `github` instead (e.g. `gh_key` -> `github_key`):
 
-    for f in gh*;
-    do
-      mv "${f}" "github${f#gh}";
-    done;
+```shell
+for f in "gh"*;
+do
+    mv "${f}" "github${f#gh}";
+done;
+```
 
 ### Substitution
 
@@ -115,23 +145,27 @@ These and their other variants are super-useful, and I wish I knew about these s
 
 Let's see some simple examples so you understand why these are useful:
 
-    $ string0='test'; # string1 is still null
+```shell
+string0='test'; # string1 is still null
+```
 
 Use `string0` value if `string1` is null
 
-    $ echo ${string1:-$string0};
-    test
+```shell
+# string1 is still null
 
-    $ echo ${string1};
-    # outputs nothing
+echo ${string1}; # no output
+
+echo ${string1:-$string0}; # "test"
+```
 
 Assign `string0` value if `string1` is null
 
-    $ echo ${string1:=$string0};
-    test
+```shell
+echo ${string1:=$string0}; # ouputs "test", as well as assign "test" to string1
 
-    $ echo ${string1};
-    test
+echo ${string1}; # outputs "test"
+```
 
 ## Redirecting shell output
 
@@ -139,23 +173,31 @@ Assign `string0` value if `string1` is null
 
 Discarding output and error messages:
 
-    $ foo [args] > /dev/null 2>&1
+```shell
+foo > /dev/null 2>&1;
+```
 
 Writing to both stdout and file `out.txt`:
 
-    $ foo [args] 2>&1 | tee out.txt
+```shell
+foo 2>&1 | tee out.txt;
+```
 
 ## Using `dd(1)`
 
-Writing a disk image to USB flash drive:
+Writing a disk image from `image.iso` to USB flash drive `/dev/sdc`:
 
-    # dd bs=4M if=<src> of=<dst> status=progress oflag=sync;
+```shell
+dd bs=4M if=image.iso of=/dev/sdc status=progress oflag=sync;
+```
 
 Writing a key file with 2048 random bytes from special random character device `/dev/random`:
 
 > In this case, use of `/dev/random` is [prefered](https://man7.org/linux/man-pages/man4/random.4.html) over `/dev/arandom` and `/dev/urandom`.
 
-    # dd bs=512 count=4 if=/dev/random of=<dest> iflag=fullblock;
+```shell
+dd bs=512 count=4 if=/dev/random of=<DEST> iflag=fullblock;
+```
 
 If you want a 4096-byte-long key file, use `count=8`.
 
@@ -163,13 +205,17 @@ If you want a 4096-byte-long key file, use `count=8`.
 
 On _modern_ GNU/Linux systems, we can mount partition images with option `loop`:
 
-    # mount -o loop file.iso /mnt/dir;
+```shell
+mount -o loop image.iso /mnt;
+```
 
 ## macOS
 
 ### `updatedb` on macOS
 
-    sudo /usr/libexec/locate.updatedb;
+```shell
+sudo /usr/libexec/locate.updatedb;
+```
 
 ### Modifying macOS system files
 
@@ -177,7 +223,9 @@ As of Catalina (10.15), the system files reside in their own encrypted read-only
 
 So if you wish to modify system files, disabling SIP alone is not enough - you will also have to remount the system partition with _write_ permission:
 
-    # mount -uw / && killall Finder;
+```shell
+mount -uw / && killall Finder;
+```
 
 ### macOS native ramdisk (HFS+)
 
@@ -185,7 +233,9 @@ Ramdisks are perfect for temporary storage. I have had a habit where I edit my t
 
 It's a shame OS X does _not_ ship with tmpfs OOTB. Nonetheless, we can still create a HFS+ ramdisk (of size 4GB) using utilities from the base install:
 
-    $ diskutil erasevolume HFS+ 'RAM Disk' `hdiutil attach -nomount ram://8388608`;
+```shell
+diskutil erasevolume HFS+ 'RAM Disk' `hdiutil attach -nomount ram://8388608`;
+```
 
 Yes, the 5th argument is in back ticks.
 
@@ -197,23 +247,28 @@ Yes, the 5th argument is in back ticks.
 
 You must first enable NFS client. You can do it in Powershell with:
 
-    Enable-WindowsOptionalFeatures -FeatureName ServicesforNFS-ClientOnly, ClientForNFS-Infrastructure -Online -NoRestart
+```PowerShell
+Enable-WindowsOptionalFeatures -FeatureName ServicesforNFS-ClientOnly, ClientForNFS-Infrastructure -Online -NoRestart
+```
 
 Or from Control Panel > "Programs" > "Turn Windows features on or off" > "Services for NFS" > "Client for NFS".
 
 After you enabled NFS client, you can just use File Explorer to go to your remote location, e.g. `\\10.8.0.1\myshare` or use `NewPSDrive` to mount the NFS share:
 
-    New-PSDrive -Name "Z" -Root "\\10.8.0.1\myshare" -Persist -PSProvider "Filesystem"
+```PowerShell
+New-PSDrive -Name "Z" -Root "\\10.8.0.1\myshare" -Persist -PSProvider "Filesystem"
+```
 
 Or use `mount` (which is alias to `New-PSDrive`) and fill up the argument by line.
 
 `Name` is desired Windows drive letter, and `Root` is the remote location, e.g.:
 
-    mount
-    Name: Z
-    PSProvider: Filesystem
-    Root: \\10.8.0.1\myshare
-
+```shell
+mount
+Name: Z
+PSProvider: Filesystem
+Root: \\10.8.0.1\myshare
+```
 You can list the shares with `Get-PSDrive` and unmount it with `Remove-PSDrive`.
 
 ### OpenBSD NFS client
@@ -226,45 +281,48 @@ Try mounting with option `-o tcp`. Also, recheck export list on the host, e.g. `
 
 See also: [WireGuard on OpenBSD](https://artnoi.com/blog/2020/wireguard/).
 
-    # Interface configuration
-    wgkey yourPrivKey=
-    wgport 6969
-    inet 10.8.1.4/24
-    up
+```
+# Interface configuration
+wgkey yourPrivKey=
+wgport 6969
+inet 10.8.1.4/24
+up
 
-    # WireGuard peers
-    !ifconfig wg0 wgpeer peer1pubkey= wgendpoint 192.168.2.3 5555 wgaip 10.8.1.1/32
-    !ifconfig wg0 wgpeer peer2pubkey= wgendpoint example.com 9696 wgaip 10.8.1.2/32
-    !ifconfig wg0 wgpeer peer3pubkey= wgaip 10.8.1.3/32
+# WireGuard peers
+!ifconfig wg0 wgpeer peer1pubkey= wgendpoint 192.168.2.3 5555 wgaip 10.8.1.1/32
+!ifconfig wg0 wgpeer peer2pubkey= wgendpoint example.com 9696 wgaip 10.8.1.2/32
+!ifconfig wg0 wgpeer peer3pubkey= wgaip 10.8.1.3/32
+```
 
 ### [pf.conf(5)](https://man.openbsd.org/pf.conf) for [wg(4)](https://man.openbsd.org/wg)
 
-    # pf.conf(5) for WireGuard
+```
+# pf.conf(5) for WireGuard
 
-    pass in on egress inet proto udp\
-      from any to any port 6969
+pass in on egress inet proto udp\
+    from any to any port 6969
 
-    pass out on egress inet\
-      from (wg0:network) nat-to (egress:0)
+pass out on egress inet\
+    from (wg0:network) nat-to (egress:0)
+```
 
 ### [relayd.conf(5)](https://man.openbsd.org/relayd.conf.5): relaying SSH connection
 
-    protocol "myssh" {
-      tcp {
-    	nodelay
-    	socket buffer 65536
-      }
+```
+protocol "myssh" {
+    tcp {
+        nodelay
+        socket buffer 65536
     }
+}
 
-    relay "sshforward" {
-      listen on www.example.com\
-        port 2222
+relay "sshforward" {
+    listen on www.example.com port 2222
+    protocol "myssh"
 
-      protocol "myssh"
-
-      forward to shell.example.com\
-        port 22
-    }
+    forward to shell.example.com port 22
+}
+```
 
 ### [relayd.conf(5)](https://man.openbsd.org/relayd.conf.5): redirecting DNS connection
 
@@ -298,13 +356,17 @@ Drop-ins are parsed and overrides global configuration. The files are read alpha
 
 If `# systemctl status` returned _degraded_, we can issue:
 
-    # systemctl reset-failed;
+```shell
+systemctl reset-failed;
+```
 
 to fix the failed units.
 
 ### systemd (journald) auth.log
 
-    # journalctl SYSLOG_FACILITY=10;
+```shell
+journalctl SYSLOG_FACILITY=10;
+```
 
 ### Persistent `iptables` dropping incoming traffic
 
@@ -314,31 +376,35 @@ To configure `iptables` such that it drops all incoming connections (in a usable
 
 > From [superuser.com](https://superuser.com/questions/427458/deny-all-incoming-connections-with-iptables)
 
-    *filter
+```
+*filter
 
-    :FORWARD DROP [0:0]
+:FORWARD DROP [0:0]
 
-    :OUTPUT ACCEPT [623107326:1392470726908]
+:OUTPUT ACCEPT [623107326:1392470726908]
 
-    :INPUT DROP [11486:513044]
+:INPUT DROP [11486:513044]
 
-    -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+-A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
 
-    -A INPUT -i lo -j ACCEPT
+-A INPUT -i lo -j ACCEPT
 
-    -4 -A INPUT -p icmp -j ACCEPT
-    -6 -A INPUT -p ipv6-icmp -j ACCEPT
+-4 -A INPUT -p icmp -j ACCEPT
+-6 -A INPUT -p ipv6-icmp -j ACCEPT
 
-    # Add exception rules here
-    #-A INPUT -p tcp -m tcp --dport 22 -j ACCEPT
-    #-A INPUT -p tcp -m tcp --dport 80 -j ACCEPT
-    #-A INPUT -p tcp -m tcp --dport 443 -j ACCEPT
+# Add exception rules here
+#-A INPUT -p tcp -m tcp --dport 22 -j ACCEPT
+#-A INPUT -p tcp -m tcp --dport 80 -j ACCEPT
+#-A INPUT -p tcp -m tcp --dport 443 -j ACCEPT
 
-    COMMIT
+COMMIT
+```
 
 Also, enable the service (otherwise you would have to use `iptables-restore` each time you reboot):
 
-    # systemctl enable --now iptables;
+```shell
+systemctl enable --now iptables;
+```
 
 ### Changing storage device designation, e.g. sdX1 to sdX4
 
@@ -350,7 +416,9 @@ After exitting from a `chroot` environment, if you find yourself unable to unmou
 
 If all else failed, and you want to _force_ unmount the mountpoint, issue:
 
-    # umount -lf /mountpoint;
+```shell
+umount -lf /mountpoint;
+```
 
 This will [_force detach filesystem from fs heirarchy, and cleanup all references to the filesystem as soon as it's not busy_](https://unix.stackexchange.com/questions/61885)
 
@@ -364,28 +432,38 @@ Certbot can be used to automatically get new certificates and update your NGINX 
 
 To obtain certificates (including the subdomains), and have Certbot modify your NGINX configuration, run:
 
-    # certbot --nginx -d <domain name 0> [-d <domain name 1>];
+```shell
+certbot --nginx -d <DOMAIN_0> [-d <DOMAIN_1>];
+```
 
 To see certificate information, run:
 
-    # certbot certificates;
+```shell
+certbot certificates;
+```
 
 To force-renew certificates _without reinstalling_ the certificates (i.e. the NGINX configuration would _not_ be modified), run:
 
-    # certbot certonly --force-renewal -d <domain name>;
+```shell
+certbot certonly --force-renewal -d <DOMAIN>;
+```
 
 Or, if you have setup webroot:
 
-    # certbot certonly --webroot -w <webroot dir> -d <domain name>;
+```shell
+certbot certonly --webroot -w <WEBROOT_DIR> -d <DOMAIN_NAME>;
+```
 
 On Arch Linux with NGINX, include this snippet in your NGINX configuration to enable webroot:
 
-    location ^~ /.well-known/acme-challenge/ {
-      allow all;
-      root /var/lib/letsencrypt/;
-      default_type "text/plain";
-      try_files $uri =404;
-    }
+```
+location ^~ /.well-known/acme-challenge/ {
+    allow all;
+    root /var/lib/letsencrypt/;
+    default_type "text/plain";
+    try_files $uri =404;
+}
+```
 
 The snippet above should be put in a `server` block
 that listens on standard HTTP port 80.
@@ -393,16 +471,20 @@ that listens on standard HTTP port 80.
 For NGINX to serve HTTPS, add the following snippet to `server` block
 listening on port 443.
 
-    ssl_certificate /etc/letsencrypt/live/example.com/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;
+```
+ssl_certificate /etc/letsencrypt/live/example.com/fullchain.pem;
+ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;
 
-    include /etc/letsencrypt/options-ssl-nginx.conf;
-    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+include /etc/letsencrypt/options-ssl-nginx.conf;
+ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+```
 
 On FreeBSD, the package recommends putting the following line
 in `/etc/periodic.conf` so that certbot will renew certificates periodically:
 
-    weekly_certbot_enable="YES"
+```
+weekly_certbot_enable="YES"
+```
 
 Artnoi.com used both `cron` and `periodic.conf` schedulers when it was running
 on FreeBSD and NGINX. Now it runs [OpenBSD](https://artnoi.com/blog/2020/bsdbox/).
@@ -416,11 +498,15 @@ My prefered way to do this is to use 2 separate programs to take screenshots,
 > however, my experience in October 2022 was that `-o` flag does not work,
 > and you can just supply the outfile name as last argument.
 
-    $ grim -g "$(slurp -d)" /tmp/scrot.png
+```shell
+grim -g "$(slurp -d)" /tmp/scrot.png
+```
 
 Or, if you want to redirect the output to stdout to `wl-copy`:
 
-    $ grim -g "$(slurp -d)" - | wl-copy -t 'image/png';
+```shell
+grim -g "$(slurp -d)" - | wl-copy -t 'image/png';
+```
 
 This will capture the screenshot selected and piped to `wl-copy`.
 
