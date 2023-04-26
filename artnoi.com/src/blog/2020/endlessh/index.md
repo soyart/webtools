@@ -36,24 +36,26 @@ You can just copy the ssh example from `relayd.conf(5)` man page. In short, we f
 
 > Note: only relavant portion is shown. You probably need to write some more global configuration, define some macros and host table, etc.
 
-    protocol "tcp_relay" {
-      tcp { nodelay, socket buffer 65536 }
-    }
+```
+protocol "tcp_relay" {
+  tcp { nodelay, socket buffer 65536 }
+}
 
-    relay "sshforward0" {
-      listen on $ipv4 port 22 #interface vio0
-      protocol "tcp_relay"
-      forward to $wg_endlessh port 2222
-    }
+relay "sshforward0" {
+  listen on $ipv4 port 22 #interface vio0
+  protocol "tcp_relay"
+  forward to $wg_endlessh port 2222
+}
 
-    # Load-balance
-    # Load-balancing will need to specify a table as forward-to host
+# Load-balance
+# Load-balancing will need to specify a table as forward-to host
 
-    relay "sshforward1" {
-      listen on $ipv4 port 2222 #interface wg0
-      protocol "tcp_relay"
-      forward to $wg_endlessh port 2222 mode loadbalance check tcp
-    }
+relay "sshforward1" {
+  listen on $ipv4 port 2222 #interface wg0
+  protocol "tcp_relay"
+  forward to $wg_endlessh port 2222 mode loadbalance check tcp
+}
+```
 
 ### Proxy Endlessh using NGINX
 
@@ -61,36 +63,42 @@ NGINX also has support for TCP relays, but called `stream`. The following config
 
 If I understand correctly, by using `upstream` directive, NGINX should also load-balance the connections instead of just proxying.
 
-    stream {
-    upstream endlessh {
-      server 127.0.0.1:2222 max_conns=3;
-      server 10.8.0.69:2222;
-    }
+```
+stream {
+upstream endlessh {
+  server 127.0.0.1:2222 max_conns=3;
+  server 10.8.0.69:2222;
+}
 
-    server {
-      listen     22;
-      proxy_pass endlessh;
-    }
+server {
+  listen     22;
+  proxy_pass endlessh;
+}
+```
 
 ## Visual examples
 
 The only difference between _my_ SSH connection and the others is the destination port, which is not accessible outside of my VPN.
 
-     SSH connections ---> artnoi.com -(relay)-> Endlessh jail server
-     My SSH connection -> artnoi.com
+```
+SSH connections ---> artnoi.com -(relay)-> Endlessh jail server
+My SSH connection -> artnoi.com
+```
 
 ## Example output on the attacker side
 
-     $ ssh -v artnoi.com
-     OpenSSH_8.4p1, OpenSSL 1.1.1h  22 Sep 2020
-     debug1: Reading configuration data /home/artnoi/.ssh/config
-     debug1: Reading configuration data /etc/ssh/ssh_config
-     debug1: Connecting to artnoi.com [45.32.125.13] port 22.
-     debug1: Connection established.
-     debug1: Local version string SSH-2.0-OpenSSH_8.4
-     debug1: kex_exchange_identification: banner line 0: 1m]+
-     debug1: kex_exchange_identification: banner line 1: i^'i
-     .
-     .
+```
+$ ssh -v artnoi.com
+OpenSSH_8.4p1, OpenSSL 1.1.1h  22 Sep 2020
+debug1: Reading configuration data /home/artnoi/.ssh/config
+debug1: Reading configuration data /etc/ssh/ssh_config
+debug1: Connecting to artnoi.com [45.32.125.13] port 22.
+debug1: Connection established.
+debug1: Local version string SSH-2.0-OpenSSH_8.4
+debug1: kex_exchange_identification: banner line 0: 1m]+
+debug1: kex_exchange_identification: banner line 1: i^'i
+.
+.
+```
 
 And it goes on and on and on!

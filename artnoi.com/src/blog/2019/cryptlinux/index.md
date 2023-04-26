@@ -32,13 +32,17 @@ The command we need to create and manage LUKS is `cryptsetup`. Most GNU/Linux di
 
 We will also need a disk partition. Use `fdisk` or `cfdisk` or any partition editor to create disk partitions for our LUKS:
 
-    # fdisk /dev/sdX;
+```shell
+fdisk /dev/sdX;
+```
 
 ## LUKS Formatting
 
 Use `lsblk` to get block device name for your fresh GPT partition, in my case it is the 4th partition on storage device "_a_", `/dev/sda4`. Then, issue:
 
-    # cryptsetup luksFormat --verify-passphrase -v /dev/sda4;
+```shell
+cryptsetup luksFormat --verify-passphrase -v /dev/sda4;
+```
 
 Note that `cryptsetup` **command is case-sensitive**. You will then be prompted if you are sure to destroy everything on the partition. After typing uppercase YES, you will be prompted for passphrase which will be used as encryption key.
 
@@ -46,7 +50,9 @@ Note that `cryptsetup` **command is case-sensitive**. You will then be prompted 
 
 Now that our `/dev/sda4` has been encrypted, we can decrypt it using:
 
-    # cryptsetup luksOpen /dev/sda4 myluks;
+```shell
+cryptsetup luksOpen /dev/sda4 myluks;
+```
 
 Where `myluks` is our decrypted device name in `/dev/mapper`, i.e. `/dev/sda4` is now decrypted and mapped to `/dev/mapper/myluks`. You can supply any name for mapper device name.
 
@@ -54,15 +60,21 @@ Where `myluks` is our decrypted device name in `/dev/mapper`, i.e. `/dev/sda4` i
 
 This is only required for the first time you set up an encrypted partition, because although we have `/dev/mapper/enc`, it does not have a filesystem yet. We can create an EXT4 filesystem on the device mapper using simple `mkfs` command:
 
-    # mkfs.ext4 /dev/mapper/myluks;
+```shell
+mkfs.ext4 /dev/mapper/myluks;
+```
 
 Or Btrfs:
 
-    # mkfs.btrfs /dev/mapper/myluks;
+```shell
+mkfs.btrfs /dev/mapper/myluks;
+```
 
 After the filesystem is created, we mount the device mapper just as you would do with other filesystems:
 
-    # mount /dev/mapper/myluks /mnt;
+```shell
+mount /dev/mapper/myluks /mnt;
+```
 
 See also: [More about Device Mapper, LUKS and LVM](/cheat/device-mapper/)
 
@@ -76,7 +88,9 @@ To enable encryption, mount the filesystem with option `compress=`_algo_ where _
 
 An example `mount` command to enable compression is this command with `zstd` algorithm:
 
-    # mount -t btrfs -o compress=zstd /dev/mapper/mybtrfs /mnt;
+```shell
+mount -t btrfs -o compress=zstd /dev/mapper/mybtrfs /mnt;
+```
 
 will compress new data that is written to out Btrfs (existing data is not recompressed).
 
@@ -88,7 +102,9 @@ ZFS command syntax is also much more practical and memorable, which makes using 
 
 To compress the entire Btrfs filesystem, **first mount the Btrfs partition with `compress=`_algo_**, then use `filesystem defragment` command with compression option `-c`_algo_:
 
-    # btrfs filesystem defragment -r -v -czstd;
+```shell
+btrfs filesystem defragment -r -v -czstd;
+```
 
 Will use `zstd(1)` to compress files stored in the Btfs filesystem sitting on `/dev/mapper/mybtrfs` device.
 

@@ -16,32 +16,32 @@ stubborn is a _caching_ DNS stub resolver, with only [DoT](https://en.wikipedia.
 
 Assuming that you already have Go installed on your system, you can just use `go install` to install `stubborn` to your `bin` directory:
 
-```
-$ go install github.com/artnoi43/stubborn/cmd/stubborn@latest
+```shell
+go install github.com/artnoi43/stubborn/cmd/stubborn@latest
 ```
 
 The above command should install `stubborn` executable in `$HOME/go/bin`, and pulls any build time depedencies down with it. If running `stubborn` is what you want, the command above should be enough. Just be sure to add the `bin` directory to your shell `$PATH`.
 
 If you only want the source code, use `go get`:
 
-```
-$ go get github.com/artnoi43/stubborn/cmd/stubborn@latest
+```shell
+go get github.com/artnoi43/stubborn/cmd/stubborn@latest
 ```
 
 After you have saw and finished cursing `stubborn` source code, you can build it with:
 
-```
-$ cd /tmp/stubborn # cd to your source root
-$ go build ./cmd/stubborn
+```shell
+cd /tmp/stubborn # cd to your source root
+go build ./cmd/stubborn
 ```
 
 The above command will produce `stubborn` binary in your working directory.
 
 `stubborn` supports only 2 outbound protocols - DoT and DoH. To run stubborn with either, use `-c` flag (case-insensitive):
 
-```
-$ stubborn -c dot # Will spawn DoT client
-$ stubborn -c doh # Will spawn DoH client
+```shell
+stubborn -c dot # Will spawn DoT client
+stubborn -c doh # Will spawn DoH client
 ```
 
 ### Why stubborn is so huge?

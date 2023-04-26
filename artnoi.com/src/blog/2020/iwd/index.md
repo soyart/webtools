@@ -20,31 +20,43 @@ I have been a fan of NetworkManager since installing my [Void Linux](https://voi
 
 First, enable the daemon:
 
-    # systemctl enable --now iwd
+```shell
+systemctl enable --now iwd
+```
 
 Then, use `iwctl(1)` to bring up interactive shell to control the daemon:
 
 > Note `iwctl` in interactive mode also has Tab autocomplete
 
-    # iwctl
+```shell
+iwctl
+```
 
 At the prompt, get the device list (wireless adaptors/cards) with:
 
-    [iwd]# device list
+```
+[iwd]# device list
+```
 
 Let's say we have `wlan0` interface, we can use it in station mode to find nearby available networks:
 
-    [iwd]# station wlan0 get-networks
+```
+[iwd]# station wlan0 get-networks
+```
 
 Connect to the access point if your desired AP's SSID shows up on previous commands:
 
-    [iwd]# station wlan0 connect "MY_HOME_WIFI"
+```
+[iwd]# station wlan0 connect "MY_HOME_WIFI"
+```
 
 The commands above can also be used in non-interactive mode, which is useful for shell scripting:
 
-    # iwctl device list
-    # iwctl station wlan0 get-networks
-    # iwctl station wlan0 connect "MY_HOME_WIFI"
+```shell
+iwctl device list;
+iwctl station wlan0 get-networks;
+iwctl station wlan0 connect "MY_HOME_WIFI";
+```
 
 ## `iwd(8)` configuration
 
@@ -54,8 +66,10 @@ If you only followed the instructions above on fresh Arch machine, you should be
 
 To have `iwd` configure the wireless interfaces to _usable_ state, add these lines to `/etc/iwd/main.conf`:
 
-    [General]
-    EnableNetworkConfiguration=true
+```
+[General]
+EnableNetworkConfiguration=true
+```
 
 This should get `iwd` to configure IP addresses, routes, and obtains relevant DNS server information from the wireless network's DHCP server.
 
@@ -67,19 +81,27 @@ The main idea is to (1) pair the iOS device, and (2) get the IP address (DHCP le
 
 iOS Wi-Fi tethering should already work if you were successful with `iwd`. If you plan to use wired tethered networks, you will need iOS device driver support. First, install `libimobiledevice` to provide driver support for wired tethering:
 
-    # pacman -S libimobiledevice
+```shell
+pacman -S libimobiledevice;
+```
 
 After the package is installed, pair the device:
 
-    $ idevicepair pair
+```shell
+idevicepair pair;
+```
 
 Then, try to figure out the interface name for the iOS-connected USB interface (usually `enp7s0f3u2c4i2`):
 
-    # ip a
+```shell
+ip a;
+```
 
 If the interface still has no IP address, use any DHCP client to acquire new lease (in this case, `systemd-networkd` or `networkctl` on `enp7s0f3u2c4i2`):
 
-    # networkctl renew enp7s0f3u2c4i2
+```shell
+networkctl renew enp7s0f3u2c4i2;
+```
 
 And recheck your IP address. If the interface finally got its own IP address from the iOS device, then you should be able to connect to the internet. Remember the steps, or even better, the main idea behind connecting to iOS hotspots.
 
@@ -87,10 +109,12 @@ And recheck your IP address. If the interface finally got its own IP address fro
 
 If you are lazy like I am, then you probably want to have `systemd-networkd` automatically manage the interface and its DHCP lease. To do just that, add a `.network` config file in `/etc/systemd/network` (in this case `20-ios-usb.network`):
 
-    [Match]
-    Name=enp7s0f3u2c4i2
+```
+[Match]
+Name=enp7s0f3u2c4i2
 
-    [Network]
-    DHCP=yes
+[Network]
+DHCP=yes
+```
 
 That should do the trick, though sometimes it fails, but you can always do `networkctl(1)` to renew DHCP lease.
