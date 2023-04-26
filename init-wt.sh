@@ -1,8 +1,20 @@
 #!/usr/bin/env bash
 
-# This file provides frequently used jq wrappers for webtools scripts.
+# Initializes environment for webtools scripts
 
-MANIFEST="./manifest.json"
+announce() {
+	echo "[$0] $@"
+}
+
+die() {
+	echo "[$0] $@" >&2
+	exit 1
+}
+
+# Read manifest.json to MANIFEST
+[ -f "manifest.json" ] || die "init-wt.sh" "manifest.json is not a file";
+MANIFEST=$(< ./manifest.json);
+
 PROG=${0#'./'}
 
 set -o pipefail

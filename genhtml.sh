@@ -62,7 +62,7 @@ gen_many_sites() {
 	sites=$2;
 
 	for site in ${sites[@]}; do
-		gen_one_site "$runmode" $site
+		gen_one_site "$runmode" $site;
 	done;
 }
 
@@ -80,12 +80,17 @@ gen_one_site() {
 
 	if [[ $runmode == $MODELIVE ]]; then
 		if simyn "Generate distribution (HTML) files for $name?"; then
+
+			# mkdir if not exists
 			[ ! -d $dist ] && mkdir -p $dist;
+
+			# Execute ssg, and then minify.py
 			"$ssg_cmd" "$src" "$dist" "$name" "$url"\
-				&&simyn "Minify $dist with minify.py?"\
-					&& ./minify.py "$dist";
-		fi
-	fi
+				&& simyn "Minify $dist with minify-html.py?"\
+				&& ./minify-html.py "$dist";
+
+		fi;
+	fi;
 
 
 	echo "[$PROG] Site $name ($name $url)"

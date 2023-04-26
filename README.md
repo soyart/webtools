@@ -9,7 +9,21 @@ static websites with ssg easier by writing a manifest config file [`manifest.jso
 > for some of its features e.g. yes-no prompt. If it is not found on your host,
 > [`netget.sh`](/netget.sh) will download missing dependencies from Github.
 
-## Usage
+## Usage overview
+
+The usual workflow for the 1st run
+
+1. You prepare your source directory and resources
+
+2. You update your site manifest(s) in [`manifest.json`](/manifest.json) to reflect your needs
+
+3. You run a webtools command to perform some task
+
+4. You push the website documents to webserver
+
+After the 1st run, you can now just do tasks 3-4 and your websites will get updated.
+
+## Structuring your website directories
 
 webtools is written to reflect my needs - managing multiple simple static sites
 with shared resources. The convention for webtools is that, each website should live
@@ -24,18 +38,6 @@ Each _website_ has 3 subdirectories under their root:
 
 3. `resc` is where you store this website exclusive resources.
 
-The usual workflow for the 1st run
-
-1. You prepare your source directory and resources
-
-2. You update your site manifest(s) in `manifest.json` to reflect your needs
-
-3. You run a webtools command to perform some task
-
-4. You push the website documents to webserver
-
-After the 1st run, you can now just do tasks 3-4 and your websites will get updated.
-
 ## Client-side components
 
 These scripts are run on the user local machine when they are writing or publishing.
@@ -44,7 +46,7 @@ Most of them have `-n` flag for doing dry runs.
 ### `cleanup.sh`
 
 ```bash
-$ cleanup.sh [ROOT_DIR];
+cleanup.sh [ROOT_DIR];
 ```
 
 Finds and cleans files according to the manifest.
@@ -58,7 +60,7 @@ Loops over available websites in the manifest, and use `ssg`
 to convert Markdown files into structured website tree of HTML files.
 
 ```bash
-$ genhtml.sh [SITEKEY] [-n];
+genhtml.sh [SITEKEY] [-n];
 ```
 
 ### `linkweb.sh`
@@ -67,7 +69,7 @@ Loops over available websites in the manifest to create symbolic links
 as configured. Useful when you're managing expensive resources.
 
 ```bash
-$ linkweb.sh [SITEKEY] [-n | -c];
+linkweb.sh [SITEKEY] [-n | -c];
 ```
 
 ### `sendweb.sh`
@@ -76,7 +78,7 @@ Loops over available websites in the manifest and tries to send the
 target directories to remote locations
 
 ```bash
-$ sendweb.sh [SITEKEY] [-n];
+sendweb.sh [SITEKEY] [-n];
 ```
 
 ## Example: a new website from scratch
@@ -90,20 +92,20 @@ it to the correct location.
 Start by creating the directories:
 
 ```bash
-$ mkdir -p example.com/{src,dist,resc};
+mkdir -p example.com/{src,dist,resc};
 ```
 
 And start populating your `src` with something, e.g. with `<h1>Hello, world!</h1>`:
 
-```sh
-$ echo "# Hello, world!" > example.com/src/index.md;
+```bash
+echo "# Hello, world!" > example.com/src/index.md;
 ```
 
 And copy some good [`ssg`](https://rgz.ee) header and footer files; we'll assume
 that those files are already in `~/.ssg`:
 
 ```bash
-$ cp ~/.ssg/{_header.html,_footer.html} example.com/src/;
+cp ~/.ssg/{_header.html,_footer.html} example.com/src/;
 ```
 
 Now, update your manifest in `manifest.json` to reflect your website state by adding
@@ -114,8 +116,8 @@ webtools script. Verify that by running `genhtml.sh` and checks if it created
 HTML files for us:
 
 ```bash
-$ ./genhtml.sh;
-$ find example.com/dist -name "index.html" && echo "webtools ok";
+./genhtml.sh;
+find example.com/dist -name "index.html" && echo "webtools ok";
 ```
 
 ### Using `cleanhtml.sh`
@@ -129,8 +131,8 @@ reflected in the `dist` folder, `ssg` will not proceed and your HTML files will
 stay the same with same header. Try this one for yourself:
 
 ```bash
-$ ./genhtml.sh; # New HTML files created
-$ ./genhtml.sh; # No HTML files created!
+./genhtml.sh; # New HTML files created
+./genhtml.sh; # No HTML files created!
 ```
 
 The second call to `genhtml.sh` will never yield anything. This is because,
@@ -146,8 +148,8 @@ already in the manifest (`cleanup.toRemove` array).
 Try doing just that by executing `cleanup.sh`:
 
 ```bash
-$ ./cleanup.sh;
-$ ./genhtml.sh;
+./cleanup.sh;
+./genhtml.sh;
 ```
 
 You should see `example.com/dist/.files` showing up in your delete prompt.
@@ -155,12 +157,13 @@ After you deleted that file, `ssg` should work again and this time `genhtml.sh`
 will create the new files with new headers, even if their Markdown content stayed
 the same.
 
-Your website should pop up in the prompt, and a new `index.html` should be available in `example.com/dist`
+Your website should pop up in the prompt, and a new `index.html` should be
+available in `example.com/dist`
 
 ### Using `sendweb.sh`
 
-Now that you can create new HTML files from Markdowns, it's time we push our HTML documents
-to the webserver.
+Now that you can create new HTML files from Markdowns, it's time we push our
+HTML documents to the webserver.
 
 To do that, let's first assume that on our local machine, we have a SSH Host `myserverlol`
 defined in `~/.ssh/config` with user `admin`, and we want to push our documents to
@@ -198,7 +201,22 @@ or media e.g. images.
 And now, run `linkweb.sh`:
 
 ```bash
-$ ./linkweb.sh;
+./linkweb.sh;
 ```
 
 And now, check your link destinations. You should see all those soft links.
+
+The other scripts are pretty straightforward. If your manifest is correct,
+you should be able to use them without problems.
+
+## Misc scripts
+
+This repo also provides other miscelleneous scripts:
+
+- [`minify-html.py`](/minify-html.py)
+
+  A simple, stupid script for minifying HTML files
+
+- [`minify-css.py`](/minify-css.py)
+
+  A shamelessly stolen Regex-based Python script for minifying CSS files

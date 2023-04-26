@@ -2,26 +2,17 @@
 
 # wtutils define helper functions for webtools
 
-announce() {
-	echo "[$0] $@"
-}
-
-die() {
-	echo "[$0] $@" >&2
-	exit 1
-}
-
 # Gets all sites directly from file
 get_all_sites_json() {
-	echo $(cat $MANIFEST) | jq -c '.sites[]';
+	echo $MANIFEST | jq -c '.sites[]';
 }
 
 get_all_servers_json() {
-	echo $(cat $MANIFEST) | jq -c '.servers[]';
+	echo $MANIFEST | jq -c '.servers[]';
 }
 
 get_cleanup_json() {
-	echo $(cat $MANIFEST) | jq -c '.cleanup';
+	echo $MANIFEST | jq -c '.cleanup';
 }
 
 get_site_from_file_json() {
@@ -34,7 +25,7 @@ get_site_from_file_json() {
 
 get_sitekeys_json() {
 	if [ -z $1 ]; then
-		data=$(cat $MANIFEST);
+		data=$(echo $MANIFEST);
 	else
 		data=$1;
 	fi
