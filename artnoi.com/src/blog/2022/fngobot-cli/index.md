@@ -4,7 +4,7 @@ Jan 25, 2022
 
 ## Why am I so delightful?
 
-When I first wrote [FnGoBot](https://github.com/artnoi43/fngobot), which is my second Go program, I made a lot of mistakes that made it very difficult to change anything in the code. Everything was highly coupled, everywhere and out of place.
+When I first wrote [FnGoBot](https://github.com/soyart/fngobot), which is my second Go program, I made a lot of mistakes that made it very difficult to change anything in the code. Everything was highly coupled, everywhere and out of place.
 
 But after [I got a new job](/blog/2021/dev/), I have been refactoring the code to the point that I can now easily add a new quote source in 1/2 hour, or even add new interface to the bot. And I did just that.
 

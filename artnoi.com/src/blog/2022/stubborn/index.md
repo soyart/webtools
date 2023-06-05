@@ -1,6 +1,6 @@
 April 13, 2022
 
-# Introducting [stubborn resolver](https://github.com/artnoi43/stubborn)
+# Introducting [stubborn resolver](https://github.com/soyart/stubborn)
 
 So after 6 months into this new software engineering job, I finally managed to balance my work with my schedule. As a result, I have had much more free (and high quality) time.
 
@@ -10,14 +10,14 @@ And last month, I began working on my new Go project - an attempt to imitate [st
 
 ## What is stubborn and how do I use it?
 
-stubborn is a _caching_ DNS stub resolver, with only [DoT](https://en.wikipedia.org/wiki/DNS_over_TLS) or [DoH](https://en.wikipedia.org/wiki/DNS_over_HTTPS) outgoing traffic. This is done to protect user privacy and for fun. It uses in-memory key-value cache, and can read UNIX-style `/etc/hosts` file or a [proprietary JSON hosts file](https://github.com/artnoi43/stubborn/blob/main/config/table.json.example) for local network lookup table.
+stubborn is a _caching_ DNS stub resolver, with only [DoT](https://en.wikipedia.org/wiki/DNS_over_TLS) or [DoH](https://en.wikipedia.org/wiki/DNS_over_HTTPS) outgoing traffic. This is done to protect user privacy and for fun. It uses in-memory key-value cache, and can read UNIX-style `/etc/hosts` file or a [proprietary JSON hosts file](https://github.com/soyart/stubborn/blob/main/config/table.json.example) for local network lookup table.
 
 ### Installing stubborn
 
 Assuming that you already have Go installed on your system, you can just use `go install` to install `stubborn` to your `bin` directory:
 
 ```shell
-go install github.com/artnoi43/stubborn/cmd/stubborn@latest
+go install github.com/soyart/stubborn/cmd/stubborn@latest
 ```
 
 The above command should install `stubborn` executable in `$HOME/go/bin`, and pulls any build time depedencies down with it. If running `stubborn` is what you want, the command above should be enough. Just be sure to add the `bin` directory to your shell `$PATH`.
@@ -25,7 +25,7 @@ The above command should install `stubborn` executable in `$HOME/go/bin`, and pu
 If you only want the source code, use `go get`:
 
 ```shell
-go get github.com/artnoi43/stubborn/cmd/stubborn@latest
+go get github.com/soyart/stubborn/cmd/stubborn@latest
 ```
 
 After you have saw and finished cursing `stubborn` source code, you can build it with:
@@ -48,7 +48,7 @@ stubborn -c doh # Will spawn DoH client
 
 > Short answer: `stubborn`, like the other 102% of all my projects, is written in Go, which is a statically compiled language.
 
-With static linking by default in Go, imported code gets compiled into _one big chunk of binary_ plus some Go runtime code (e.g. the GC or garbage compiled). You can see the list of Go modules used in this project in its [`go.mod` file](https://github.com/artnoi43/stubborn/blob/main/go.mod). I swear I tried to minimize the libraries used.
+With static linking by default in Go, imported code gets compiled into _one big chunk of binary_ plus some Go runtime code (e.g. the GC or garbage compiled). You can see the list of Go modules used in this project in its [`go.mod` file](https://github.com/soyart/stubborn/blob/main/go.mod). I swear I tried to minimize the libraries used.
 
 Static linking makes Go applications appear to have much larger disk footprint than a C program. However, although stubborn is ~10MB when built, it is actually much smaller than some other C-based DNS resolvers that uses a lot of dynamic linking.
 
@@ -56,7 +56,7 @@ And because by default nothing is dynamically linked in Go, you can run this app
 
 ### Yeah I get it, Go is statically linked, but why the source is so large?
 
-Well, it started out small, but I decided to restructure it according to uncle Bob's clean architecture. `stubborn` is also very easy to implement new features or new infrastructure, just like my other project [todong](https://github.com/artnoi43/todong) which supports 2 data store types, and 4 web frameworks! All configurable with just a line in the config file.
+Well, it started out small, but I decided to restructure it according to uncle Bob's clean architecture. `stubborn` is also very easy to implement new features or new infrastructure, just like my other project [todong](https://github.com/soyart/todong) which supports 2 data store types, and 4 web frameworks! All configurable with just a line in the config file.
 
 This view is in stark contrast to my previously held view that software should be suckless, i.e. being minimalists and focus on peak efficiency. Now I don't enjoy reading hacky code that's fast but configurable. Today I enjoy code than can be maintained and picked up by others easily. And extensibility (which means proper isolation) is now one of my top priorities.
 

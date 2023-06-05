@@ -28,7 +28,7 @@ I have to admit I was still too dumb to learn Rust during this period, although 
 
 > Personally, I believe Rust will be BIG. It is a modern C, and much safer.
 
-My first software that actually has real world use, [gfc](https://github.com/artnoi43/gfc), was first written during this period.
+My first software that actually has real world use, [gfc](https://github.com/soyart/gfc), was first written during this period.
 
 ### Mid 2021: Got a full-stack cert
 
@@ -46,19 +46,19 @@ After feeling confident about my skills as a junior back-end developer who learn
 
 Only one replied. And it was [Cleverse](https://cleverse.com), a Thai startup well known in Thailand for its talented young developers. And now I'm working as Cleverse back-end software engineer, perhaps the first one in the dev team to write back-end code without a proper college degree.
 
-After working for Cleverse, I have learned a lot of programming best practices, and have since been incorporating those good designs into my own code. You can see on my GitHub page that I have been heavily refactoring [FnGoBot](https://github.com/artnoi43/fngobot) and [gfc](https://github.com/artnoi43/gfc) during this period.
+After working for Cleverse, I have learned a lot of programming best practices, and have since been incorporating those good designs into my own code. You can see on my GitHub page that I have been heavily refactoring [FnGoBot](https://github.com/soyart/fngobot) and [gfc](https://github.com/soyart/gfc) during this period.
 
 ## List of my software released in 2021
 
-1. [gfc](https://github.com/artnoi43/gfc) - a simple, stupid CLI file/console encryption/decryption tool using AES-256 GCM, AES-256 CTR, and RSA OAEP SHA256. It can output raw ciphertext, or hex/base64 formated ciphertext. Likewise, its ciphertext input can be either raw, hex, or base64.
+1. [gfc](https://github.com/soyart/gfc) - a simple, stupid CLI file/console encryption/decryption tool using AES-256 GCM, AES-256 CTR, and RSA OAEP SHA256. It can output raw ciphertext, or hex/base64 formated ciphertext. Likewise, its ciphertext input can be either raw, hex, or base64.
 
-2. [FnGoBot](https://github.com/artnoi43/fngobot) - a simple, stupid Telegram chatbot for financial securities. This project helped me learn development planning, good and modular design, as well as [JSON parsing in Go](/blog/2021/go-json-api/).
+2. [FnGoBot](https://github.com/soyart/fngobot) - a simple, stupid Telegram chatbot for financial securities. This project helped me learn development planning, good and modular design, as well as [JSON parsing in Go](/blog/2021/go-json-api/).
 
-3. [DoggoVac](https://github.com/artnoi43/doggovac) - a full-stack simple, stupid canine and feline vaccination tracker for small vet businesses, with both back-end and front-end written in Javascript. Try it on [doggovac.artnoi.com](https://doggovac.artnoi.com) Warning: The code is not very pleasant to look at. It works well though - my family currently use our private instance to store out pets' vaccination data.
+3. [DoggoVac](https://github.com/soyart/doggovac) - a full-stack simple, stupid canine and feline vaccination tracker for small vet businesses, with both back-end and front-end written in Javascript. Try it on [doggovac.artnoi.com](https://doggovac.artnoi.com) Warning: The code is not very pleasant to look at. It works well though - my family currently use our private instance to store out pets' vaccination data.
 
-4. [19](https://github.com/artnoi43/19) - a global COVID-19 tracker with data from OWID. It is front-end only and is currently hosted on [19.artnoi.com](https://19.artnoi.com).
+4. [19](https://github.com/soyart/19) - a global COVID-19 tracker with data from OWID. It is front-end only and is currently hosted on [19.artnoi.com](https://19.artnoi.com).
 
-5. [csc](https://github.com/artnoi43/csc) - a simple, stupid file checksum utility. It currently supports MD5, SHA1, and SHA256 hash algorithms.
+5. [csc](https://github.com/soyart/csc) - a simple, stupid file checksum utility. It currently supports MD5, SHA1, and SHA256 hash algorithms.
 
 ## 2022 Plans
 
@@ -66,7 +66,7 @@ After working for Cleverse, I have learned a lot of programming best practices, 
 
 ## ⚙️
 
-I want to be able to write [gfc](https://github.com/artnoi43/gfc) in Rust this year.
+I want to be able to write [gfc](https://github.com/soyart/gfc) in Rust this year.
 
 ### Learn more DevOps
 
