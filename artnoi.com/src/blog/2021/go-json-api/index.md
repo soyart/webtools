@@ -224,6 +224,6 @@ func Get(kw string) *Quote {
 }
 ```
 
-After all this, we can see that there's still some duplicate codes. I have eliminate those duplicate code in my actual file, you can see it [here](https://github.com/artnoi43/fngobot/blob/main/fetch/satang/satang.go).
+After all this, we can see that there's still some duplicate codes. I have eliminate those duplicate code in my actual file, you can see it [here](https://github.com/soyart/fngobot/blob/main/fetch/satang/satang.go).
 
 That's it guys, and some time later I may add another example to this example.

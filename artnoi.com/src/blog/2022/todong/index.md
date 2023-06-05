@@ -2,7 +2,7 @@ Mar 30, [2022](/blog/2022/)
 
 # What no bitches does to a MF: todong
 
-During my last feature development, I finished my part early, and so I had a bit of free time. So I decided to practice writing clean code, with the same old to-do list REST back-end. [The code is open for thrashing on my GitHub](https://github.com/artnoi43/todong).
+During my last feature development, I finished my part early, and so I had a bit of free time. So I decided to practice writing clean code, with the same old to-do list REST back-end. [The code is open for thrashing on my GitHub](https://github.com/soyart/todong).
 
 ## Goals
 

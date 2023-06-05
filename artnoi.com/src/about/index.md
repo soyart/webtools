@@ -10,7 +10,7 @@ system programmer, because I like to write code and [setting up my computers](os
 
 - [twitter.com/artnoi](https://twitter.com/artnoi)
 
-- [github.com/artnoi43](https://github.com/artnoi43)
+- [github.com/soyart](https://github.com/soyart)
 
 - [gitlab.com/artnoi](https://gitlab.com/artnoi)
 
@@ -20,16 +20,16 @@ system programmer, because I like to write code and [setting up my computers](os
 
 #### Go
 
-- file encryption utility [gfc, 2021](https://github.com/artnoi43/gfc)
+- file encryption utility [gfc, 2021](https://github.com/soyart/gfc)
 
-- financial market Telegram bot [fngobot, 2021](https://github.com/artnoi43/fngobot)
+- financial market Telegram bot [fngobot, 2021](https://github.com/soyart/fngobot)
 
-- DoH/DoT stub resolver [stubborn, 2022](https://github.com/artnoi43/stubborn)
+- DoH/DoT stub resolver [stubborn, 2022](https://github.com/soyart/stubborn)
 
 #### Rust
 
-- Simple trie library [soytrie, 2023](https://github.com/artnoi43/soytrie)
+- Simple trie library [soytrie, 2023](https://github.com/soyart/soytrie)
 
-- Web-based text sharing app [soydrop, 2023](https://github.com/artnoi43/actix-drop)
+- Web-based text sharing app [soydrop, 2023](https://github.com/soyart/actix-drop)
 
-and countless other useless programs on [github.com/artnoi43](https://github.com/artnoi43)
+and countless other useless programs on [github.com/soyart](https://github.com/soyart)

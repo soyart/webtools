@@ -8,7 +8,7 @@ I just wrote a small Go command-line utility to encrypt/decrypt files using AES-
 
 This is my second real program (not a `sh(1)` script), the first being UNIX `cat(1)` clone called [kat](https://gitlab.com/artnoi/c/-/blob/master/src/kat.c).
 
-Check gfc out on [my Github](https://github.com/artnoi43/gfc) or [GitLab](https://gitlab.com/artnoi/gfc) (more frequent updates on GitLab)
+Check gfc out on [my Github](https://github.com/soyart/gfc) or [GitLab](https://gitlab.com/artnoi/gfc) (more frequent updates on GitLab)
 
 ## gfc features
 

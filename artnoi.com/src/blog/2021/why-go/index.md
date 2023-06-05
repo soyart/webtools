@@ -20,7 +20,7 @@ Although Go is garbage-collected and thus is not suitable for writing operating 
 
 ### Great standard library
 
-Go ships with amazing standard library that enables you to write sophisticated software. The extra library (`golang.org/x`) is also super useful and inclusive. For example, my first Go program, [gfc](https://github.com/artnoi43/gfc), is written using only Go standard library and the extra ones. You can build a HTTP client or server using only the standard library.
+Go ships with amazing standard library that enables you to write sophisticated software. The extra library (`golang.org/x`) is also super useful and inclusive. For example, my first Go program, [gfc](https://github.com/soyart/gfc), is written using only Go standard library and the extra ones. You can build a HTTP client or server using only the standard library.
 
 ### Nice pattern
 
