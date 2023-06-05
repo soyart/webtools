@@ -32,7 +32,7 @@ is used on this website.
 The website partially uses monospaced [TTF Hack](https://sourcefoundry.org/hack/),
 which is my desktop and terminal font face, with blue-ish color scheme from [Iceberg](https://github.com/cocopon/iceberg.vim).
 
-I write my web pages in Markdown and then use [webtools](https://github.com/artnoi43/webtools)
+I write my web pages in Markdown and then use [webtools](https://github.com/soyart/webtools)
 to generate and manage the HTML files.
 
 artnoi.com is [served using OpenBSD `httpd(8)` and `relayd(8)`](/blog/2022/openbsd-webserver).
