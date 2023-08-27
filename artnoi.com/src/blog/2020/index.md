@@ -12,10 +12,6 @@
 
 [Oct 14, 2020](/blog/2020/oct-14/)
 
-[My problems with work computers](/blog/2020/enterprise/)
-
-[I'm employed!](/blog/2020/employed/)
-
 [Moving artnoi.com to OpenBSD](/blog/2020/bsdbox/)
 
 [OpenBSD first impression](/blog/2020/openbsd/)
