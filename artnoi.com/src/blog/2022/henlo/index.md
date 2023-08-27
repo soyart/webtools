@@ -52,7 +52,7 @@ After working for Cleverse, I have learned a lot of programming best practices, 
 
 1. [gfc](https://github.com/soyart/gfc) - a simple, stupid CLI file/console encryption/decryption tool using AES-256 GCM, AES-256 CTR, and RSA OAEP SHA256. It can output raw ciphertext, or hex/base64 formated ciphertext. Likewise, its ciphertext input can be either raw, hex, or base64.
 
-2. [FnGoBot](https://github.com/soyart/fngobot) - a simple, stupid Telegram chatbot for financial securities. This project helped me learn development planning, good and modular design, as well as [JSON parsing in Go](/blog/2021/go-json-api/).
+2. [FnGoBot](https://github.com/soyart/fngobot) - a simple, stupid Telegram chatbot for financial securities. This project helped me learn development planning, good and modular design..
 
 3. [DoggoVac](https://github.com/soyart/doggovac) - a full-stack simple, stupid canine and feline vaccination tracker for small vet businesses, with both back-end and front-end written in Javascript. Try it on [doggovac.artnoi.com](https://doggovac.artnoi.com) Warning: The code is not very pleasant to look at. It works well though - my family currently use our private instance to store out pets' vaccination data.
 

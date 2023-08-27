@@ -3,7 +3,7 @@
 Hi, I'm [@artnoi](https://twitter.com/artnoi) (Prem), and I'm running this website.
 
 I'm a self-taught back-end software engineer based in Bangkok.
-Now I'm working as a back-end engineer for a Thai Web3 startup.
+Now I'm working as a back-end engineer for a Thai Web3 startup (I despise Web3, though).
 
 ## About this webs(h)ite
 
