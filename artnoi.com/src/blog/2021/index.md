@@ -6,15 +6,11 @@
 
 [Redis basic commands](/blog/2021/redis/)
 
-[Parsing JSON with arbitary keys in Go](/blog/2021/go-json-api/)
-
 [Why I prefer Go as a beginner developer](/blog/2021/why-go/)
 
 [Sequelize ORM](/blog/2021/sequelize-orm/)
 
 [Hifiman HE4XX is perfect with films](/blog/2021/he4xx/)
-
-[MariaDB and MySQL Workbench on Arch Linux](/blog/2021/archmysql/)
 
 [สร้างเว็บไซต์จาก Markdown ด้วย ssg](/blog/2021/markdownsite/)
 
