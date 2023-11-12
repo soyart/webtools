@@ -55,12 +55,12 @@ get_shtools() {
 
 get_lb() {
 	get_shtools "bin" "lb.sh"\
-		"https://gitlab.com/artnoi/unix/-/raw/main/sh-tools/bin/lb.sh";
+		"https://gitlab.com/artnoi/unix/-/raw/master/sh-tools/bin/lb.sh";
 }
 
 get_yn() {
 	get_shtools "bin" "yn.sh"\
-		"https://gitlab.com/artnoi/unix/-/raw/main/sh-tools/bin/yn.sh";
+		"https://gitlab.com/artnoi/unix/-/raw/master/sh-tools/bin/yn.sh";
 }
 
 get_unix() {
