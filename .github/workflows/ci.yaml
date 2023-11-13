@@ -1,0 +1,37 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - artnoi.com
+
+jobs:
+  build:
+    name: Build static sites
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+
+      - name: Install python dependencies
+        run: pip install htmlmin
+
+      - name: Install lowdown
+        run: sudo apt-get install -y lowdown
+
+      - name: Prepare dist
+        run: mkdir -p artnoi.com/dist
+
+      - name: Build
+        run: yes | ./genhtml.sh
+        
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@364c31d33bb99327c77b3a5438a83a357a6729ad # v3.4.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: publish/artnoi.com
+          publish_dir: artnoi.com/dist
+          force_orphan: true
