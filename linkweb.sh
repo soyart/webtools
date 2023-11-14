@@ -113,7 +113,7 @@ looplink() {
 				rmlink "$dst"; ;;
 			"$MODELIVE")
 				rmlink "$dst";
-				ln -s "$src" "$dst"; ;;
+				cp -a "$src" "$dst"; ;;
 		esac
 
 		announce "$src -> $dst ($runmode)";
