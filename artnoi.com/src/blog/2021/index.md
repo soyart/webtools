@@ -4,23 +4,13 @@
 
 [I got a new software development job](/blog/2021/dev/)
 
-[Redis basic commands](/blog/2021/redis/)
-
 [Why I prefer Go as a beginner developer](/blog/2021/why-go/)
 
-[Sequelize ORM](/blog/2021/sequelize-orm/)
-
 [Hifiman HE4XX is perfect with films](/blog/2021/he4xx/)
-
-[สร้างเว็บไซต์จาก Markdown ด้วย ssg](/blog/2021/markdownsite/)
 
 [Arch Linux bit-perfect USB audio (USB DAC)](/blog/2021/archaudio/)
 
 [My experience with Windows](/blog/2021/windows/)
-
-[My suckless, Netflix-like setup](/blog/2021/myflix/)
-
-[Why Lenovo > Apple](/blog/2021/lenovo/)
 
 [Tricked on Telegram](/blog/2021/tricked/)
 
@@ -39,5 +29,3 @@
 [เริ่มต้นกับ WireGuard](/blog/2021/wireguard-th/)
 
 [Switching from X11 to Wayland](/blog/2021/sway/)
-
-[Switching from Bash to KornShell](/blog/2021/ksh/)
