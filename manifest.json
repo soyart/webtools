@@ -11,7 +11,7 @@
 	],
 	"sites": [
 		{
-			"sitekey": "jd",
+			"sitekey": "jd.com",
 			"name": "JohnDoe.com",
 			"url": "https://johndoe.com",
 			"src": "johndoe.com/src",
@@ -27,7 +27,7 @@
 			}
 		},
 		{
-			"sitekey": "artnoi",
+			"sitekey": "artnoi.com",
 			"name": "Artnoi.com",
 			"url": "https://artnoi.com",
 			"src": "artnoi.com/src",
