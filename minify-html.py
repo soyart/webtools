@@ -16,24 +16,24 @@ def loop_dir(dir_name, start_path):
             loop_dir(current_file, start_path)
 
         if ".html" in current_file:
-            read_and_minify(current_file)
+            minify(current_file)
 
     os.chdir("..")
 
 
-def read_and_minify(html_filename):
+def minify(html_filename):
     full_path = os.path.abspath(html_filename)
 
-    fp_r = open(html_filename, "r")
-    document = fp_r.read()
-    fp_r.close()
+    f_read = open(html_filename, "r")
+    document = f_read.read()
+    f_read.close()
 
     minified = htmlmin.minify(document)
     print(f"[{prog_name}] Minify: {full_path}")
 
-    fp_w = open(html_filename, "w")
-    fp_w.write(minified)
-    fp_w.close()
+    f_write = open(html_filename, "w")
+    f_write.write(minified)
+    f_write.close()
 
 def main():
     if len(sys.argv) < 2:
