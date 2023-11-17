@@ -2,6 +2,8 @@ bak
 bin/*
 
 artnoi.com/dist/*
+artnoi.com/src/_header.html
+artnoi.com/src/_footer.html
 
 # These files are linked by linkweb.sh
 dist
