@@ -1,0 +1,215 @@
+<!DOCTYPE html><html lang=en> <head><title>Artnoi.com</title><meta name=viewport content="width=device-width, initial-scale=1.0"><meta name=keywords content="artnoi, Prem Phansuriyanon"><meta name=author content=@artnoi><meta charset=UTF-8><link href=/style.css rel=stylesheet></head> <body> <ul class=navbar> <li><a href=/ ><img src=/toplogo.png alt=Artnoi.com class=logo>artnoi</a></li> <li class=f-right><a href=/cheat/ >cheat</a></li> <li class=f-right><a href=/blog/ >blog</a></li> <li class=f-right><a href=/about/ >about</a></li> </ul> <h1 id=Arch%20Linux%20cheat%20sheet>Arch Linux cheat sheet</h1> <h2 id=Pacman>Pacman</h2> <p>Listing explicitly installed packages</p> <pre><code class=language-shell>pacman -Qqe;  # Any marked explicitly installed
+pacman -Qqen; # Native only (non-AUR)
+</code></pre> <p>Listing explicitly installed AUR packages</p> <pre><code class=language-shell>pacman -Qqem;
+</code></pre> <p>Marking a package as explicitly installed, or as dependencies</p> <pre><code class=language-shell>pacman -D --asexplicit &#60;package&#62; [..packages];
+pacman -D --asdeps &#60;package&#62; [..packages];
+</code></pre> <h2 id=Broken%20Pacman>Broken Pacman</h2> <p>When <code>pacman(8)</code> is broken, either by partial upgrades or mirror errors, and you don&#8217;t have a spare USB flash drive for the boot ISO, you can manually install <code>.zst</code> packages to <em>temporarily</em> fix broken dependencies. And no, this is not <code>pacman -U</code>, and did not involve the Arch Linux Archive.</p> <p>In this example, package <code>glibc</code> wasn&#8217;t upgraded properly, so <code>libalpm</code> breaks (lib Arch Linux Pacman) now that its run-time dependencies are missing. To get <code>pacman</code> back to working in this case, untar <code>glibc</code> from package cache (defaults to <code>&#47;var&#47;cache&#47;pacman&#47;pkg</code>) to system root:</p> <blockquote> <p>Omit <code>-w</code> if you don&#8217;t want interactive prompt for every file.</p> </blockquote> <pre><code class=language-shell>tar -xvpwf glibc-xxx.tar.zst -C &#47; --exclude &#39;.PKGINFO&#39; --exclude &#39;.INSTALL&#39; --exclude &#39;.MTREE&#39; --exclude &#39;.BUILDINFO&#39;;
+</code></pre> <p>This will extract <code>glibc-xxx.zst</code> to root, and hopefully fixes <code>pacman</code> at runtime. If there are more breakages, you may want to repeat the process until you satisfy <em>all</em> of <code>pacman</code>&#8217;s dependencies.</p> <p>You can use a healthy Arch system to see full <code>pacman</code> depedencies with:</p> <pre><code class=language-shell>pacman -Q $(pactree pacman);
+````
+
+After `pacman` works, remember to sync your local packages with the mirrors and upgrade regularly.
+
+## Arch Linux Suspense and Hibernation
+
+### Kernel parameters: with swap partition
+
+With a proper swap partition, `resume` value can be any type of path to the swap partition, like UUID or other identifier name like this`resume=&#47;dev&#47;mapper&#47;mylvm-swap`.
+
+Now let&#39;s add `resume` hook in `mkinitcpio.conf`&#39;s HOOKS sections. I made it run late, just before `filesystems`. And now, generate a new image:
+
+```shell
+mkinitcpio -P;
+</code></pre> <h3 id=Kernel%20parameters:%20with%20swapfile>Kernel parameters: with swapfile</h3> <p>If you use a <a href=https://wiki.archlinux.org/index.php/Swap#Swap_file>swapfile</a>, then <code>resume</code> and <code>resume_offset</code> kernel parameter option are needed.</p> <h4 id=Swapfile%20on%20Btrfs>Swapfile on Btrfs</h4> <p>Linux swapfiles cannot be on Btrfs with CoW attributes.</p> <p>So if you want CoW on your root system, but also want to use swapfile on the root system, you&#8217;ll have to create a new Btrfs subvolume and disable its CoW attributes:</p> <blockquote> <p>Users of other popular Linux non-CoW filesystems such as EXT4 can skip (1) and (2), and they don&#8217;t need <code>..&#47;swapvolume&#47;..</code>, they can just use <code>&#47;swapfile</code>.</p> </blockquote> <pre><code class=language-shell>## 1. New subv
+btrfs subv create &#47;swapvolume;
+
+## 2. Disable CoW
+chattr +C &#47;swapvolume;
+
+## 3. Create file and format to swap
+SWAPFILE=&#39;&#47;swapvolume&#47;swapfile&#39;;
+
+dd if=&#47;dev&#47;zero of="$SWAPFILE";
+
+mkswap -U clear "$SWAPFILE";
+
+## 4. Try swapon and, if OK, update fstab
+swapon "$SWAPFILE";
+
+echo "$SWAPFILE none swap defaults 0 0" &#62;&#62; &#47;etc&#47;fstab;
+</code></pre> <p>Now we have a good swapfile, now let&#8217;s tell our bootloader to pass the new <code>resume</code> and <code>resume_offset</code>.</p> <p>This time, <code>resume</code> is the UUID of the device on which the filesystem with the swapfile is. In my case, <code>swapfile</code> is in Btrfs subvolume <code>&#47;swapvolume</code>, which, being a logical volume, shares the same UUID as its parent <code>&#47;</code>. So <code>resume</code> for me is going to be the UUID of my Btrfs filesystem.</p> <p><code>resume_offset</code> is offset of the swapfile.</p> <p>Getting file offset on a filesystems <strong>other than Btrfs</strong> can use this command to find the value for <code>resume_offset</code> of file <code>&#47;swapfile</code>:</p> <pre><code class=language-shell>    filefrag -v &#39;&#47;swapfile&#39;;
+</code></pre> <p>And this is the output of the above command:</p> <pre><code>Filesystem type is: fb69
+File size of &#47;swapfile is 4294967296 (1048576 blocks of 4096 bytes)
+ext:     logical_offset:        physical_offset: length:   expected: flags:
+0:        0..       0:      38912..     38912:      1:
+1:        1..   22527:      38913..     61439:  22527:             unwritten
+2:    22528..   53247:     899072..    929791:  30720:      61440: unwritten
+</code></pre> <p>In this case, the <code>resume_offset</code> is 38912. With Btrfs, the whole thing is a mess, and <code>filefrag</code> won&#8217;t help you. Instead, you&#8217;ll need to grab a small C program source code off GitHub, and use it to determine your <code>resume_offset</code>:</p> <pre><code class=language-shell>    ## You should review the source code before proceeding :)
+    URL="https:&#47;&#47;github.com&#47;osandov&#47;osandov-linux&#47;blob&#47;master&#47;scripts&#47;btrfs_map_physical.c";
+    #
+    PROGNAME=&#39;btrfs_map_physical&#39;;
+    cd &#47;tmp;
+    curl $URL &#62; $PROGNAME;
+    gcc -O2 -o "$PROGNAME" "${PROGNAME}.c";
+    chmod +x $PROGNAME
+    mv $PROGNAME &#47;usr&#47;local&#47;sbin&#47;;
+    "$PROGNAME" &#47;swapvolume&#47;swapfile
+</code></pre> <p>The last command should produce the following output:</p> <pre><code>FILE OFFSET EXTENT TYPE LOGICAL SIZE LOGICAL OFFSET PHYSICAL SIZE DEVID PHYSICAL OFFSET
+0          regular  4096      2927632384 268435456 1 4009762816
+4096       prealloc 268431360 2927636480 268431360 1 4009766912
+268435456  prealloc 268435456 3251634176 268435456 1 4333764608
+536870912  prealloc 268435456 3520069632 268435456 1 4602200064
+805306368  prealloc 268435456 3788505088 268435456 1 4870635520
+1073741824 prealloc 268435456 4056940544 268435456 1 5139070976
+1342177280 prealloc 268435456 4325376000 268435456 1 5407506432
+1610612736 prealloc 268435456 4593811456 268435456 1 5675941888
+</code></pre> <p>This time, <code>resume_offset</code> boot parameter is the <code>PHYSICAL_OFFSET</code> of <code>FILE OFFSET 0</code>, which is 4009762816. After you put both kernel parameters in your bootloader entry, you&#8217;re done. That should be it for resuming to swapfile.</p> <h3 id=Resume%20to%20ZFS>Resume to ZFS</h3> <p>I have both dm-crypt and encrpyted ZFS root filesystems, but I can only got the dm-crypt root to resume properly, because the <code>resume</code> initramfs hook would just skip ZFS swap ZVOL and complained that it could not find the resume device when actually the ZPOOL had not been unlocked. I could not use a separate dm-crypt swap partition either, because I want TRIM support for my filesystems, and that requires <code>systemd</code> and <code>sd-encrypt</code> hook which in turn breaks ZFS encryption (as of June 21, 2020).</p> <h3 id=Suspend&#47;hibernate%20on%20lid-close>Suspend&#47;hibernate on lid-close</h3> <p>For Arch to suspend&#47;hibernate on laptop lid-close event, I had to do the following:</p> <ul> <li><p>System-wide&#47;console<br> First, start by configuring <code>logind.conf</code> and see if it works.</p></li> <li><p>GUI: basic suspend<br> If suspense on console works, now it should also work on X by issuing <code># systemctl suspend</code> on an X terminal.</p></li> <li><p>GUI: suspend and lock GUI (X&#47;Wayland) screen (<code>slock</code>, <code>swaylock</code>)</p></li> </ul> <h3 id=Using%20systemd%20service%20to%20activate%20screen%20lock%20on%20sleep>Using systemd service to activate screen lock on sleep</h3> <p>We can use a basic systemd service to execute a screen locker before <code>suspend.target</code>.</p> <p>Below is an example I copied from the Arch Wiki <a href=https://wiki.archlinux.org/index.php/Slock>slock page</a> and my <code>swaylock@.service</code> for Sway (a Wayland window manager):</p> <pre><code>#&#47;etc&#47;systemd&#47;system&#47;slock@.service
+[Unit]
+Description=Lock X session using slock for user %i
+Before=sleep.target
+
+[Service]
+User=%i
+Environment=DISPLAY=:0
+ExecStartPre=&#47;usr&#47;bin&#47;xset dpms force suspend
+ExecStart=&#47;usr&#47;bin&#47;slock
+
+[Install]
+WantedBy=sleep.target
+
+#&#47;etc&#47;systemd&#47;system&#47;swaylock@.service
+[Unit]
+Description=Lock X session using slock for user %i
+Before=sleep.target
+
+[Service]
+User=%i
+Environment=DISPLAY=:0
+ExecStartPre=swaymsg "output * dpms off"
+ExecStart=&#47;usr&#47;bin&#47;swaylock
+
+[Install]
+WantedBy=sleep.target
+</code></pre> <p>And this is my own similar service, albeit with <code>swaylock</code>:</p> <pre><code># &#47;etc&#47;systemd&#47;system&#47;swaylock@.service
+[Unit]
+Description=Lock X session using slock for user %i
+Before=sleep.target
+
+[Service]
+User=%i
+Environment=DISPLAY=:0
+ExecStartPre=swaymsg "output * dpms off"
+ExecStart=&#47;usr&#47;bin&#47;swaylock
+
+[Install]
+WantedBy=sleep.target
+</code></pre> <p>And enable the service(s):</p> <pre><code class=language-shell>systemctl enable slock@username.service;
+systemctl enable swaylock@username.service;
+</code></pre> <p>Substitute <em>username</em> with user running the desktop.</p> <h2 id=Arch%20Linux%20Bit-perfect%20USB%20Audio>Arch Linux Bit-perfect USB Audio</h2> <p>Install <code>pulseaudio-alsa</code> and your USB audio output should be bit-perfect, that is, the USB DAC changes sample rates according to your audio source.</p> <p>It should now output 48KHz when watching videos, and 44.1KHz for CD audio.</p> <h2 id=Pacman:%20Essential%20Package%20List%20(Updated%20June%202020)>Pacman: Essential Package List (Updated June 2020)</h2> <p>My usually installed packages. Package names prepended &#8216;#&#8217; indicate that the packages are no longer relevant <strong>to me</strong>, i.e. I no longer want to use them. The X and graphics section needs some revision.</p> <pre><code># base+boot
+base base-devel man-db vim mkinitcpio efibootmgr
+
+# disks
+lvm2 dosfstools #parted #cfdisk
+
+# hardware
+crda lm_sensors smartmontools #tlp #acpi #acpid
+
+# networking
+iwd stubby dnsmasq ufw wireguard-tools #wireguard-dkms
+
+# networking utils
+dnsutils openresolv nfs-utils nmap speedtest-cli #iperf3
+
+# classics
+make git bash-completion patch mlocate rsync openssh #lsof #lshw #which #tree
+
+# kernels
+linux-firmware linux* linux*-firmware linux*-headers
+
+# security
+gnupg #arch-audit #clamav #lynis
+
+# basic X (gui)
+xorg-server xorg-xinit xorg-xrdb xorg-xsetroot
+
+# OpenGL # see below for compatible driver packages
+mesa
+
+# OpenGL X drivers (AMDGPU)
+xf86-video-amdgpu mesa-driver
+# OpenGL X drivers (Intel iGPU)
+xf86-video-intel
+# OpenGL X drivers (Nvidia)
+xf86-video-nouveau #nvidia #nvidia-utils
+
+# VA&#47;VDPAU
+libvdpau libva-libvdpau-driver libvdpau-va-gl
+
+# AMDGPU VA&#47;VDPAU
+libva-mesa-driver libvdpau mesa-vdpau
+# Intel iGPU VA&#47;VDPAU
+libva-intel-driver #intel-media-driver
+# Nvidia VA&#47;VDPAU
+libva-mesa-driver nvidia-utils
+
+# basic X WMs and menu bar
+bspwm sxhkd tint2 #openbox
+
+# X applets
+xfce4-power-manager volumeicon pavucontrol pulseaudio-alsa
+
+# NetworkManager (deprecated - use iwd instead)
+#NetworkManager #networkmanager-applet
+
+# X utils
+dmenu alacritty slock
+
+# X fonts
+ttf-dejavu ttf-liberation ttf-inconsolata
+
+# post-install
+pkgconf newsboat scrot stress w3m syncthing bc #calc
+
+# post-install (essential desktop apps)
+firefox mpv sxiv mupdf #vlc
+
+# ios
+libimobiledevice #ifuse
+
+# aur
+ttf-sipa-dip gotop #htop-temperature #ttf-th-sarabun-new
+</code></pre> <h2 id=DNS-over-TLS%20and%20DNSSEC>DNS-over-TLS and DNSSEC</h2> <blockquote> <p>Maybe out of date (as of Sep, 2022)</p> </blockquote> <p>The following DoT with DNSSEC guide may have been outdated. Currently, I&#8217;m using <code>systemd-resolved</code> which has DoT forwarding, although I also keep an <code>unbound</code> service up and running.</p> <h3 id=Components%20and%20how%20they%20work%20together>Components and how they work together</h3> <p>I use <code>stubby</code> as a DNS-over-TLS stub resolver (listens on 127.0.0.1 port 53535), and <code>dnsmasq</code> as the caching system DNS resolver (listen on 127.0.0.1 port 53). This means that when my machines perform DNS lookups, they first consult their <code>hosts.conf</code> file, then <code>dnsmasq</code>&#8217;s cache. If the target address is not cached by <code>dnsmasq</code> which is our system resolver, <code>dnsmasq</code> will query <code>stubby</code>, which in turn will query DNS lookups to the DNS servers in the internet via DNS-over-TLS, with DNSSEC.</p> <h3 id=%3Ccode%3Estubby%3C/code%3E%20configuration><code>stubby</code> configuration</h3> <p>First, let&#8217;s configure <code>stubby</code> to <strong>listen on port <code>53535</code></strong> and <strong>enable DNSSEC</strong>:</p> <pre><code class=language-yaml># &#47;etc&#47;stubby&#47;stubby.yml
+
+listen_addresses:
+    - 127.0.0.1@53535
+    - 0::1@53535
+
+dnssec: GETDNS_EXTENSION_TRUE
+</code></pre> <h3 id=%3Ccode%3Ednsmasq%3C/code%3E%20configuration><code>dnsmasq</code> configuration</h3> <p>Then, let&#8217;s configure <code>dnsmasq</code> to use <code>stubby</code> as the stub resolver:</p> <pre><code># &#47;etc&#47;dnsmasq.conf
+
+no-resolv
+#proxy-dnssec
+listen-address=::1,127.0.0.1
+
+# stubby listen address (localhost:53535)
+server=127.0.0.1#53535
+
+# other servers
+server=10.8.0.2
+server=10.8.0.69
+
+all-servers
+</code></pre> <h3 id=Using%20NetworkManager+dnsmasq%20with%20stubby%20on%20Arch%20Linux>Using NetworkManager+dnsmasq with stubby on Arch Linux</h3> <p>As a <em>laptop</em> NetworkManager Arch user, I found that <code>stubby+dnsmasq</code> solution does not work as reliably as my wired systems. From my own experience, the systemd <code>dnsmasq.service</code> and <code>stubby.service</code> services usually fail after reconnections if started separately by systemd on Wi-Fi connections. I then searched the Arch Wiki for how to get NetworkManager to spawn and manage <code>dnsmasq</code> as its DNS resolver to avoid the latter crashing after network switching&#47;reconnections, and found a simple working solution.</p> <p>To have NetworkManager manage <code>dnsmasq</code>, edit the following files in <code>&#47;etc&#47;NetworkManager</code>:</p> <pre><code># &#47;etc&#47;NetworkManager&#47;conf.d&#47;dns.conf
+[main]
+dns=dnsmasq
+</code></pre> <pre><code># &#47;etc&#47;NetworkManager&#47;dnsmasq.d&#47;dnsmasq-stubby.conf
+no-resolv
+all-servers
+#proxy-dnssec
+server=10.9.0.2
+server=10.9.0.1
+server=127.0.0.1#5300
+listen-address=::1,127.0.0.1
+</code></pre> <p>Now test <code>dnsmasq</code> config file(s) with:</p> <pre><code class=language-shell>dnsmasq --test --conf-file=&#47;dev&#47;null --conf-dir=&#47;etc&#47;NetworkManager&#47;dnsmasq.d;
+</code></pre> <p>If it is OK, we are safe to start the services:</p> <pre><code class=language-shell>nmcli general reload;
+systemctl enable stubby --now;
+</code></pre> <p>Enjoy!</p> <hr> <p><a href=#top>Back to top</a></p> <hr> <footer> <p>Copyright (c) 2019 - 2023 Prem Phansuriyanon</p> <p>Verbatim copying and redistribution of this entire page are permitted provided this notice is preserved</p> </footer> </body> </html> 

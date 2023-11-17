@@ -1,0 +1,136 @@
+<!DOCTYPE html><html lang=en> <head><title>Artnoi.com</title><meta name=viewport content="width=device-width, initial-scale=1.0"><meta name=keywords content="artnoi, Prem Phansuriyanon"><meta name=author content=@artnoi><meta charset=UTF-8><link href=/style.css rel=stylesheet></head> <body> <ul class=navbar> <li><a href=/ ><img src=/toplogo.png alt=Artnoi.com class=logo>artnoi</a></li> <li class=f-right><a href=/cheat/ >cheat</a></li> <li class=f-right><a href=/blog/ >blog</a></li> <li class=f-right><a href=/about/ >about</a></li> </ul> <h1 id=Cheat%20sheet%20for%20myself>Cheat sheet for myself</h1> <p><a href=#others>Other cheat sheets</a> are also available</p> <h2 id=Combining%20%3Ccode%3Efind(1)%3C/code%3E%20with%20%3Ccode%3Erm(1)%3C/code%3E>Combining <code>find(1)</code> with <code>rm(1)</code></h2> <p><code>find(1)</code> is a very powerful UNIX tool. This example shows how we can find and remove unwanted files recursively:</p> <pre><code class=language-shell>find &#60;PATH&#62; -name &#60;NAME&#62; -exec rm -f {} \;
+</code></pre> <p>The example below will recursively remove file(s) <code>.DS_Store</code>, starting from the working directory:</p> <pre><code class=language-shell>find . -name &#39;.DS_Store&#39; -exec rm -f {} \;
+</code></pre> <h2 id=Using%20%3Ccode%3Elsof%3C/code%3E%20to%20discover%20process%20running%20on%20a%20port>Using <code>lsof</code> to discover process running on a port</h2> <pre><code class=language-shell># macOS, and probably BSD
+lsof -n -i TCP:6379;
+
+# GNU&#47;Linux
+lsof -i :6379;
+</code></pre> <h2 id=POSIX%20shell%20parameter%20expansion>POSIX shell parameter expansion</h2> <p>People should know parameter expansion to avoid invoking (abusing) <code>cat(1)</code>, <code>awk(1)</code>, <code>sed(1)</code>, and <code>grep(1)</code>.</p> <p>However, when people use shell parameter expansion, they use non-POSIX syntax, i.e. <code>bash</code>-specific syntax, which is not portable.</p> <blockquote> <p>The examples are for POSIX-compliant shell like UNIX <code>sh(1)</code> and <code>dash(1)</code>. If you are using <code>bash(1)</code> and don&#8217;t care about portability, see <a href=https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html>reference manual for <code>bash(1)</code> shell</a>. You can also see <code>dash</code> man pages for POSIX parameter expansion.</p> </blockquote> <h3 id=String%20length>String length</h3> <pre><code class=language-shell>FOO="foo";
+
+echo ${#FOO}; # 3
+</code></pre> <h3 id=Substring:%20prefix%20removal%20with%20&#8216;#&#8217;%20(&#8216;##&#8217;)>Substring: prefix removal with &#8216;#&#8217; (&#8216;##&#8217;)</h3> <p>The variable name used in this demo will be <code>STR</code> with value <code>"foobar"</code>:</p> <pre><code class=language-shell>STR=&#39;foobar&#39;;
+</code></pre> <p>Remove last 3 characters:</p> <pre><code class=language-shell>echo ${STR#???}; # "bar"
+</code></pre> <p>Remove &#8216;foo&#8217; from start:</p> <pre><code class=language-shell>echo ${STR#foo}; # "bar"
+</code></pre> <p>Remove &#8216;fo&#8217; (smallest pattern):</p> <pre><code class=language-shell>echo ${STR#f*o}; # "obar"
+</code></pre> <p>Remove &#8216;foo&#8217; (largest pattern):</p> <pre><code class=language-shell>echo ${STR##f*o}; # "bar"
+</code></pre> <h3 id=Substring:%20suffix%20removal%20with%20&#8216;%&#8217;%20(&#8216;%%&#8217;)>Substring: suffix removal with &#8216;%&#8217; (&#8216;%%&#8217;)</h3> <p>The variable name used in this demo will be <code>STR</code> with value <code>"foobar"</code>:</p> <pre><code class=language-shell>STR=&#39;foobar&#39;;
+</code></pre> <p>Remove first 2 characters</p> <pre><code class=language-shell>echo ${STR%??}; # "foob"
+</code></pre> <p>Remove &#8216;bar&#8217; pattern from end:</p> <pre><code class=language-shell>echo ${string%bar}; # "foo"
+</code></pre> <p>Remove pattern expands to &#8216;obar&#8217;:</p> <pre><code class=language-shell>echo ${string%o*r}; # "fo"
+</code></pre> <p>Remove pattern expands to &#8216;oobar&#8217;:</p> <pre><code class=language-shell>echo ${string%%o*r}; # "f"
+</code></pre> <p>The example below will move (i.e. rename) all files with <code>.text</code> extension to <code>.txt</code> with a shell <code>for</code> loop (e.g. <code>token.text</code> -&#62; <code>token.txt</code>):</p> <pre><code class=language-shell>for f in *".text";
+do
+    mv "${f}" "${f%.text}.txt";
+done;
+</code></pre> <p>The example below will move all files starting with substring <code>gh</code> to be starting with <code>github</code> instead (e.g. <code>gh_key</code> -&#62; <code>github_key</code>):</p> <pre><code class=language-shell>for f in "gh"*;
+do
+    mv "${f}" "github${f#gh}";
+done;
+</code></pre> <h3 id=Substitution>Substitution</h3> <p>I usually just use 2 of the many substitutions:</p> <ul> <li><p><code>${parameter:-word}</code> - use word as default value if <code>parameter</code> is null</p></li> <li><p><code>${parameter:=word}</code> - assign word as default value if <code>parameter</code> is null</p></li> </ul> <p>These and their other variants are super-useful, and I wish I knew about these sooner.</p> <p>Let&#8217;s see some simple examples so you understand why these are useful:</p> <pre><code class=language-shell>string0=&#39;test&#39;; # string1 is still null
+</code></pre> <p>Use <code>string0</code> value if <code>string1</code> is null</p> <pre><code class=language-shell># string1 is still null
+
+echo ${string1}; # no output
+
+echo ${string1:-$string0}; # "test"
+</code></pre> <p>Assign <code>string0</code> value if <code>string1</code> is null</p> <pre><code class=language-shell>echo ${string1:=$string0}; # ouputs "test", as well as assign "test" to string1
+
+echo ${string1}; # outputs "test"
+</code></pre> <h2 id=Redirecting%20shell%20output>Redirecting shell output</h2> <blockquote> <p><code>2&#62;&#38;1</code> redirects stderr to stdout</p> </blockquote> <p>Discarding output and error messages:</p> <pre><code class=language-shell>foo &#62; &#47;dev&#47;null 2&#62;&#38;1;
+</code></pre> <p>Writing to both stdout and file <code>out.txt</code>:</p> <pre><code class=language-shell>foo 2&#62;&#38;1 | tee out.txt;
+</code></pre> <h2 id=Using%20%3Ccode%3Edd(1)%3C/code%3E>Using <code>dd(1)</code></h2> <p>Writing a disk image from <code>image.iso</code> to USB flash drive <code>&#47;dev&#47;sdc</code>:</p> <pre><code class=language-shell>dd bs=4M if=image.iso of=&#47;dev&#47;sdc status=progress oflag=sync;
+</code></pre> <p>Writing a key file with 2048 random bytes from special random character device <code>&#47;dev&#47;random</code>:</p> <blockquote> <p>In this case, use of <code>&#47;dev&#47;random</code> is <a href=https://man7.org/linux/man-pages/man4/random.4.html>prefered</a> over <code>&#47;dev&#47;arandom</code> and <code>&#47;dev&#47;urandom</code>.</p> </blockquote> <pre><code class=language-shell>dd bs=512 count=4 if=&#47;dev&#47;random of=&#60;DEST&#62; iflag=fullblock;
+</code></pre> <p>If you want a 4096-byte-long key file, use <code>count=8</code>.</p> <h2 id=Mounting%20disk%20images>Mounting disk images</h2> <p>On <em>modern</em> GNU&#47;Linux systems, we can mount partition images with option <code>loop</code>:</p> <pre><code class=language-shell>mount -o loop image.iso &#47;mnt;
+</code></pre> <h2 id=macOS>macOS</h2> <h3 id=%3Ccode%3Eupdatedb%3C/code%3E%20on%20macOS><code>updatedb</code> on macOS</h3> <pre><code class=language-shell>sudo &#47;usr&#47;libexec&#47;locate.updatedb;
+</code></pre> <h3 id=Modifying%20macOS%20system%20files>Modifying macOS system files</h3> <p>As of Catalina (10.15), the system files reside in their own encrypted read-only partition.</p> <p>So if you wish to modify system files, disabling SIP alone is not enough - you will also have to remount the system partition with <em>write</em> permission:</p> <pre><code class=language-shell>mount -uw &#47; &#38;&#38; killall Finder;
+</code></pre> <h3 id=macOS%20native%20ramdisk%20(HFS+)>macOS native ramdisk (HFS+)</h3> <p>Ramdisks are perfect for temporary storage. I have had a habit where I edit my text files exclusively in <code>&#47;tmp</code>.</p> <p>It&#8217;s a shame OS X does <em>not</em> ship with tmpfs OOTB. Nonetheless, we can still create a HFS+ ramdisk (of size 4GB) using utilities from the base install:</p> <pre><code class=language-shell>diskutil erasevolume HFS+ &#39;RAM Disk&#39; `hdiutil attach -nomount ram:&#47;&#47;8388608`;
+</code></pre> <p>Yes, the 5th argument is in back ticks.</p> <blockquote> <p>Hint: use the following value to specify block size: 524288 for 256MB, 1048576 for 512MB, 2097152 for 1GB, 4194304 for 2GB.</p> </blockquote> <h2 id=NFS-related>NFS-related</h2> <h3 id=Windows%2010%20Pro%20NFS%20client>Windows 10 Pro NFS client</h3> <p>You must first enable NFS client. You can do it in Powershell with:</p> <pre><code class=language-PowerShell>Enable-WindowsOptionalFeatures -FeatureName ServicesforNFS-ClientOnly, ClientForNFS-Infrastructure -Online -NoRestart
+</code></pre> <p>Or from Control Panel &#62; &#8220;Programs&#8221; &#62; &#8220;Turn Windows features on or off&#8221; &#62; &#8220;Services for NFS&#8221; &#62; &#8220;Client for NFS&#8221;.</p> <p>After you enabled NFS client, you can just use File Explorer to go to your remote location, e.g. <code>\\10.8.0.1\myshare</code> or use <code>NewPSDrive</code> to mount the NFS share:</p> <pre><code class=language-PowerShell>New-PSDrive -Name "Z" -Root "\\10.8.0.1\myshare" -Persist -PSProvider "Filesystem"
+</code></pre> <p>Or use <code>mount</code> (which is alias to <code>New-PSDrive</code>) and fill up the argument by line.</p> <p><code>Name</code> is desired Windows drive letter, and <code>Root</code> is the remote location, e.g.:</p> <pre><code class=language-shell>mount
+Name: Z
+PSProvider: Filesystem
+Root: \\10.8.0.1\myshare
+</code></pre> <p>You can list the shares with <code>Get-PSDrive</code> and unmount it with <code>Remove-PSDrive</code>.</p> <h3 id=OpenBSD%20NFS%20client>OpenBSD NFS client</h3> <p>Try mounting with option <code>-o tcp</code>. Also, recheck export list on the host, e.g. <code>foo</code>: <code>showmount -e foo</code>, and make sure to have NTP time sync enabled with the correct timezone.</p> <h2 id=OpenBSD%20configuraton>OpenBSD configuraton</h2> <h3 id="%3Ca%20href=%22https://man.openbsd.org/hostname.if.5%22%3Ehostname.if(5)%3C/a%3E%20for%20%3Ca%20href=%22https://man.openbsd.org/wg%22%3Ewg(4)%3C/a%3E:%20WireGuard%20point-to-point%20connection"><a href=https://man.openbsd.org/hostname.if.5>hostname.if(5)</a> for <a href=https://man.openbsd.org/wg>wg(4)</a>: WireGuard point-to-point connection</h3> <p>See also: <a href=https://artnoi.com/blog/2020/wireguard/ >WireGuard on OpenBSD</a>.</p> <pre><code># Interface configuration
+wgkey yourPrivKey=
+wgport 6969
+inet 10.8.1.4&#47;24
+up
+
+# WireGuard peers
+!ifconfig wg0 wgpeer peer1pubkey= wgendpoint 192.168.2.3 5555 wgaip 10.8.1.1&#47;32
+!ifconfig wg0 wgpeer peer2pubkey= wgendpoint example.com 9696 wgaip 10.8.1.2&#47;32
+!ifconfig wg0 wgpeer peer3pubkey= wgaip 10.8.1.3&#47;32
+</code></pre> <h3 id="%3Ca%20href=%22https://man.openbsd.org/pf.conf%22%3Epf.conf(5)%3C/a%3E%20for%20%3Ca%20href=%22https://man.openbsd.org/wg%22%3Ewg(4)%3C/a%3E"><a href=https://man.openbsd.org/pf.conf>pf.conf(5)</a> for <a href=https://man.openbsd.org/wg>wg(4)</a></h3> <pre><code># pf.conf(5) for WireGuard
+
+pass in on egress inet proto udp\
+    from any to any port 6969
+
+pass out on egress inet\
+    from (wg0:network) nat-to (egress:0)
+</code></pre> <h3 id="%3Ca%20href=%22https://man.openbsd.org/relayd.conf.5%22%3Erelayd.conf(5)%3C/a%3E:%20relaying%20SSH%20connection"><a href=https://man.openbsd.org/relayd.conf.5>relayd.conf(5)</a>: relaying SSH connection</h3> <pre><code>protocol "myssh" {
+    tcp {
+        nodelay
+        socket buffer 65536
+    }
+}
+
+relay "sshforward" {
+    listen on www.example.com port 2222
+    protocol "myssh"
+
+    forward to shell.example.com port 22
+}
+</code></pre> <h3 id="%3Ca%20href=%22https://man.openbsd.org/relayd.conf.5%22%3Erelayd.conf(5)%3C/a%3E:%20redirecting%20DNS%20connection"><a href=https://man.openbsd.org/relayd.conf.5>relayd.conf(5)</a>: redirecting DNS connection</h3> <pre><code>redirect "dns" {
+
+  listen on dns.example.com\
+    tcp port 53
+
+  listen on dns.example.com\
+    udp port 53
+
+  forward to &#60;dnshosts&#62;\
+    port 53 check tcp
+}
+</code></pre> <h3 id=httpd(8)%20with%20TLS%20(HTTPS)>httpd(8) with TLS (HTTPS)</h3> <p>See <a href=/blog/2020/bsdbox/ >this blog</a>.</p> <h3 id="Installing%20OpenBSD%20with%20full-disk%20encrpytion%20on%20%3Ca%20href=%22https://vultr.com%22%3EVultr%3C/a%3E">Installing OpenBSD with full-disk encrpytion on <a href=https://vultr.com>Vultr</a></h3> <p>See <a href=/blog/2020/openbsd/ >this blog</a>.</p> <h2 id=GNU&#47;Linux%20only>GNU&#47;Linux only</h2> <h3 id=systemd%20drop-in%20configuration>systemd drop-in configuration</h3> <p>Drop-ins are parsed and overrides global configuration. The files are read alphabetically, so file <code>00-override</code> loads before <code>100-override</code>, i.e. <code>00</code> is overridden by <code>100</code>.</p> <h3 id=systemd%20service%20failure>systemd service failure</h3> <p>If <code># systemctl status</code> returned <em>degraded</em>, we can issue:</p> <pre><code class=language-shell>systemctl reset-failed;
+</code></pre> <p>to fix the failed units.</p> <h3 id=systemd%20(journald)%20auth.log>systemd (journald) auth.log</h3> <pre><code class=language-shell>journalctl SYSLOG_FACILITY=10;
+</code></pre> <h3 id=Persistent%20%3Ccode%3Eiptables%3C/code%3E%20dropping%20incoming%20traffic>Persistent <code>iptables</code> dropping incoming traffic</h3> <p>On Arch Linux, Systemd service <code>iptables.service</code> will load configuration <code>&#47;etc&#47;iptables&#47;ipatbles.rules</code> on startup if the service is enabled. The file originally has blank fules.</p> <p>To configure <code>iptables</code> such that it drops all incoming connections (in a usable way), change the configuration to:</p> <blockquote> <p>From <a href=https://superuser.com/questions/427458/deny-all-incoming-connections-with-iptables>superuser.com</a></p> </blockquote> <pre><code>*filter
+
+:FORWARD DROP [0:0]
+
+:OUTPUT ACCEPT [623107326:1392470726908]
+
+:INPUT DROP [11486:513044]
+
+-A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+
+-A INPUT -i lo -j ACCEPT
+
+-4 -A INPUT -p icmp -j ACCEPT
+-6 -A INPUT -p ipv6-icmp -j ACCEPT
+
+# Add exception rules here
+#-A INPUT -p tcp -m tcp --dport 22 -j ACCEPT
+#-A INPUT -p tcp -m tcp --dport 80 -j ACCEPT
+#-A INPUT -p tcp -m tcp --dport 443 -j ACCEPT
+
+COMMIT
+</code></pre> <p>Also, enable the service (otherwise you would have to use <code>iptables-restore</code> each time you reboot):</p> <pre><code class=language-shell>systemctl enable --now iptables;
+</code></pre> <h3 id=Changing%20storage%20device%20designation,%20e.g.%20sdX1%20to%20sdX4>Changing storage device designation, e.g. sdX1 to sdX4</h3> <p>Look for answer edited&#47;posted by users <strong>drs</strong> and <strong>Joao S Veiga</strong> on <a href=https://unix.stackexchange.com/questions/18752/change-the-number-of-the-partition-from-sda1-to-sda2>unix.stackexchange.com</a></p> <h3 id=Force%20unmounting%20after%20a%20chroot%20operation>Force unmounting after a chroot operation</h3> <p>After exitting from a <code>chroot</code> environment, if you find yourself unable to unmount certain mountpoints (target busy, etc), try following the <a href=#my-other-cheat-sheet-links>Linux LVM guide below</a> first if your chroot environment is on LVM.</p> <p>If all else failed, and you want to <em>force</em> unmount the mountpoint, issue:</p> <pre><code class=language-shell>umount -lf &#47;mountpoint;
+</code></pre> <p>This will <a href=https://unix.stackexchange.com/questions/61885><em>force detach filesystem from fs heirarchy, and cleanup all references to the filesystem as soon as it&#8217;s not busy</em></a></p> <h3 id=Console%20backlight>Console backlight</h3> <p>Most distributions place their console brightness configuration in <code>&#47;sys&#47;class&#47;backlight&#47;xxx&#47;brightness</code></p> <h2 id=certbot%20(with%20NGINX)>certbot (with NGINX)</h2> <p>Certbot can be used to automatically get new certificates and update your NGINX configuration to enable HTTPS in one command.</p> <p>To obtain certificates (including the subdomains), and have Certbot modify your NGINX configuration, run:</p> <pre><code class=language-shell>certbot --nginx -d &#60;DOMAIN_0&#62; [-d &#60;DOMAIN_1&#62;];
+</code></pre> <p>To see certificate information, run:</p> <pre><code class=language-shell>certbot certificates;
+</code></pre> <p>To force-renew certificates <em>without reinstalling</em> the certificates (i.e. the NGINX configuration would <em>not</em> be modified), run:</p> <pre><code class=language-shell>certbot certonly --force-renewal -d &#60;DOMAIN&#62;;
+</code></pre> <p>Or, if you have setup webroot:</p> <pre><code class=language-shell>certbot certonly --webroot -w &#60;WEBROOT_DIR&#62; -d &#60;DOMAIN_NAME&#62;;
+</code></pre> <p>On Arch Linux with NGINX, include this snippet in your NGINX configuration to enable webroot:</p> <pre><code>location ^~ &#47;.well-known&#47;acme-challenge&#47; {
+    allow all;
+    root &#47;var&#47;lib&#47;letsencrypt&#47;;
+    default_type "text&#47;plain";
+    try_files $uri =404;
+}
+</code></pre> <p>The snippet above should be put in a <code>server</code> block that listens on standard HTTP port 80.</p> <p>For NGINX to serve HTTPS, add the following snippet to <code>server</code> block listening on port 443.</p> <pre><code>ssl_certificate &#47;etc&#47;letsencrypt&#47;live&#47;example.com&#47;fullchain.pem;
+ssl_certificate_key &#47;etc&#47;letsencrypt&#47;live&#47;example.com&#47;privkey.pem;
+
+include &#47;etc&#47;letsencrypt&#47;options-ssl-nginx.conf;
+ssl_dhparam &#47;etc&#47;letsencrypt&#47;ssl-dhparams.pem;
+</code></pre> <p>On FreeBSD, the package recommends putting the following line in <code>&#47;etc&#47;periodic.conf</code> so that certbot will renew certificates periodically:</p> <pre><code>weekly_certbot_enable="YES"
+</code></pre> <p>Artnoi.com used both <code>cron</code> and <code>periodic.conf</code> schedulers when it was running on FreeBSD and NGINX. Now it runs <a href=https://artnoi.com/blog/2020/bsdbox/ >OpenBSD</a>.</p> <h2 id=Screenshots%20on%20Sway>Screenshots on Sway</h2> <p>My prefered way to do this is to use 2 separate programs to take screenshots, (1) <code>slurp</code> for selecting a region, (2) <code>grim</code> for actually capturing the image:</p> <blockquote> <p>The man page suggests that <code>-o &#60;OUTFILE&#62;</code> can be used to specify output file, however, my experience in October 2022 was that <code>-o</code> flag does not work, and you can just supply the outfile name as last argument.</p> </blockquote> <pre><code class=language-shell>grim -g "$(slurp -d)" &#47;tmp&#47;scrot.png
+</code></pre> <p>Or, if you want to redirect the output to stdout to <code>wl-copy</code>:</p> <pre><code class=language-shell>grim -g "$(slurp -d)" - | wl-copy -t &#39;image&#47;png&#39;;
+</code></pre> <p>This will capture the screenshot selected and piped to <code>wl-copy</code>.</p> <h2 id="%3Ca%20name=%22others%22%3E%3C/a%3EMy%20other%20cheat%20sheet%20links"><a name=others></a>My other cheat sheet links</h2> <p><a href=/cheat/arch/ >Arch Linux cheat sheet</a></p> <p><a href=/blog/2019/zfsarch/ >Arch Linux ZFS root</a></p> <p><a href=/cheat/zfs/ >ZFS cheat sheet</a></p> <p><a href=/cheat/device-mapper/ >Device Mapper - LUKS and LVM</a></p> <p><a href=/cheat/git/ >Git cheat sheet</a></p> <h2 id="%3Ca%20href=%22/noob/%22%3EMy%20cheat%20sheet%20links%20for%20noob%20friends%3C/a%3E"><a href=/noob/ >My cheat sheet links for noob friends</a></h2> <p><a href=/noob/block/ >Storage (disks, etc.)</a></p> <p><a href=/noob/boot/ >Booting the computer</a></p> <p><a href=/noob/desktop/ >Minimal UNIX desktop</a></p> <p><a href=/noob/vim/ >Vim for noobs</a></p> <hr> <p><a href=#top>Back to top</a></p> <hr> <footer> <p>Copyright (c) 2019 - 2023 Prem Phansuriyanon</p> <p>Verbatim copying and redistribution of this entire page are permitted provided this notice is preserved</p> </footer> </body> </html> 

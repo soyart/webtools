@@ -1,0 +1,35 @@
+<!DOCTYPE html><html lang=en> <head><title>Artnoi.com</title><meta name=viewport content="width=device-width, initial-scale=1.0"><meta name=keywords content="artnoi, Prem Phansuriyanon"><meta name=author content=@artnoi><meta charset=UTF-8><link href=/style.css rel=stylesheet></head> <body> <ul class=navbar> <li><a href=/ ><img src=/toplogo.png alt=Artnoi.com class=logo>artnoi</a></li> <li class=f-right><a href=/cheat/ >cheat</a></li> <li class=f-right><a href=/blog/ >blog</a></li> <li class=f-right><a href=/about/ >about</a></li> </ul> <p>Mar 16, <a href=/blog/2021>2021</a></p> <h1>gfc (go file crypt)</h1> <blockquote> <p>For recent notes on gfc, see its <a href=https://gitlab.com/artnoi/gfc>README.md</a></p> </blockquote> <p>I just wrote a small Go command-line utility to encrypt&#47;decrypt files using AES-256. Its early versions support AES-GCM and AES-CTR, key file, and PBKDFF2 passphase hash. It is meant to be reused later in other programs, but now it is also a small standalone command-line program.</p> <p>This is my second real program (not a <code>sh(1)</code> script), the first being UNIX <code>cat(1)</code> clone called <a href=https://gitlab.com/artnoi/c/-/blob/master/src/kat.c>kat</a>.</p> <p>Check gfc out on <a href=https://github.com/soyart/gfc>my Github</a> or <a href=https://gitlab.com/artnoi/gfc>GitLab</a> (more frequent updates on GitLab)</p> <h2 id=gfc%20features>gfc features</h2> <ul> <li><p>AES256-GCM (default)</p></li> <li><p>AES256-CTR (optional)</p></li> <li><p>PBKDF2 passphrase-key derivation (default)</p></li> <li><p>Hexademical output (optional)</p></li> </ul> <h2 id=Usage>Usage</h2> <pre><code>-H &#60;bool&#62;
+    Use hex output
+-d &#60;bool&#62;
+    Use decrypt mode
+-k &#60;bool&#62;
+    Use keyfile mode
+-p &#60;bool&#62;
+    Print output to stdout
+-m &#60;string&#62;
+    AES modes (GCM or CTR) (default "GCM")
+-f &#60;string&#62;
+    Keyfile file (default "files&#47;key.key")
+-i &#60;string&#62;
+    Input file (default "files&#47;plain")
+-o &#60;string&#62;
+    Output file (default "&#47;tmp&#47;delete.me")
+</code></pre> <h2 id=How%20gfc%20works>How gfc works</h2> <pre><code>gfc
+├── crypt
+│   ├── ctr.go
+│   ├── file.go
+│   ├── gcm.go
+│   └── key.go
+├── files
+│   ├── hex
+│   ├── key.key
+│   ├── plain
+│   └── zeroes
+├── gfc.go
+├── go.mod
+├── go.sum
+├── README.md
+└── test.sh
+</code></pre> <blockquote> <p>gfc will import <code>gfc&#47;crypt</code></p> </blockquote> <p><code>test.sh</code></p> <p>This shell script is used to test multiple combinations of command-line arguments to gfc. It uses associative arrays, so it&#8217;s not POSIX shell compatible.</p> <p><code>files&#47;</code></p> <p>This directory stores files for testing gfc, i.e. a random file, a plaintext file, a hex file, a 256-bit random key, etc. The keyfile from the repository should be replaced with your own random key:</p> <pre><code>$ cd gfc;
+$ dd bs=1 count=32 if=&#47;dev&#47;random of=files&#47;key.key;
+</code></pre> <p>gfc will <em>not</em> hash keyfiles, because I expect user&#8217;s keyfile to be more random than its PBKDF2 hash.</p> <ul> <li><code>gfc.go</code></li> </ul> <p>The only file for <code>main</code> package is <code>gfc.go</code> and is responsible for controlling flows. Other code (e.g. I&#47;O and AES) is in <code>gfc&#47;crypt</code> directory.</p> <p>This main file defines type <code>flags</code> that holds command-line flags information. The <code>flags</code> struct also has crypt.GfcFile embedded.</p> <ul> <li><code>crypt&#47;file.go</code></li> </ul> <p>I&#47;O and file operation methods are defined in <code>aesgfc&#47;file.go</code>. This file also defines a struct; <code>aesgfc.GfcFile</code> for files used by gfc.</p> <p>Currently, this struct and its methods wraps basic <code>os.File</code> methods like <code>Open()</code>, <code>Create()</code>, <code>Read()</code> and <code>Write()</code>. Other functions and methods include those that deal with hex encoding and decoding.</p> <p>If gfc is given <code>-H</code> (hexadecimal), then (1) for encryption, the encrypted output buffer is encoded to hex with <code>EncodeBuf()</code> before being written to outfile, or (2) for decryption, the infile is read into a buffer, and that read buffer is decoded from hex to bytes with <code>DecodeFile()</code>.</p> <ul> <li><code>crypt&#47;key.go</code></li> </ul> <p>This file contains code related to encryption key, e.g. reading passphrase from console, hashing passphrase, and reading keyfile. It also holds constants for gfc cryptography, e.g. the length of certain objects.</p> <p><code>crypt&#47;ctr.go</code> and <code>crypt&#47;gcm.go</code></p> <p>gfc supports 2 AES stream cipher modes; GCM (default) and CTR (optional). GCM mode enables message authentication, which should prevent the encrypted files from being tampered. Both modes are stream ciphers based on counter mode of block mode of operation.</p> <h2 id=GCM%20(default%20mode)>GCM (default mode)</h2> <p>In <a href=https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation>AES256-GCM mode</a>, the file bytes is broken <em>sequentially</em> into numbered blocks of 32 octets of bytes (256 bits).</p> <p>Those block <em>counter</em> (block numbers) is then combined with an initialization vector <em>iv</em>, and later encrypted with an AES <em>block</em> cipher derived from the key.</p> <p>The output from last operation is then used XORed with the underlying plaintext to produce the ciphertext output for the block. That resulting ciphertext is then used to compute the message authentication tag.</p> <h2 id=CTR>CTR</h2> <p>Because gfc needs to pass all the bytes to <code>gcm.Seal()</code> or <code>gcm.Open()</code> to encrypt and decrypt respectively, consuming large amount of memoty. So I provided <a href=https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation>AES256-CTR mode</a>, which encrypts data by fixed-sized chunks in memory, although gfc&#8217;s <strong>CTR mode does not have any message authentication (e.g. HMAC) built-in</strong>.</p> <h2 id=So%20we%20should%20always%20use%20CTR%20for%20larger%20files?>So we should always use CTR for larger files?</h2> <p><strong>But because I suck, the method <code>crypt&#47;ctr.go</code> uses to read the file actually reads the whole file content</strong> (although in chunks) into memory as read buffer before passing it to the encrypter&#47;decrypter.</p> <p>Even worse, the way I wrote the write methods for gfc is that the output ciphertext or plaintext is first written to a buffer, so that I can use a reader interface on this buffer later when I encode it (which needs another buffer) to hex, and that buffer is then converted to <code>[]byte</code> before it is written to a file.</p> <p>This is because I want to later use channels and Goroutines to concurrently read, encrypt, and encode to hex, or read, decode hex, and decrypt.</p> <hr> <p><a href=#top>Back to top</a></p> <hr> <footer> <p>Copyright (c) 2019 - 2023 Prem Phansuriyanon</p> <p>Verbatim copying and redistribution of this entire page are permitted provided this notice is preserved</p> </footer> </body> </html> 
