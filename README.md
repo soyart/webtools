@@ -8,6 +8,9 @@ static websites with ssg easier by writing a manifest config file [`manifest.jso
 > As of now, webtools require [`unix/sh-tools`](https://gitlab.com/artnoi/unix)
 > for some of its features e.g. yes-no prompt. If it is not found on your host,
 > [`netget.sh`](/netget.sh) will download missing dependencies from Github.
+>
+> In addition to build scripts, this repository also hosts [GitHub Actions workflows](./.github/workfows)
+> template for deploying built websites to custom domain names.
 
 ## Usage overview
 
