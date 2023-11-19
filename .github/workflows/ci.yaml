@@ -6,9 +6,9 @@ on:
       - artnoi.com
 
 jobs:
-  build:
+  build-deploy-pages:
     name: Build GitHub Pages
-    uses: ./github/workflows/pages.yaml
+    uses: ./.github/workflows/pages.yaml
     with:
       sitekey: artnoi.com
       mkdir: ./artnoi.com/dist/fonts
@@ -16,4 +16,4 @@ jobs:
       deploy_branch: publish/artnoi.com
       wipe_deploy_branch: true
       cname: artnoi.com
-    
+     
