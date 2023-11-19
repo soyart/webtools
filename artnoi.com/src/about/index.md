@@ -2,7 +2,7 @@
 
 Hello, world! I'm Prem Phansuriyanon, a finance student turned self-taught programmer.
 I first learned Go and TypeScript, and now I'm learning Rust. I'm an aspiring
-system programmer, because I like programming and [setting up my computers](os.html).
+system programmer, because I like programming and [messing up with my computers](os.html).
 
 ## Contact
 
