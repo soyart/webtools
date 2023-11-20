@@ -55,6 +55,7 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url><loc>"https://artnoi.com"/blog/2023/</loc><lastmod>2023-11-20</lastmod><priority>1.0</priority></url>
 <url><loc>"https://artnoi.com"/blog/2023/ali/</loc><lastmod>2023-11-20</lastmod><priority>1.0</priority></url>
 <url><loc>"https://artnoi.com"/blog/2023/try-rust/</loc><lastmod>2023-11-20</lastmod><priority>1.0</priority></url>
+<url><loc>"https://artnoi.com"/blog/2023/pages/</loc><lastmod>2023-11-20</lastmod><priority>1.0</priority></url>
 <url><loc>"https://artnoi.com"/blog/2019/bsdlinuxboot/</loc><lastmod>2023-11-20</lastmod><priority>1.0</priority></url>
 <url><loc>"https://artnoi.com"/blog/2019/thinkpad/</loc><lastmod>2023-11-20</lastmod><priority>1.0</priority></url>
 <url><loc>"https://artnoi.com"/blog/2019/whyfoss/</loc><lastmod>2023-11-20</lastmod><priority>1.0</priority></url>
