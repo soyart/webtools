@@ -11,7 +11,7 @@ static websites with ssg easier by writing a manifest config file [`manifest.jso
 > [`netget.sh`](/netget.sh) will download missing dependencies from GitLab.
 
 In addition to build scripts, this repository also hosts
-[GitHub Actions templates](./.github/workfows)
+[GitHub Actions templates](./.github/workflows)
 for building websites using webtools and deploying built
 websites to custom domain names using GitHub Pages.
 
