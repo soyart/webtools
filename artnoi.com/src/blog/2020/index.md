@@ -1,4 +1,4 @@
-<h1>Blog posts from 2020</h1>
+# Blog posts from 2020
 
 [Replacing NetworkManager in laptops](/blog/2020/iwd/)
 

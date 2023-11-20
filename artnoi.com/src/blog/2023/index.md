@@ -1,4 +1,4 @@
-# Blog posts from 2022
+# Blog posts from 2023
 
 [Experience with Rust](/blog/2023/try-rust/)
 
