@@ -13,7 +13,7 @@ working on Rust.
 After a week with Rust, I just liked it. The developer experience is unmatched
 once you learn to move past the mystifying bits of Rust - lifetimes and ownership.
 
-Here is why I like Rust
+Here is why I like Rust.
 
 ## Memory safety
 
