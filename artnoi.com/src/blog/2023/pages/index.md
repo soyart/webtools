@@ -1,4 +1,4 @@
-Nov 20, 2023
+Nov 20, [2023](/blog/2023/)
 
 # artnoi.com is now using GitHub Pages
 

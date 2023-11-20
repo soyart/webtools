@@ -1,4 +1,4 @@
-Feb 27, 2023
+Feb 27, [2023](/blog/2023/)
 
 # My experience with Rust
 
