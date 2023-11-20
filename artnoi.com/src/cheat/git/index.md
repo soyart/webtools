@@ -1,5 +1,29 @@
 # Git cheat sheet
 
+## Force renames on remote
+
+In some Git environment, filename cases are handled weirdly.
+When you first push your file as camelCase, e.g. `fooBar.txt`,
+Git remembers it and places it on the remote repo correctly,
+e.g. my company's GitLab and Vercel build platform.
+
+However, when you rename your file to `foobar.txt`, the filename
+change might not be reflected in the remote repository. And this
+can cause all kinds of nasty thing.
+
+To force renames, remove the cached data from the local repo,
+commit, and push the changes:
+
+```shell
+# Remove cached objects
+git rm -r --cached .;
+
+# Re-commit and push to remote
+git add -A;
+git commit -m 'fix: filename cases';
+git push origin branchfoo;
+```
+
 ## Stashing changes
 
 Add the changes to stash, and then stash. Once you're done, pop the stash, and optionally reset the staging changes:
