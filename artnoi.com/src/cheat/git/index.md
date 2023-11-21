@@ -2,14 +2,14 @@
 
 ## Force renames on remote
 
-In some Git environment, filename cases are handled weirdly.
-When you first push your file as camelCase, e.g. `fooBar.txt`,
-Git remembers it and places it on the remote repo correctly,
-e.g. my company's GitLab and Vercel build platform.
+In some Git environment, e.g. my workplace's GitLab or Vercel,
+filename cases are handled weirdly. When you first push your
+file as camelCase, e.g. `fooBar.txt`, Git remembers it and places
+it on the remote repo correctly.
 
 However, when you rename your file to `foobar.txt`, the filename
 change might not be reflected in the remote repository. And this
-can cause all kinds of nasty thing.
+can cause all kinds of nasty stuff.
 
 To force renames, remove the cached data from the local repo,
 commit, and push the changes:
