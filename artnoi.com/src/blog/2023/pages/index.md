@@ -14,14 +14,14 @@ I'm tired of worrying about security.
 ## But you said OpenBSD was cool
 
 The only reason I chose OpenBSD as previous webserver
-was because of security concerns. If I, a noob,
+was because of security concerns. If I, a normal person,
 have to host a public website on the internet,
 I'd rather prefer the most secure OS by defaults
 as my webserver box.
 
 But lately, I've been thinking, if I could
 delegate this public-facing component with someone else's,
-then I wouldn't have to worry about being hacked!
+then I wouldn't have to worry about it being hacked!
 
 ## How
 
