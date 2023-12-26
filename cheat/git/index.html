@@ -1,0 +1,49 @@
+<!DOCTYPE html><html lang=en> <head><title>Artnoi.com</title><meta name=viewport content="width=device-width, initial-scale=1.0"><meta name=keywords content="artnoi, Prem Phansuriyanon"><meta name=author content=@artnoi><meta charset=UTF-8><link href=/style.css rel=stylesheet></head> <body> <ul class=navbar> <li><a href=/ ><img src=/toplogo.png alt=Artnoi.com class=logo>artnoi</a></li> <li class=f-right><a href=/cheat/ >cheat</a></li> <li class=f-right><a href=/blog/ >blog</a></li> <li class=f-right><a href=/about/ >about</a></li> </ul> <h1 id=Git%20cheat%20sheet>Git cheat sheet</h1> <h2 id=Force%20renames%20on%20remote>Force renames on remote</h2> <p>In some Git environment, e.g. my workplace&#8217;s GitLab or Vercel, filename cases are handled weirdly. When you first push your file as camelCase, e.g. <code>fooBar.txt</code>, Git remembers it and places it on the remote repo correctly.</p> <p>However, when you rename your file to <code>foobar.txt</code>, the filename change might not be reflected in the remote repository. And this can cause all kinds of nasty stuff.</p> <p>To force renames, remove the cached data from the local repo, commit, and push the changes:</p> <pre><code class=language-shell># Remove cached objects
+git rm -r --cached .;
+
+# Re-commit and push to remote
+git add -A;
+git commit -m &#39;fix: filename cases&#39;;
+git push origin branchfoo;
+</code></pre> <h2 id=Stashing%20changes>Stashing changes</h2> <p>Add the changes to stash, and then stash. Once you&#8217;re done, pop the stash, and optionally reset the staging changes:</p> <pre><code class=language-shell>git add .&#47;recent_works;
+git stash;
+
+
+git stash pop;
+git reset; # Un-add stashed changes
+</code></pre> <h2 id=Comparing%20Git%20repositories>Comparing Git repositories</h2> <p>Usually, to compare diffs between branches, we&#8217;d do:</p> <pre><code class=language-shell>git diff &#60;BRANCH_A&#62; &#60;BRANCH_B&#62;;
+git diff master develop;
+</code></pre> <p>We can also compare remote branch with the exact same command:</p> <pre><code class=language-shell>git diff origin&#47;master master;
+</code></pre> <p>If the remote branch is not known to the local repo, add it, and then compare</p> <pre><code class=language-shell>git remote add github_upstream https:&#47;&#47;github.com&#47;foo&#47;bar;
+git diff github_upstream&#47;main main;
+</code></pre> <p>If the branch to compare lives in a local directory, add the local repo, and see diffs.</p> <pre><code class=language-shell>git remote add -f localrepo path&#47;to&#47;localrepo;
+git remote update;
+git diff master localrepo&#47;master;
+</code></pre> <p>And we can just remove the remote repo once we&#8217;re done.</p> <pre><code class=language-shell>git remote rm localrepo;
+</code></pre> <h3 id=Comparing%20Git%20repositories:%20special%20keywords>Comparing Git repositories: special keywords</h3> <p>We can use <code>@</code>, <code>@{upstream}</code>, <code>@{push}</code> to get diffs too.</p> <p>Comparing working copy with upstream branch.</p> <pre><code class=language-shell>git diff @{upstream};
+</code></pre> <p>Comparing current <code>HEAD</code> with upstream branch.</p> <pre><code class=language-shell>git diff @ @{upstream};
+</code></pre> <p>Comparing against a branch we&#8217;re pushing to (in case upstream is not yet set)</p> <pre><code class=language-shell>git diff @{push};
+</code></pre> <h2 id=Reseting%20Git%20repositories>Reseting Git repositories</h2> <blockquote> <p>If you want to preserve recent changes, use shallow clone instead. This guide will removes all commit history and start over.</p> </blockquote> <h3 id=Local>Local</h3> <p><a href=https://stackoverflow.com/a/2006252>To start over</a>, remove <code>.git</code> directory and re-initialize the repository with:</p> <pre><code class=language-shell>sudo rm -r .git;
+git init;
+</code></pre> <p>Now we have our new <code>.git</code> directory, we can add then files with <code>git add &#60;files&#62;</code> and commit the change:</p> <pre><code class=language-shell>git add .;
+git commit -m &#39;Initialized&#39;;
+</code></pre> <h3 id=Remote>Remote</h3> <p>To <em>force</em> rebase a remote repository with our recently reset local repository, first you will need to add the remote repository URL to our local repository:</p> <pre><code class=language-shell>git remote add [OPTIONS] &#60;REMOTE NAME&#62; &#60;URL&#62;;
+</code></pre> <p>The URL can be SSH URL <code>&#60;user&#62;@&#60;host&#62;:&#60;path&#62;</code>, or HTTP(S) URL <code>https:&#47;&#47;&#60;host&#62;&#47;&#60;path&#62;</code>. For example, my <a href=https://gitlab.com/artnoi/gfc.git>gfc</a> GitLab repository can be accessed with both:</p> <pre><code>https:&#47;&#47;gitlab.com&#47;artnoi&#47;gfc.git
+</code></pre> <p>and</p> <pre><code>git@gitlab.com:artnoi&#47;gfc.git
+</code></pre> <p>Now you can <em>force</em> update the remote repository with the following <code>git push</code> command:</p> <pre><code class=language-shell>git push --force --set-upstream &#60;REMOTE NAME&#62; &#60;BRANCH NAME&#62;;
+</code></pre> <h2 id=Using%20SSH%20keypair%20to%20authenticate%20GitLab&#47;GitHub>Using SSH keypair to authenticate GitLab&#47;GitHub</h2> <blockquote> <p>We will be using OpenBSD&#8217;s OpenSSH, and this guide assumes you will be using just one keypair for one account (i.e. GitHub or GitLab), so that one keypair will be used to authenticate all projects on the website.</p> </blockquote> <p>Generate new RSA keypair with <code>ssh-keygen(1)</code>: $ ssh-keygen -t <type> -C <comment></p> <p>For example, 4096-bit RSA keypair:</p> <pre><code class=language-shell>ssh-keygen -t rsa -b 4096 -C &#39;My RSA GitHub key&#39;;
+</code></pre> <p>Or with ED25519:</p> <pre><code class=language-shell>ssh-keygen -t ed25519 -C &#39;My ED25519 GitHub key&#39;;
+</code></pre> <p>After creating new key (incl. assigning key path and passphrase), add the following key with <code>ssh-agent(1)</code> and <code>ssh-add(1)</code>:</p> <pre><code class=language-shell>eval $(ssh-agent -s);
+ssh-add &#60;KEY FILE&#62;;
+</code></pre> <blockquote> <p>Note: list keys added by <code>ssh-add(1)</code> with <code>$ ssh-add -l</code>, and remove all keys with <code>$ssh-add -D</code></p> </blockquote> <p>You may now add the public keys to GitLab&#47;GitHub accounts on their websites, and test authentication with:</p> <pre><code class=language-shell>ssh -Tv git@gitlab.com;
+ssh -Tv git@github.com;
+</code></pre> <p>If that works, we can now reassign Git URLs as remote URLs, replacing HTTP URLs:</p> <pre><code class=language-shell>git remote set-url &#60;REMOTE NAME&#62; git@gitlab.com:&#60;USER&#62;&#47;&#60;PATH&#62;.git;
+git remote set-url &#60;REMOTE NAME&#62; git@github.com:&#60;USER&#62;&#47;&#60;PATH&#62;.git;
+</code></pre> <p>Edit OpenSSH configuration (<code>$HOME&#47;.ssh&#47;config</code>) to explicitly use the keyfiles:</p> <pre><code>Host gitlab.com
+    PreferredAuthentications publickey
+    IdentityFile &#60;KEYFILE&#62;
+
+Host github.com
+    PreferredAuthentications publickey
+    IdentityFile &#60;KEYFILE&#62;
+</code></pre> <p>After this is done, you should be able to use your SSH keys to authenticate with remote repositories.</p> <hr> <p><a href=#top>Back to top</a></p> <hr> <footer> <p>Copyright (c) 2019 - 2023 Prem Phansuriyanon</p> <p>Verbatim copying and redistribution of this entire page are permitted provided this notice is preserved</p> </footer> </body> </html> 

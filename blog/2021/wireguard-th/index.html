@@ -1,0 +1,117 @@
+<!DOCTYPE html><html lang=en> <head><title>Artnoi.com</title><meta name=viewport content="width=device-width, initial-scale=1.0"><meta name=keywords content="artnoi, Prem Phansuriyanon"><meta name=author content=@artnoi><meta charset=UTF-8><link href=/style.css rel=stylesheet></head> <body> <ul class=navbar> <li><a href=/ ><img src=/toplogo.png alt=Artnoi.com class=logo>artnoi</a></li> <li class=f-right><a href=/cheat/ >cheat</a></li> <li class=f-right><a href=/blog/ >blog</a></li> <li class=f-right><a href=/about/ >about</a></li> </ul> <p>Jan 27, <a href=/blog/2021/ >2021</a></p> <h1 id=%E0%B9%81%E0%B8%99%E0%B8%B0%E0%B8%99%E0%B8%B3%20WireGuard%20VPN>แนะนำ WireGuard VPN</h1> <p><a href=/blog/2020/wireguard/ >See the original English blog post here</a></p> <p><a href=#guide>ข้ามไปอ่านวิธีตั้งค่า</a></p> <h2 id=WireGuard%20%E0%B8%84%E0%B8%B7%E0%B8%AD%E0%B8%AD%E0%B8%B0%E0%B9%84%E0%B8%A3?>WireGuard คืออะไร?</h2> <p>ในช่วงปีนี้ VPN เหมือนจะถูกหยิบยกมาพูดกันอย่างแพร่หลายเกินกราฟมากในประเทศไทย อาจจะด้วยสภาวะทางการเมืองและกฎหมายที่ชอบปิดหูปิดตาประชาชน แต่ผมก็ยังเห็นว่าคนไทยยังขาดความรู้ความเข้าใจในเรื่อง VPN ส่วนมากเรื่องที่คนไทยคุยกันคือแอพ VPN ฟรี หรือผู้ให้บริการ consumer VPN ต่างๆ แต่ไม่ยักจะมีใครพูดถึง IPSec, OpenVPN หรือ WireGuard กันซักคน ทั้งที่ซอฟต์แวร์โปรโตคอลพวกนี้แหละโดยเฉพาะ OpenVPN คือ backbone ของ consumer VPN service เพราะฉะนั้นวันนี้ผมจะมาบ่นเรื่อง WireGuard ให้ทุกคนฟังกันครับ</p> <blockquote> <p>ตัวอย่างการตั้งค่าอยู่ที่ท้ายบทความครับ</p> </blockquote> <p><a href=https://wireguard.com>WireGuard</a> คือโปรโตคอล VPN แบบใหม่ที่เขียนขึ้นมาเพื่อ Linux kernel โดยเฉพาะ (แต่สามารถใช้บนแพลตฟอร์มอื่นได้)</p> <h2 id=%E0%B9%80%E0%B8%A5%E0%B9%87%E0%B8%81%E0%B8%AA%E0%B8%B1%E0%B9%89%E0%B8%99%E0%B9%81%E0%B8%A5%E0%B8%B0%E0%B8%89%E0%B8%B1%E0%B8%9A%E0%B9%84%E0%B8%A7%20%E0%B8%99%E0%B8%B1%E0%B9%88%E0%B8%99%E0%B9%81%E0%B8%AB%E0%B8%A5%E0%B8%B0%20WireGuard>เล็กสั้นและฉับไว นั่นแหละ WireGuard</h2> <p>WireGuard เน้นประสิทธิภาพ ความเร็ว ความปลอดภัย และความเล็กของโค้ด WireGuard มีเพียงแค่ 4,000 กว่าบรรทัด (LoC) เมื่อเทียบกับโปรโตคอลคู่แข่งอย่าง OpenVPN ที่ใหญ่มากๆ 70,000++ LoC ที่ยังต้องใช้ไลบรารี่ OpenSSL อีก 500,000 กว่าๆ LoC! โค้ดเบสที่เล็ก ทำให้ WireGuard มี attack surface ที่เล็กกว่า VPN อื่นๆมากๆ และยังมีประโยชน์ทั้งด้านความเร็วของการรับส่งข้อมูลและความสะดวกในการ port ไปใช้บนแพลตฟอร์มที่ไม่ใช่ Linux และที่สำคัญ คือประหยัด system resource ครับ</p> <p>นอกจากโค้ดที่เล็กมากแล้ว สิ่งที่ทำให้ WireGuard แตกต่างจาก VPN อื่นๆคือความ<em>ง่าย</em> (simplicity - <a href=https://en.wikipedia.org/wiki/KISS_principle>KISS</a>) และ strong cryptography โดย WireGuard ได้เลือก cryptographic cypher ไว้แล้วหลายตัว แต่ละตัวทำหน้าที่เฉพาะตัว และผู้ใช้ไม่สามารถเลือก cypher ได้เอง นอกจากนี้ การจัดการคีย์เช่นการลบหรือเปลี่ยนคีย์ต่างๆยังทำได้ง่าย เนื่องจาก WireGuard ไม่ใช้ trusted authority หรือเซิร์ฟเวอร์กลางในการรับรอง certificate เหมือน OpenVPN ซึ่งหมายความว่าการตั้งค่าต่างๆ เราสามารถทำได้ในไฟล์เดียว จากโฮสต์ไหนก็ได้</p> <p>WireGuard ใช้หลักการ Crypto routing และ UDP เป็นรากฐาน ทำให้โปรโตคอลใหม่นี้สามารถทำงานได้อย่างปลอดภัยกว่า ประสิทธิภาพสูงกว่า และเสถียรกว่า traditional VPN อย่าง OpenVPN และ IPSec มากๆ เพราะ WireGuard ใช้ UDP (<strong>ผู้ใช้เลือก TCP ไม่ได้</strong>) และถูกเขียนมาอย่างฉลาด การเชื่อมต่อผ่าน WireGuard จึงสามารถ survive สภาวะที่ไม่เอื้ออำนวยได้ดีกว่าโปรโตคอลคู่แข่ง</p> <h2 id=%E0%B8%AD%E0%B8%99%E0%B8%B2%E0%B8%84%E0%B8%95%E0%B9%83%E0%B8%AB%E0%B8%A1%E0%B9%88%E0%B9%81%E0%B8%AB%E0%B9%88%E0%B8%87%E0%B9%82%E0%B8%A5%E0%B8%81%20VPN>อนาคตใหม่แห่งโลก VPN</h2> <p>ความไฮเทคนี้ทำให้นาย Theo De Raddt และ Linus Torvalds (เฮ้ดของ OpenBSD และ Linux kernel ตามลำดับ) ถึงกับต้องร้องว้าวแล้วรีบจัดการ port มาลงแพลตฟอร์มของตัวเอง การที่ WireGuard ได้ไปอยู่ใน Linux kernel เป็นการการันตีว่าโปรโตคอลใหม่นี้ดีจริงและยังมีอนาคตที่สดใสอีกด้วย</p> <p>จากการใช้งานจริง ผมพบว่า WireGuard มีความเถียรและตั้งค่าโฮสต์ใหม่ได้ง่ายกว่า OpenVPN มากๆ และที่สำคัญที่สุดคือเร็วกว่า ไวกว่า หลุดแล้วต่อติดกลับได้อย่างเสถียรมาก และต้องขอบคุณ WireGuard ที่เป็น UDP-only ที่ทำให้ผมสามารถต่อ VPN หลัง Firewall ที่ต่างๆได้สบายๆ เพราะการเชื่อมต่อผ่าน WireGuard หากมองแค่ชั้น UDP แล้ว Firewall จะเห็นเป็น state-less connection</p> <blockquote> <p>ในปัจจุบัน WireGuard ได้ถูกรวมไว้ใน Linux kernel (&#62;5.7) และ OpenBSD (&#62;6.8) เป็นที่เรียบร้อย และ Commercial VPN provider หลายๆเจ้าก็กำลังทำ WireGuard ไว้เป็นออปชันให้ลูกค้าเลือก หากคุณสนใจเรียนรู้เกี่ยวกับ WireGuard ลอง<a href="https://www.youtube.com/watch?v=88GyLoZbDNw">ดูวีดีโอนี้บนยูทูป จากผู้พัฒนา WireGuard ครับ</a></p> </blockquote> <p>ปัจจุบัน นอกจากแอพ stand-alone สำหรับ macOS, iOS, Android, และ Windows แล้ว ซัพพอร์ตสำหรับ WireGuard บน Linux Desktop เองก็ถือว่าดีขึ้นมากและอยู่ในระหว่างการพัฒนาจริงจัง ทั้งใน <code>systemd-networkd</code> และ <code>NetworkManager</code></p> <h2 id=%E0%B8%81%E0%B8%B2%E0%B8%A3%E0%B8%95%E0%B8%B4%E0%B8%94%E0%B8%95%E0%B8%B1%E0%B9%89%E0%B8%87%20WireGuard%20%E0%B8%9A%E0%B8%99%20macOS,%20iOS,%20Android,%20Windows>การติดตั้ง WireGuard บน macOS, iOS, Android, Windows</h2> <p>เราสามารถติดตั้ง WireGuard ได้ง่ายๆบน OS ยอดนิยมต่างๆเช่น macOS, iOS, Android, และ Windows เพียงดาวน์โหลดแอพ WireGuard จาก App Store (ง่ายที่สุด) หรือจาก<a href=https://wireguard.com>เว็บไซต์ WireGuard</a> การเซ็ทอัพ WireGuard บนแต่ละแพล็ตฟอร์มมีความคล้ายกันมาก โดยผู้ใช้ macOS, iOS, Windows สามารถอ่านการตั้งค่าบน GNU&#47;Linux หรือ OpenBSD เพื่อนำไปประยุกต์ต่อได้</p> <h2 id="%3Ca%20name=%22guide%22%3E%3C/a%3E%E0%B8%81%E0%B8%B2%E0%B8%A3%E0%B9%80%E0%B8%95%E0%B8%A3%E0%B8%B5%E0%B8%A2%E0%B8%A1%E0%B8%81%E0%B8%B2%E0%B8%A3%E0%B8%81%E0%B9%88%E0%B8%AD%E0%B8%99%E0%B8%95%E0%B8%B4%E0%B8%94%E0%B8%95%E0%B8%B1%E0%B9%89%E0%B8%87%20WireGuard%20%E0%B8%9A%E0%B8%99%20UNIX"><a name=guide></a>การเตรียมการก่อนติดตั้ง WireGuard บน UNIX</h2> <blockquote> <p>ไม่จำเป็นสำหรับผู้ใช้ที่ใช้ WireGuard ในรูปแบบแอพ</p> </blockquote> <p>WireGuard จะทำงานได้ก็ต่อเมื่อเราได้ตั้งค่า IP forwarding เป็น <code>1</code> หรือ <code>true</code> ใน kernel setting (<code>sysctl(8)</code>) โดยคีย์เวิร์ดของการตั้งค่า <code>sysctl</code> จะแตกต่างกันไปตามแต่ละแพลตฟอร์ม โดยไฟล์ตัวอย่างข้างล่างเป็นการสร้างไฟล์เพื่อตั้งค่า <code>sysctl</code> <a href=https://wiki.archlinux.org/index.php/Sysctl#Configuration>แบบ <em>Persistent</em> สำหรับ GNU&#47;Linux (Arch Linux)</a>:</p> <pre><code># sysctld=&#39;&#47;etc&#47;sysctl.d&#39;;
+# mkdir -p $sysctld;
+
+# ipfwd="$sysctld&#47;50-ip_forwarding";
+# touch $ipfwd;
+
+# echo &#39;net.ipv4.ip_forward=1&#39; &#62;&#62; "$ipfwd";
+# echo &#39;net.ipv6.conf.all.forwarding=1&#39; &#62;&#62; "$ipfwd";
+</code></pre> <p><em>Persistent</em> IP forwarding <a href=https://www.openbsd.org/faq/pf/nat.html#ipfwd>สำหรับ OpenBSD</a>:</p> <pre><code># echo &#39;net.inet.ip.forwarding=1&#39; &#62;&#62; &#47;etc&#47;sysctl.conf;
+# echo &#39;net.inet6.ip6.forwarding=1&#39; &#62;&#62; &#47;etc&#47;sysctl.conf;
+</code></pre> <p>หรือหากคุณต้องการตั้งค่าแบบ one-shot (reboot แล้วเซ็ทติ้งหาย) บน GNU&#47;Linux</p> <pre><code># sysctl -w net.ipv4.ip_forward=1;
+# sysctl -w net.ipv6.conf.all.forwarding=1;
+</code></pre> <p>หรือหากคุณต้องการตั้งค่าแบบ one-shot (reboot แล้วเซ็ทติ้งหาย) บน OpenBSD</p> <pre><code># sysctl net.inet.ip.forwarding=1;
+# sysctl net.inet6.ip6.forwarding=1;
+</code></pre> <blockquote> <p>ผู้ใช้ควรเปิด Firewall หลังเปิดใช้งาน IP forwarding</p> </blockquote> <h2 id=%E0%B8%81%E0%B8%B2%E0%B8%A3%E0%B8%95%E0%B8%B4%E0%B8%94%E0%B8%95%E0%B8%B1%E0%B9%89%E0%B8%87%20WireGuard%20%E0%B8%9A%E0%B8%99%20UNIX>การติดตั้ง WireGuard บน UNIX</h2> <p>การใช้งาน WireGuard บน UNIX จำเป็นต้องมี</p> <ol> <li><p>kernel module (<code>wg(4)</code>) ซึ่งมีอยู่ใน Linux Kernel (&#62;5.7) หรือ OpenBSD kernel อยู่แล้ว</p></li> <li><p>user-space utilities (<code>wg(8)</code>, <code>wg-quick(1)</code>) ซึ่งสามารถติดตั้งได้จากแพ็คเกจ <code>wireguard-tools</code></p></li> </ol> <p>ติดตั้ง WireGuard (user-space utilities) ด้วย package manager</p> <pre><code># pkg_add wireguard-tools;
+# pacman -S wireguard-tools;
+# dnf install wireguard-tools;
+# apt install wireguard-tools;
+</code></pre> <p>ติดตั้ง WireGuard (Linux &#60;5.7 kernel module) ด้วย package manager</p> <pre><code># pacman -S wireguard-dkms;
+# pacman -S wireguard-lts;
+</code></pre> <h2 id=%E0%B8%81%E0%B8%B2%E0%B8%A3%E0%B8%AA%E0%B8%A3%E0%B9%89%E0%B8%B2%E0%B8%87%20public%20key%20pair%20%E0%B8%AA%E0%B8%B3%E0%B8%AB%E0%B8%A3%E0%B8%B1%E0%B8%9A%20WireGuard%20%E0%B8%9A%E0%B8%99%20UNIX>การสร้าง public key pair สำหรับ WireGuard บน UNIX</h2> <blockquote> <p>ต้องมี superuser privilege เพื่ออ่าน <code>&#47;etc&#47;wireguard</code></p> </blockquote> <p>คอมมานด์ข้างล่างจะสร้าง key pair <code>foo.pub</code> และ <code>foo.key</code> ไว้ใน <code>&#47;etc&#47;wireguard</code> ด้วย <code>wg(8)</code>:</p> <pre><code># cd &#47;etc&#47;wireguard;
+# wg genkey | tee foo.key | wg pubkey &#62; foo.pub;
+</code></pre> <blockquote> <p>หากไม่ใช้ pipeline เอาท์พุทของ <code>wg(8)</code> จะออกมาที่ stdout</p> </blockquote> <p>เพื่อเพิ่มความปลอดภัย เราสามารถสร้าง Pre-shared key (psk) สำหรับ WireGuard ด้วย:</p> <pre><code># wg genpsk;
+</code></pre> <h2 id=%E0%B8%81%E0%B8%B2%E0%B8%A3%E0%B8%95%E0%B8%B1%E0%B9%89%E0%B8%87%E0%B8%84%E0%B9%88%E0%B8%B2%20WireGuard%20%E0%B8%9A%E0%B8%99%20GNU&#47;Linux>การตั้งค่า WireGuard บน GNU&#47;Linux</h2> <p>WireGuard มาพร้อม <code>bash</code> สคริปต์ <code>wg-quick(1)</code> ที่ช่วย <em>bring up</em> อินเตอร์เฟซ <code>wg(4)</code> สำหรับ WireGuard VPN บน GNU&#47;Linux</p> <p><code>wg-quick(1)</code> จะอ่านการตั้งค่าจาก <code>&#47;etc&#47;wireguard&#47;wgX.conf</code> (แทน <code>X</code> ด้วยชื่ออินเตอร์เฟซ เช่น <code>&#47;etc&#47;wireguard&#47;wg0.conf</code>)</p> <p>การตั้งค่า WireGuard บน GNU&#47;Linux, macOS, iOS, Android, และ Windows ใช้ภาษาที่เกือบจะเหมือนกันในการตั้งค่า (ชื่อ setting field เหมือนกัน) การตั้งค่า WireGuard จะมี 2 ส่วนหลักๆ คิอส่วนของ <code>[Interface]</code> สำหรับอินเตอร์เฟซ (ตัวโฮสต์เอง) และ <code>[Peer]</code> สำหรับ remote hosts โดยเราสามารถเพิ่ม peer ได้ด้วยการเขียน <code>[Peer]</code> เพิ่มขึ้นมา:</p> <pre><code>[Interface]
+.
+.
+[Peer]
+.
+.
+[Peer]
+.
+.
+[Peer]
+.
+.
+</code></pre> <p>บน GNU&#47;Linux การตั้งค่าของ server และ client จะคล้่ายๆกัน ต่างกันที่ <code>[Interface]: PostUp</code>, <code>[Interface]: PostDown</code> ซึ่งฝั่ง client ไม่จำเป็นต้องมี หากต้องการเชื่อมต่อแบบ point-to-point</p> <h3 id=%E0%B8%95%E0%B8%B1%E0%B8%A7%E0%B8%AD%E0%B8%A2%E0%B9%88%E0%B8%B2%E0%B8%87%20GNU&#47;Linux%20client>ตัวอย่าง GNU&#47;Linux client</h3> <p>เซ็ทติ้งข้างล่างเป็นการเซ็ทอัพไคลเอนท์ <code>10.8.0.14</code> ที่จะมี 2 peers <code>10.8.0.1</code> และ <code>10.8.0.2</code> โดยเน็ตเวิร์คเป็นแบบ <code>10.8.0.0&#47;24</code></p> <p>สำหรับเน็ตเวิร์คนี้ (<code>10.8.0.0&#47;24</code>) ต้องกำหนด <code>[Interface]: Address</code> (IP address) ของโฮสต์เราเองด้วย CIDR <code>&#47;24</code></p> <p>สำหรับ <code>[Peer]: AllowedIPs</code> ให้ใส่ IP address ของเน็ตเวิร์ค VPN ของเรา ในกรณีนี้คือ <code>10.8.0.0&#47;24</code> และ peer IP address เช่น <code>10.8.0.2&#47;32</code></p> <blockquote> <p>เติม <code>0.0.0.0&#47;0</code> และ <code>::1&#47;0</code> ใน <code>[Peer]: AllowedIPs</code> หากต้องการให้ peer ไหนเป็น WireGuard default gateway สำหรับทั้ง IPv4 และ v6 (หรือมุดอุโมงค์ไปโผล่ที่ peer นั้นนั่นเอง)</p> <p>เซ็ทติ้งข้างล่างมีการใช้ DNS server ในวง WireGuard เอง และใช้ <code>PreSharedKey</code> สำหรับ <code>10.8.0.1</code>-<code>10.8.0.14</code></p> </blockquote> <pre><code>[Interface] # Client
+PrivateKey = uBxlYH6&#47;fdAy4FfJxquw&#47;Jes+jMntIAxC5Tn65Jwpn0=
+Address = 10.8.0.14&#47;24
+DNS = 10.8.0.2, 10.8.0.1
+PostUp = iptables -t nat -A POSTROUTING -o %i -j MASQUERADE
+PostDown = iptables -t nat -D POSTROUTING -o %i -j MASQUERADE
+
+[Peer]
+EndPoint = 43.69.233.467:55555
+PublicKey = q6n2vXR3NSoy2A6OSBElR95JerCXnJLpdGS8RxuFs1s=
+PreSharedKey = JWZkesHbaSYMzjRcSK4j&#47;Q0wunWYSa4LkTSwxEtzJzM=
+AllowedIPs = 10.8.0.1&#47;32
+#AllowedIPs = 0.0.0.0&#47;0, ::&#47;0
+PersistentKeepalive = 25
+
+[Peer]
+Endpoint = my.domain.com:22134
+PublicKey = OmhQUrpLIzc1fRxpBRdpLwV63bAiYRHCbX6nV07nYQw=
+AllowedIPs = 10.8.0.2&#47;32
+PersistentKeepAlive = 25
+</code></pre> <h3 id=%E0%B8%95%E0%B8%B1%E0%B8%A7%E0%B8%AD%E0%B8%A2%E0%B9%88%E0%B8%B2%E0%B8%87%20GNU&#47;Linux%20server>ตัวอย่าง GNU&#47;Linux server</h3> <p>เซิร์ฟเวอร์ WireGuard ต่างจากไคลเอนท์ ตรงที่เซิร์ฟเวอร์จำเป็นต้องมี <code>[Interface]: Endpoint</code>, <code>[Interface]: ListenPort</code> เพื่อให้ peer หาตัวเซิร์ฟเวอร์เจอ และคำสั่ง <code>iptables</code> (+<code>ip6tables</code>) ใน <code>[Interface]: PostUp</code>, <code>[Interface]: PostDown</code> เพื่อ route ทราฟฟิค (ทั้ง IPv4, v6) ของ peer:</p> <blockquote> <p>WireGuard server ในตัวอย่างข้างล่าง ใช้อินเตอร์เฟซชื่อ <code>eno1</code> หากคอมพิวเตอร์ของคุณต่อกับอินเตอร์เน็ตได้หลายอินเตอร์เฟซ และต้องการจะใช้ WireGuard บนอินเตอร์เฟซพวกนั้น ให้เพิ่มคำสั่ง <code>iptables</code> และ <code>ip6tables</code> สำหรับอินเตอร์เฟซนั้นๆด้วย หาชื่ออินเตอร์เฟซได้ด้วย <code>$ ip a;</code> หรือ <code>$ ifconfig;</code> บน GNU&#47;Linux</p> </blockquote> <pre><code>[Interface] # Server
+PrivateKey = APkD7ksO40RWUZDkYU7FwDecqqTS0+rGSbhIHSqSPFk=
+Address = 10.8.0.1&#47;24
+ListenPort = 55555
+PostUp = iptables -A FORWARD -i %i -j ACCEPT; iptables -t nat -A POSTROUTING -o eno1 -j MASQUERADE;\
+ip6tables -A FORWARD -i %i -j ACCEPT; ip6tables -t nat -A POSTROUTING -o eno1 -j MASQUERADE
+PostDown = iptables -D FORWARD -i %i -j ACCEPT; iptables -t nat -D POSTROUTING -o eno1 -j MASQUERADE;\
+ip6tables -D FORWARD -i %i -j ACCEPT; ip6tables -t nat -D POSTROUTING -o eno1 -j MASQUERADE
+
+[Peer]
+EndPoint = 45.76.190.176:51543
+PublicKey = Z432a5ZyKhcbRvbuH6HFPShmiODjLkL&#47;K+rqX6uqaG0=
+PreSharedKey = JWZkesHbaSYMzjRcSK4j&#47;Q0wunWYSa4LkTSwxEtzJzM=
+AllowedIPs = 10.8.0.14&#47;32
+#AllowedIPs = 0.0.0.0&#47;0, ::&#47;0
+PersistentKeepalive = 60
+
+[Peer]
+Endpoint = my.domain.com:22134
+PublicKey = OmhQUrpLIzc1fRxpBRdpLwV63bAiYRHCbX6nV07nYQw=
+AllowedIPs = 10.8.0.2&#47;32
+PersistentKeepAlive = 25
+</code></pre> <p>หลังจากตั้งค่าเสร็จเรียบร้อย ในระบบที่มี Systemd เราสามารถ <em>enable</em> (หรือแค่ <em>start</em>) เซอร์วิส <code>wg-quick@wgX.service</code> ได้ โดย Systemd จะใช้ <code>wg-quick(8)</code> เพื่อ bring up&#47;down อินเตอร์เฟซ <code>wgX</code> ตัวอย่างข้างล่างจะ <em>enable</em> และ <em>start</em> เซอร์วิสสำหรับอินเตอร์เฟซ <code>wg0</code> (ไฟล์ตั้งค่าอยู่ที่ <code>&#47;etc&#47;wireguard&#47;wg0.conf</code>):</p> <pre><code># systemctl enable --now wg-quick@wg0.service;
+</code></pre> <p>เราสามารถเช็คการเชื่อมต่อได้ด้วย <code>wg(8)</code>:</p> <pre><code># wg;
+</code></pre> <p>หรือ:</p> <pre><code># wg show;
+</code></pre> <p>หน้าตาของเอาท์พุทก็จะประมาณนี้ครับ (ผมใส่ value มั่วๆนะครับ):</p> <pre><code>$ sudo wg;
+
+interface: wg0
+public key: 4HBWx19Jl5YogSzi+l0akxXBhPVZruwx+zDDv&#47;UEFXI=
+private key: (hidden)
+listening port: 69420
+
+peer: EJQ2dniqR4J&#47;CnEncl7Mg6pT&#47;co57irBLmG0pVL9XXc=
+endpoint: 122.213.43.23:11210
+allowed ips: 10.5.0.1&#47;32
+latest handshake: 13 seconds ago
+transfer: 1.12 MiB received, 10.24 MiB sent
+
+peer: +A+LL2YlR0PMqCIJONl+8kMppJpOvfkAEUCegwYEoUk=
+preshared key: (hidden)
+endpoint: 12.23.23.21:55569
+allowed ips: 10.5.0.2&#47;32
+latest handshake: 1 minute, 22 seconds ago
+transfer: 281.91 KiB received, 197.54 KiB sent
+persistent keepalive: every 25 seconds
+</code></pre> <p>สามารถดูคู่มือ <code>wg(8)</code> ได้หากไม่เข้าใจความหมายของเอาท์พุทครับ</p> <pre><code># man 8 wg;
+</code></pre> <h3 id=%E0%B8%95%E0%B8%B1%E0%B9%89%E0%B8%87%E0%B8%84%E0%B9%88%E0%B8%B2%20WireGuard%20%E0%B8%9A%E0%B8%99%20OpenBSD%20(&#62;6.8)%20%E0%B8%94%E0%B9%89%E0%B8%A7%E0%B8%A2%20%3Ccode%3Ehostname.if(5)%3C/code%3E>ตั้งค่า WireGuard บน OpenBSD (&#62;6.8) ด้วย <code>hostname.if(5)</code></h3> <blockquote> <p>ผู้ใช้ OpenBSD ทุกคนควรอ่านคู่มือ <a href=https://man.openbsd.org/hostname.if.5><code>man</code> สำหรับ <code>hostname.if(5)</code></a> และ <a href=https://man.openbsd.org/wg.4><code>wg(4)</code></a></p> </blockquote> <p>เราสามารถใช้ WireGuard บน OpenBSD ได้ <em>แม้จะไม่ติดตั้ง user-space tools <code>wireguard-tools</code> ซึ่งมาพร้อม <code>wg(8)</code> และ <code>wg-quick(8)</code></em> เพียงแค่เขียนไฟล์ <code>&#47;etc&#47;hostname.wgX</code> (แทน <code>X</code> ด้วยชื่ออินเตอร์เฟซ):</p> <pre><code># Interface configuration
+wgkey sPXc4K&#47;SXu8oYcEbVentbh7EShxRFR6nccR98GRyX1U=
+wgport 22134
+inet 10.8.0.2&#47;24
+up
+
+# Adding WireGuard peers
+!ifconfig wg0 wgpeer Z432a5ZyKhcbRvbuH6HFPShmiODjLkL&#47;K+rqX6uqaG0= wgendpoint 10.10.0.1 55555 wgaip 10.8.0.1&#47;32
+!ifconfig wg0 wgpeer Z432a5ZyKhcbRvbuH6HFPShmiODjLkL&#47;K+rqX6uqaG0= wgaip 10.8.0.14&#47;32
+</code></pre> <p>หลังจากเขียนไฟล์สำหรับตั้งค่า WireGuard เสร็จ ควรเช็ค <code>pf.conf(5)</code> เพื่อดูว่า firewall ทำงานกับ WireGuard ได้ไหม <a href=/blog/2020/wireguard.html>ผมเคยเขียนบล็อกเกี่ยวกับการตั้งค่า <code>pf(4)</code> สำหรับ OpenBSD ไว้แล้วเมื่อปีที่แล้ว</a> โดยทั่วไปเราน่าจะต้องเพิ่มบรรทัดที่หน้าตาคล้ายๆ:</p> <pre><code># pf config for WireGuard
+pass in on egress inet proto udp from any to any port $wgports
+pass out on egress inet from ($wgif:network) nat-to (egress:0)
+</code></pre> <p>หลังจากตั้งค่าทุกอย่างเสร็จ ให้ reboot แล้วรออ่าน boot messages เพื่อดูว่าอินเตอร์เฟซ <code>wgX</code> ของเรา up หรือเปล่า จากนั้นให้ลองดูสถานะการเชื่อมต่อด้วย:</p> <pre><code># ifconfig -A;
+</code></pre> <p>ที่ผมใช้ <code>ifconfig(8)</code> แทน <code>wg(8)</code> ในการเช็คสถานะ เพราะว่าไม่ต้องการติดตั้ง user-space utilities สำหรับ WireGuard <code>wireguard-tools</code> ครับ</p> <blockquote> <p>หากไม่มี root provilege แล้ว <code>ifconfig -A</code> จะไม่เห็น public keys ของ peers</p> </blockquote> <p>ต้องอย่าลืมว่าเราสามารถอ่านคู่มือได้ตลอดหากสงสัยว่าไดรเวอร์ <code>wg(4)</code> ทำงานยังไงบน OpenBSD ครับ:</p> <pre><code># man 4 wg;
+</code></pre> <p>หากคุณติดตั้ง <code>wireguard-tools</code> คุณก็สามารพอ่านคู่มือของ user-space utility <code>wg(8)</code> ได้ด้วย:</p> <pre><code># man 8 wg;
+</code></pre> <p><em>ขอให้โชคดีกับ VPN ของตัวเองครับ!</em></p> <hr> <p><a href=#top>Back to top</a></p> <hr> <footer> <p>Copyright (c) 2019 - 2023 Prem Phansuriyanon</p> <p>Verbatim copying and redistribution of this entire page are permitted provided this notice is preserved</p> </footer> </body> </html> 
