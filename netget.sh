@@ -1,69 +1,86 @@
 #!/usr/bin/env bash
 
-# TODO: refactor
+flag_require_import="require_import"
+
+# Downloads and sources required shell scripts
+download_resource() {
+	local download_url="$1";
+	local download_dir="$2";
+	local download_file="$download_dir/$3";
+	local action_flags="$4"
+
+	echo "Downloading from $download_url to $download_file";
+
+	local downloaded=$(curl "$download_url");
+
+	echo "Resource from $download_url downloaded successfully";
+
+	printf "Previewing content in memory:\n\n--- START %s ---\n\n%s\n\n--- END %s ---\n\n" "$download_url" "$downloaded" "$download_url";
+
+	if [ -z $action_flags ]; then
+		simyn "Write out to file $download_file?"\
+			&& mkdir -p $download_dir\
+			&& echo "$downloaded" > "$download_file";
+
+	else
+			echo "WARN: resource from URL $download_url is a required import, writing out to file $download_file now"
+			mkdir -p $download_dir\
+				&& echo "$downloaded" > "$download_file";
+	fi;
+
+	chmod u+x $download_file;
+}
+
+# Checks if target_path exists, if not, download and maybe source
+check_download_source() {
+	local target_dir="$1";
+	local target_file="$2";
+	local download_url="$3";
+	local action_flags="$4";
+	local target_path="$target_dir/$target_file"
+
+	echo "Checking $target_path"
+
+	if [ ! -x "$target_path" ]; then
+		echo "Missing $target_path"\
+			&& download_resource "$download_url" "$target_dir" "$target_file" "$action_flags"\
+			|| die "Failed to download resource $download_url to $target_path";
+	fi;
+
+	if [ "$action_flags" == "$flag_require_import" ]; then
+			echo "Sourcing downloaded resource from $download_url at $target_path"\
+				&& source $target_path\
+				|| die "Failed to source $target_path";
+	fi
+
+	printf "%s: ok\n" "$target_path";
+}
 
 # Download using ftp or curl to bin/ssg
 # Since ssg is not from me, you may need to check its content first.
 get_ssg() {
-	if [ ! -x bin/ssg ]; then
-		ssg_url="https://rgz.ee/bin/ssg";
-		ssg_tmp="/tmp/ssg_webtools_tmp.sh";
-		ssg_dst="bin/ssg";
-
-		echo "missing bin/ssg";
-		echo "";
-		echo "Getting preview";
-
-		curl "$ssg_url" > "$ssg_tmp"\
-			&& cat  "$ssg_tmp"\
-			&& simyn "Install this version of ssg?"\
-			&& mv $ssg_tmp "$ssg_dst"\
-			&& chmod +x "$ssg_dst"\
-			&& echo "ssg download from $ssg_url to ./$ssg_dst";
-	else
-		echo "bin/ssg: ok"
-	fi
-}
-
-downloader() {
-	URL=$1;
-	save_name="$2/$3"
-	echo "downloading from $URL to $save_name";
-
-	mkdir -p $2;
-	command -v ftp && ftp -Vo "$save_name" "$URL"\
-		|| command -v curl && curl $URL > "$save_name";
-
-	chmod u+x $save_name;
-}
-
-get_shtools() {
-	target_dir="$1";
-	target_file="$2";
-	rel_path="$target_dir/$target_file"
-	download_url="$3";
-
-	if [ ! -x "$rel_path" ]; then
-		echo "missing $rel_path"\
-			&& echo "downloading $rel_path from $download_url"\
-			&& downloader "$download_url" "$target_dir" "$target_file"\
-			&& echo "$target_file downloaded to $target_dir from $download_url";
-	else
-		echo "$rel_path: ok";
-	fi
+	check_download_source\
+		"bin"\
+		"ssg"\
+		"https://rgz.ee/bin/ssg";
 }
 
 get_lb() {
-	get_shtools "bin" "lb.sh"\
+	check_download_source\
+		"bin"\
+		"lb.sh"\
 		"https://gitlab.com/artnoi/unix/-/raw/master/sh-tools/bin/lb.sh";
 }
 
 get_yn() {
-	get_shtools "bin" "yn.sh"\
-		"https://gitlab.com/artnoi/unix/-/raw/master/sh-tools/bin/yn.sh";
+	check_download_source\
+		"bin"\
+		"yn.sh"\
+		"https://gitlab.com/artnoi/unix/-/raw/master/sh-tools/bin/yn.sh"\
+		"$flag_require_import";
 }
 
 get_unix() {
-	get_lb;
 	get_yn;
+	get_lb;
 }
