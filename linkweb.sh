@@ -9,21 +9,24 @@ MODECLEAN="clean-links"
 
 main() {
 	if [ ! -z $1 ] && [ "$1" != "-"* ]; then
-	# PROG sitename;
-	# PROG sitename -n;
-		sitekey="$1";
-		runflag="$2";
-		data=$(get_site_from_file_json "$sitekey");
+		# Examples:
+		# PROG sitename;
+		# PROG sitename -n;
+		local sitekey="$1";
+		local runflag="$2";
+		local data=$(get_site_from_file_json "$sitekey");
+
 		[ -z $data ]\
 			&& die "no sitekey $sitekey found";
 
-		sitename=$(get_name_json "$data");
-		link_func="link_one_site";
+		local sitename=$(get_name_json "$data");
+		local link_func="link_one_site";
 	else
-	# PROG
-	# PROG -n
-	# PROG -a;
-	# PROG -a -n;
+		# Examples:
+		# PROG
+		# PROG -n
+		# PROG -a;
+		# PROG -a -n;
 		announce "all sites mode"
 		if [ -z $1 ]; then
 		# PROG
@@ -55,51 +58,53 @@ main() {
 }
 
 link_many_sites() {
-	runmode=$1;
-	sites=$2;
+	local runmode=$1;
+	local sites=$2;
 
 	for site in ${sites[@]}; do
-		sitename=$(get_name_json $site);
-		link_one_site "$runmode" "$site" "$sitename";
+		local sitename=$(get_name_json $site);
+
+		link_one_site "$runmode" "$site" "$sitename"\
+			|| die "failed to link $site"
 	done;
 }
 
 link_one_site() {
-	runmode="$1";
-	sitedata="$2";
-	sitename="$3";
+	local runmode="$1";
+	local sitedata="$2";
+	local sitename="$3";
 
-	links_map=$(access_field_json $sitedata "links");
-	links_sources=$(echo $links_map | jq -c 'keys | .[]');
+	local links_map=$(access_field_json $sitedata "links");
+	local links_sources=$(echo $links_map | jq -c 'keys | .[]');
 
 	wrapped_looplink "$runmode" "$links_map" "$links_sources" "$sitename";
 }
 
 wrapped_looplink() {
-	runmode=$1;
-	linksmap=$2;
-	sources=$3;
-	sitename=$4;
+	local runmode=$1;
+	local linksmap=$2;
+	local sources=$3;
+	local sitename=$4;
 
 	simyn "[$PROG] Run for $sitename ($runmode)?"\
 		&& looplink "$linksmap" "$sources" "$runmode";
 }
 
 looplink() {
-	site_links="$1";
-	link_sources="$2";
-	runmode="$3";
+	local site_links="$1";
+	local link_sources="$2";
+	local runmode="$3";
 
 	for src in ${link_sources[@]}; do
 		# These strings contain double quotes
-		dst=$(echo $site_links| jq -c ".$src");
+		local pwdir="$(pwd)";
+		local dst=$(echo $site_links| jq -c ".$src");
 
 		# Remove double quotes from string literals
 		src=$(echo $src | tr -d '"');
 		dst=$(echo $dst | tr -d '"');
 
 		# Convert to full, absolute path
-		pwdir="$(pwd)";
 		src="$(find $pwdir -wholename $pwdir/$src)";
 		dst="$pwdir/$dst";
 

@@ -10,10 +10,10 @@ main() {
 	if [ ! -z $1 ] && [ "$1" != "-"* ]; then
 	# PROG sitename;
 	# PROG sitename -n;
-		sitekey="$1";
-		runflag="$2";
-		send_func="send_one_site";
-		data=$(get_site_from_file_json "${sitekey}");
+		local sitekey="$1";
+		local runflag="$2";
+		local send_func="send_one_site";
+		local data=$(get_site_from_file_json "${sitekey}");
 
 		[ -z $data ]\
 			&& die "[$PROG] no sitekey $sitekey found";
@@ -46,15 +46,15 @@ main() {
 			runmode="$MODELIVE"; ;;
 	esac
 
-	servers=$(get_all_servers_json)
+	local servers=$(get_all_servers_json)
 
 	"${send_func}" "$runmode" "$data" "$servers";
 }
 
 send_many_sites() {
-	runmode="$1";
-	sites="$2";
-	servers="$3";
+	local runmode="$1";
+	local sites="$2";
+	local servers="$3";
 
 	for site in ${sites[@]}; do
 		send_one_site "$runmode" "$site" "$servers";
@@ -62,14 +62,14 @@ send_many_sites() {
 }
 
 send_one_site() {
-	runmode="$1";
-	site="$2";
-	servers="$3";
+	local runmode="$1";
+	local site="$2";
+	local servers="$3";
 
-	name=$(get_name_json "$site");
-	dist=$(access_field_json "$site" "dist");
+	local name=$(get_name_json "$site");
+	local dist=$(access_field_json "$site" "dist");
+	local src=$(echo $src | tr -d '"');
 
-	src=$(echo $src | tr -d '"');
 	dist=$(echo $dist | tr -d '"');
 
 	simyn "Publish $name?"\
@@ -77,16 +77,16 @@ send_one_site() {
 }
 
 send_to_servers() {
-	runmode="$1";
-	name="$2"
-	dist="$3";
-	servers="$4";
+	local runmode="$1";
+	local name="$2"
+	local dist="$3";
+	local servers="$4";
 
 	for server in ${servers[@]}; do
-		hostname=$(access_field_json "$server" "hostname");
-		scppath=$(access_field_json "$server" "scpPath");
-		hostname=$(echo $hostname | tr -d '"');
-		scppath=$(echo $scppath | tr -d '"');
+		local hostname=$(access_field_json "$server" "hostname");
+		local scppath=$(access_field_json "$server" "scpPath");
+		local hostname=$(echo $hostname | tr -d '"');
+		local scppath=$(echo $scppath | tr -d '"');
 
 		if simyn "Publish $name to $hostname?";
 		then
@@ -104,18 +104,18 @@ send_to_servers() {
 }
 
 sendweb() {
-	dist="$1";
-	fullpath="$3";
+	local dist="$1";
+	local fullpath="$3";
 
 	scp -r "$1" "$2";
 }
 
 sendweb_tarball() {
-	dist="$1";
-	hostname="$2";
-	fullpath="$3";
+	local dist="$1";
+	local hostname="$2";
+	local fullpath="$3";
+	local tarball="/tmp/$(basename $dist).tar.gz";
 
-	tarball="/tmp/$(basename $dist).tar.gz";
 	tar --dereference -czvf "$tarball" "$dist";
 	sendweb "$tarball" "$fullpath";
 

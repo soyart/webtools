@@ -16,21 +16,25 @@ fi
 
 main() {
 	if [ ! -z $1 ] && [ "$1" != "-"* ]; then
-	# PROG sitename;
-	# PROG sitename -n;
-		sitekey="$1";
-		runflag="$2";
-		gen_func="gen_one_site";
-		data=$(get_site_from_file_json "${sitekey}");
+		# Examples
+		# PROG sitename;
+		# PROG sitename -n;
+		local sitekey="$1";
+		local runflag="$2";
+		local gen_func="gen_one_site";
+		local data=$(get_site_from_file_json "${sitekey}");
 
 		[ -z $data ]\
 			&& die "no sitekey $sitekey found";
 	else
-	# PROG
-	# PROG -n
-	# PROG -a;
-	# PROG -a -n;
+
+		# Examples:
+		# PROG
+		# PROG -n
+		# PROG -a;
+		# PROG -a -n;
 		announce "all sites mode"
+
 		if [ -z $1 ]; then
 		# PROG
 			runflag="";
@@ -58,8 +62,8 @@ main() {
 }
 
 gen_many_sites() {
-	runmode=$1;
-	sites=$2;
+	local runmode=$1;
+	local sites=$2;
 
 	for site in ${sites[@]}; do
 		gen_one_site "$runmode" $site;
@@ -67,13 +71,13 @@ gen_many_sites() {
 }
 
 gen_one_site() {
-	runmode="$1";
-	site="$2";
+	local runmode="$1";
+	local site="$2";
 
-	name=$(get_name_json "$site");
-	url=$(access_field_json "$site" "url");
-	src=$(access_field_json "$site" "src");
-	dist=$(access_field_json "$site" "dist");
+	local name=$(get_name_json "$site");
+	local url=$(access_field_json "$site" "url");
+	local src=$(access_field_json "$site" "src");
+	local dist=$(access_field_json "$site" "dist");
 
 	src=$(echo $src | tr -d '"');
 	dist=$(echo $dist | tr -d '"');
