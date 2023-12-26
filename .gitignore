@@ -1,5 +1,6 @@
 bak
 bin/*
+!bin/ssg
 
 artnoi.com/dist/*
 artnoi.com/src/_header.html
