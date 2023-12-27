@@ -19,6 +19,8 @@ main() {
 		# Examples
 		# PROG sitename;
 		# PROG sitename -n;
+		announce "Single-site mode"
+
 		local sitekey="$1";
 		local runflag="$2";
 		local gen_func="gen_one_site";
@@ -33,7 +35,7 @@ main() {
 		# PROG -n
 		# PROG -a;
 		# PROG -a -n;
-		announce "all sites mode"
+		announce "All sites mode"
 
 		if [ -z $1 ]; then
 		# PROG
@@ -97,8 +99,8 @@ gen_one_site() {
 	fi;
 
 
-	echo "[$PROG] Site $name ($name $url)"
-	echo "[$PROG] $src -> $dist"
+	announce "[$PROG] Site $name ($name $url)"
+	announce "[$PROG] $src -> $dist"
 }
 
 main $@;

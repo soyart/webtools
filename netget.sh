@@ -9,23 +9,23 @@ download_resource() {
 	local download_file="$download_dir/$3";
 	local action_flags="$4"
 
-	echo "Downloading from $download_url to $download_file";
+	announce "Downloading from $download_url to $download_file";
 
 	local downloaded=$(curl "$download_url");
 
-	echo "Resource from $download_url downloaded successfully";
+	announce "Resource from $download_url downloaded successfully";
 
 	printf "Previewing content in memory:\n\n--- START %s ---\n\n%s\n\n--- END %s ---\n\n" "$download_url" "$downloaded" "$download_url";
 
 	if [ -z $action_flags ]; then
 		simyn "Write out to file $download_file?"\
 			&& mkdir -p $download_dir\
-			&& echo "$downloaded" > "$download_file";
+			&& announce "$downloaded" > "$download_file";
 
 	else
-			echo "WARN: resource from URL $download_url is a required import, writing out to file $download_file now"
+			announce "WARN: resource from URL $download_url is a required import, writing out to file $download_file now"
 			mkdir -p $download_dir\
-				&& echo "$downloaded" > "$download_file";
+				&& announce "$downloaded" > "$download_file";
 	fi;
 
 	chmod u+x $download_file;
@@ -39,21 +39,21 @@ check_download_source() {
 	local action_flags="$4";
 	local target_path="$target_dir/$target_file"
 
-	echo "Checking $target_path"
+	announce "Checking $target_path"
 
 	if [ ! -x "$target_path" ]; then
-		echo "Missing $target_path"\
+		announce "Missing $target_path"\
 			&& download_resource "$download_url" "$target_dir" "$target_file" "$action_flags"\
 			|| die "Failed to download resource $download_url to $target_path";
 	fi;
 
 	if [ "$action_flags" == "$flag_require_import" ]; then
-			echo "Sourcing downloaded resource from $download_url at $target_path"\
+			announce "Sourcing downloaded resource from $download_url at $target_path"\
 				&& source $target_path\
 				|| die "Failed to source $target_path";
 	fi
 
-	printf "%s: ok\n" "$target_path";
+	announce "$target_path: ok"
 }
 
 # Download using ftp or curl to bin/ssg
