@@ -80,7 +80,7 @@ get_yn() {
 		"$flag_require_import";
 }
 
-get_unix() {
+get_shtools() {
 	get_yn;
 	get_lb;
 }
