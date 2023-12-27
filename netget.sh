@@ -20,12 +20,12 @@ download_resource() {
 	if [ -z $action_flags ]; then
 		simyn "Write out to file $download_file?"\
 			&& mkdir -p $download_dir\
-			&& announce "$downloaded" > "$download_file";
+			&& echo "$downloaded" > "$download_file";
 
 	else
 			announce "WARN: resource from URL $download_url is a required import, writing out to file $download_file now"
 			mkdir -p $download_dir\
-				&& announce "$downloaded" > "$download_file";
+				&& echo "$downloaded" > "$download_file";
 	fi;
 
 	chmod u+x $download_file;

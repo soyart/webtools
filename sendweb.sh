@@ -7,7 +7,7 @@ MODELIVE="live-send"
 MODEDRY="dry-run"
 
 main() {
-	if [ ! -z $1 ] && [ "$1" != "-"* ]; then
+	if [ -n $1 ] && [ "$1" != "-"* ]; then
 	# PROG sitename;
 	# PROG sitename -n;
 		local sitekey="$1";

@@ -8,7 +8,7 @@ MODEDRY="dry-run"
 MODECLEAN="clean-links"
 
 main() {
-	if [ ! -z $1 ] && [ "$1" != "-"* ]; then
+	if [ -n $1 ] && [ "$1" != "-"* ]; then
 		# Examples:
 		# PROG sitename;
 		# PROG sitename -n;
