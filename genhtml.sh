@@ -15,7 +15,7 @@ else
 fi
 
 main() {
-	if [ ! -z $1 ] && [ "$1" != "-"* ]; then
+	if [ -n $1 ] && [ "$1" != "-"* ]; then
 		# Examples
 		# PROG sitename;
 		# PROG sitename -n;
