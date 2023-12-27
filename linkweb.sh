@@ -12,6 +12,8 @@ main() {
 		# Examples:
 		# PROG sitename;
 		# PROG sitename -n;
+		announce "Single-site mode"
+
 		local sitekey="$1";
 		local runflag="$2";
 		local data=$(get_site_from_file_json "$sitekey");
@@ -27,7 +29,8 @@ main() {
 		# PROG -n
 		# PROG -a;
 		# PROG -a -n;
-		announce "all sites mode"
+		announce "All sites mode"
+
 		if [ -z $1 ]; then
 		# PROG
 			runflag="";
