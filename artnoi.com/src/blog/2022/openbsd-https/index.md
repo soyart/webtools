@@ -26,7 +26,7 @@ In the final stage, I want my webserver to
 
 - Redirect `www.artnoi.com` to `artnoi.com`
 
-- For subdomains other that `www`, do redirections like `cheat.artnoi.com/foo` to `artnoi.com/cheat/foo`
+- For subdomains other that `www`, do redirections like `artnoi.com/cheat/foo` to `artnoi.com/cheat/foo`
 
 ## Using only `httpd(8)` for standard HTTP
 
@@ -39,7 +39,7 @@ You must first setup a simple webserver on your box and obtain ACME certificates
     # This virtual server can also handle ACME auth in HTTPS
     server "artnoi.com" {
     	alias "www.artnoi.com"
-    	alias "cheat.artnoi.com"
+    	alias "artnoi.com/cheat"
     	alias "noob.artnoi.com"
     	alias "zv.artnoi.com"
 
@@ -60,7 +60,7 @@ Now, configure `acme-client.conf(5)` such that we can use 1 ACME _fullchain_ cer
     }
 
     domain artnoi.com {
-    	alternative names { www.artnoi.com cheat.artnoi.com noob.artnoi.com zv.artnoi.com }
+    	alternative names { www.artnoi.com artnoi.com/cheat noob.artnoi.com zv.artnoi.com }
     	domain key "/etc/ssl/private/artnoi.com.key"
     	domain full chain certificate "/etc/ssl/artnoi.com.crt"
     	#domain certificate "/etc/ssl/artnoi.com.crt"
@@ -135,8 +135,8 @@ You can now proceed to setup a full HTTPS webserver if ACME challenge was succes
     # because we want to change the request host and URI too, and that new request
     # should point to our main virtual server "artnoi.com" on 443.
     #
-    # "http://cheat.artnoi.com/foo" should be redirected to 'https://artnoi.com/cheat/foo'
-    server "cheat.artnoi.com" {
+    # "http://artnoi.com/cheat/foo" should be redirected to 'https://artnoi.com/cheat/foo'
+    server "artnoi.com/cheat" {
     	listen on $public_interface port 80
 
     	# Redirect to the virtual server above for ACME challenges
@@ -221,7 +221,7 @@ Let's start with updating our `httpd.conf(5)` virtual server blocks to listen HT
     	}
     }
 
-    server "cheat.artnoi.com" {
+    server "artnoi.com/cheat" {
     	listen on $this_server port $internal_httpd_port
 
     	location "/.well-known/acme-challenge/*" {
@@ -302,7 +302,7 @@ This will allow us to omit `tls keypair ..` in `relayd.conf(5)`. And after the w
 
     	#pass request quick header "Host" value "artnoi.com" forward to <httpd>
     	#pass request quick header "Host" value "www.artnoi.com" forward to <httpd>
-    	#pass request quick header "Host" value "cheat.artnoi.com" forward to <httpd>
+    	#pass request quick header "Host" value "artnoi.com/cheat" forward to <httpd>
     	#pass request quick header "Host" value "noob.artnoi.com" forward to <httpd>
     	#pass request quick header "Host" value "zv.artnoi.com" forward to <httpd>
     	#pass request quick header "Host" value "chat.example.com" forward to <synapse>
