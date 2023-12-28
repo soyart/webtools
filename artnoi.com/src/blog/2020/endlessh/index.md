@@ -16,7 +16,7 @@ Install AUR package `endlessh-git`, edit some configuration in `/etc/endlessh.co
 
 ## Endlessh on Artnoi.com
 
-The source is [available on GitHub](https://github.com/skeeto/endlessh). I am too lazy to patch it for OpenBSD, [which is what my webserver is running](/blog/2020/bsdbox/), therefore I built the software and enabled it a different platform, and have OpenBSD's [`relayd(8)`](https://man.openbsd.org/relayd.8) relay the SSH connections into the box running `endlessh`.
+The source is [available on GitHub](https://github.com/skeeto/endlessh). I am too lazy to patch it for OpenBSD, [which is what my webserver is running](/blog/2020/openbsd-server/), therefore I built the software and enabled it a different platform, and have OpenBSD's [`relayd(8)`](https://man.openbsd.org/relayd.8) relay the SSH connections into the box running `endlessh`.
 
 ## Using Endlessh on different hosts with proxies
 
