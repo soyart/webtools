@@ -1,5 +1,5 @@
 <h1>ZFS cheat sheet</h1>
-## [Arch Linux installation on ZFS root](/blog/2019/zfsarch/)
+## [Arch Linux installation on ZFS root](/blog/2019/arch-zfs/)
 Installing Arch Linux on a ZFS root helps with system backup thanks to its copy-on-write snapshot capabilities - and if you are running on old hard disk(s), ZFS ensures that data integrity is not compromised, although at the cost of system resource, especially memory. ZFS snapshots are also effective against ransomware attacks.
 
 ## Optimum zpool `ashift` value

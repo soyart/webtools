@@ -2,7 +2,7 @@
 
 [Refactoring gfc](/blog/2022/gfc-refactor/)
 
-[Hosting HTTPS website with OpenBSD](/blog/2022/openbsd-webserver/)
+[Hosting HTTPS website with OpenBSD](/blog/2022/openbsd-https/)
 
 [I reset my servers](/blog/2022/reset/)
 

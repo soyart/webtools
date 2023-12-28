@@ -14,7 +14,7 @@ And because of the nature of their jobs, _security matters **a lot**_ for this t
 
 **This is why my public-facing boxes only run OpenBSD**. OpenBSD is a very robust operating systems, and it feels like it's designed specifically to be used in this role, although this is not the case, as OpenBSD strives to be great for both desktop and server users.
 
-OpenBSD includes all of the classic and safe services you'd expect from a UNIX box (OpenBSD removed telnet support and decrepated other insecure protocols periodically). They have sane defaults (unlike FreeBSD), and everything they ship is of very high quality. For example, if you're deploying a webserver, [OpenBSD's `base` got you covered](/blog/2022/openbsd-webserver/). Here's a list of OpenBSD software I really love and is included in `base`:
+OpenBSD includes all of the classic and safe services you'd expect from a UNIX box (OpenBSD removed telnet support and decrepated other insecure protocols periodically). They have sane defaults (unlike FreeBSD), and everything they ship is of very high quality. For example, if you're deploying a webserver, [OpenBSD's `base` got you covered](/blog/2022/openbsd-https/). Here's a list of OpenBSD software I really love and is included in `base`:
 
 - `pf(4)` - the best firewall out there
 

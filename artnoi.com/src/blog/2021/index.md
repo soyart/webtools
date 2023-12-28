@@ -8,7 +8,7 @@
 
 [Hifiman HE4XX is perfect with films](/blog/2021/he4xx/)
 
-[Arch Linux bit-perfect USB audio (USB DAC)](/blog/2021/archaudio/)
+[Arch Linux bit-perfect USB audio (USB DAC)](/blog/2021/arch-audio/)
 
 [My experience with Windows](/blog/2021/windows/)
 

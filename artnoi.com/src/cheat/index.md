@@ -340,7 +340,7 @@ relay "sshforward" {
 
 ### httpd(8) with TLS (HTTPS)
 
-See [this blog](/blog/2020/bsdbox/).
+See [this blog](/blog/2020/openbsd-server/).
 
 ### Installing OpenBSD with full-disk encrpytion on [Vultr](https://vultr.com)
 
@@ -487,7 +487,7 @@ weekly_certbot_enable="YES"
 ```
 
 Artnoi.com used both `cron` and `periodic.conf` schedulers when it was running
-on FreeBSD and NGINX. Now it runs [OpenBSD](https://artnoi.com/blog/2020/bsdbox/).
+on FreeBSD and NGINX. Now it runs [OpenBSD](https://artnoi.com/blog/2020/openbsd-server/).
 
 ## Screenshots on Sway
 
@@ -514,7 +514,7 @@ This will capture the screenshot selected and piped to `wl-copy`.
 
 [Arch Linux cheat sheet](/cheat/arch/)
 
-[Arch Linux ZFS root](/blog/2019/zfsarch/)
+[Arch Linux ZFS root](/blog/2019/arch-zfs/)
 
 [ZFS cheat sheet](/cheat/zfs/)
 
