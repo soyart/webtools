@@ -74,7 +74,7 @@ Many ACME client software has support for NGINX, so I can quickly obtained certf
 
 I used bloated `certbot` as ACME client. And I configured a `webroot` for ACME, and use NGINX as HTTPS frontend on my NGINX configuration. I chose to have one certificate for all of my domains.
 
-The result is one server block that would establish HTTPS connections for all of my domains - artnoi.com, www.artnoi.com, cheat.artnoi.com, noob.artnoi.com, searx.artnoi.com, artnoi.xyz, searx.artnoi.xyz.
+The result is one server block that would establish HTTPS connections for all of my domains - artnoi.com, www.artnoi.com, artnoi.com/cheat, noob.artnoi.com, searx.artnoi.com, artnoi.xyz, searx.artnoi.xyz.
 
 You can write a dummy configuration just for ACME challenges, or use webroot method to avoid downtime. I write a separate ACME webroot configuration for NGINX which will later be included by production configuration:
 
@@ -125,7 +125,7 @@ server {
   # Reverse proxies for artnoi.com and its subdomains
   set $servername '';
   set $servername '${servername} artnoi.com www.artnoi.com artnoi.xyz';
-  set $servername '${servername} cheat.artnoi.com zv.artnoi.com noob.artnoi.com';
+  set $servername '${servername} artnoi.com/cheat zv.artnoi.com noob.artnoi.com';
   set $servername '${servername} searx.artnoi.com searx.artnoi.xyz';
   server_name $servername;
 
@@ -143,7 +143,7 @@ server {
     return 301 https://artnoi.com/noob;
   }
 
-  if ($host = cheat.artnoi.com) {
+  if ($host = artnoi.com/cheat) {
     return 301 https://artnoi.com/cheat;
   }
 
@@ -220,7 +220,7 @@ server {
     return 301 https://$host$request_uri;
   }
 
-  if ($host = cheat.artnoi.com) {
+  if ($host = artnoi.com/cheat) {
     return 301 https://$host$request_uri;
   }
 
