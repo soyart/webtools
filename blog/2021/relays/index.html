@@ -16,7 +16,7 @@ HTTPS client: https:&#47;&#47;artnoi.com&#47;searx
 &#62; NGINX HTTPS proxy (Host 0):443
 &#62; filtron           (Host 0):4004
 &#62; Searx instance    (Host 0):8888 HTTP 200 OK
-</code></pre> <p>Many ACME client software has support for NGINX, so I can quickly obtained certficates using any means comfortable to me.</p> <h3 id=NGINX%20-%20obtaining%20Let&#8217;s%20Encrypt%20certificate%20with%20certbot>NGINX - obtaining Let&#8217;s Encrypt certificate with certbot</h3> <p>I used bloated <code>certbot</code> as ACME client. And I configured a <code>webroot</code> for ACME, and use NGINX as HTTPS frontend on my NGINX configuration. I chose to have one certificate for all of my domains.</p> <p>The result is one server block that would establish HTTPS connections for all of my domains - artnoi.com, www.artnoi.com, cheat.artnoi.com, noob.artnoi.com, searx.artnoi.com, artnoi.xyz, searx.artnoi.xyz.</p> <p>You can write a dummy configuration just for ACME challenges, or use webroot method to avoid downtime. I write a separate ACME webroot configuration for NGINX which will later be included by production configuration:</p> <pre><code># &#47;etc&#47;nginx&#47;production&#47;letsencrypt&#47;webroot
+</code></pre> <p>Many ACME client software has support for NGINX, so I can quickly obtained certficates using any means comfortable to me.</p> <h3 id=NGINX%20-%20obtaining%20Let&#8217;s%20Encrypt%20certificate%20with%20certbot>NGINX - obtaining Let&#8217;s Encrypt certificate with certbot</h3> <p>I used bloated <code>certbot</code> as ACME client. And I configured a <code>webroot</code> for ACME, and use NGINX as HTTPS frontend on my NGINX configuration. I chose to have one certificate for all of my domains.</p> <p>The result is one server block that would establish HTTPS connections for all of my domains - artnoi.com, www.artnoi.com, artnoi.com&#47;cheat, noob.artnoi.com, searx.artnoi.com, artnoi.xyz, searx.artnoi.xyz.</p> <p>You can write a dummy configuration just for ACME challenges, or use webroot method to avoid downtime. I write a separate ACME webroot configuration for NGINX which will later be included by production configuration:</p> <pre><code># &#47;etc&#47;nginx&#47;production&#47;letsencrypt&#47;webroot
 
 # webroot is &#47;var&#47;lib&#47;letsencrypt
 location ^~ &#47;.well-known&#47;acme-challenge&#47; {
@@ -39,7 +39,7 @@ ssl_dhparam &#47;etc&#47;letsencrypt&#47;ssl-dhparams.pem;
   # Reverse proxies for artnoi.com and its subdomains
   set $servername &#39;&#39;;
   set $servername &#39;${servername} artnoi.com www.artnoi.com artnoi.xyz&#39;;
-  set $servername &#39;${servername} cheat.artnoi.com zv.artnoi.com noob.artnoi.com&#39;;
+  set $servername &#39;${servername} artnoi.com&#47;cheat zv.artnoi.com noob.artnoi.com&#39;;
   set $servername &#39;${servername} searx.artnoi.com searx.artnoi.xyz&#39;;
   server_name $servername;
 
@@ -57,7 +57,7 @@ ssl_dhparam &#47;etc&#47;letsencrypt&#47;ssl-dhparams.pem;
     return 301 https:&#47;&#47;artnoi.com&#47;noob;
   }
 
-  if ($host = cheat.artnoi.com) {
+  if ($host = artnoi.com&#47;cheat) {
     return 301 https:&#47;&#47;artnoi.com&#47;cheat;
   }
 
@@ -134,7 +134,7 @@ server {
     return 301 https:&#47;&#47;$host$request_uri;
   }
 
-  if ($host = cheat.artnoi.com) {
+  if ($host = artnoi.com&#47;cheat) {
     return 301 https:&#47;&#47;$host$request_uri;
   }
 
