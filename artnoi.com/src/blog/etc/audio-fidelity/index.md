@@ -1,19 +1,41 @@
 December 17, 2017
 
-Last edited: 17 Jul [2020](/blog/2020/)
-
-# What defines audio fidelity?
+Last edited: 17 Jul [2023](/blog/2023/)
 
 See also: [Decent (non-shitty, no pseudoscience) audio stuff that I personally use](/blog/2019/fave/)
 [](#para)
 
-## How do you define audio fidelity? What's the parameters?
+This blog post is an educative rant about audio fidelity,
+i.e. hi-fi sound systems. I wrote it around my third year
+in college, and I have since stopped caring about
+the state of the hi-fi markets.
+
+I had to write it because I was so sick of pseudoscience
+narrative as well as general misconception caused by marketing of
+the *top-tier* consumer hi-fi products.
+
+I also hate all those *golden ears (audiophiles)* who lacks any real understanding
+of audio, whose brains fool themselves to think that they
+could actually hear a difference.
+
+I'm not qualified academically to disprove these absurd
+marketing claims, but I think I know enough to see why
+all these manufacturers and retailers are lying (sometimes they
+do really believe their own lies though), and why buyers
+once brainwashed are so disconnected to the real world.
+
+# Audio fidelity
+
+## Definition
 
 [Here](https://sonicscoop.com/2014/04/24/defining-audio-fidelity), Ethan Winer defines it for you. Sound, for all the nuance and excitement if offers, only operates in two dimensions: Time and intensity. In turn, only four parameters are needed to assess everything that affects audio fidelity:
 
 - **Noise** (anything not present in the source material)
+
 - **Frequency response** (ideally is a flat line across audible range)
+
 - **Distortion** (how audio signal may distort, i.e. incorrectly manifest)
+
 - **Time-based errors** (since sound is naturally a longitudinal wave with time as one of its axis, large time-based errors _will_ affect other parameters - example would be analog audio's _wow_ (cassete tape standard ~ 0.08%) or digital audio's jitter.
 
 > "These four basic parameters define everything that affects audio fidelity. As powerful as it is, there's no secret "magic" to sound, no unknown parameters that "science" hasn't yet learned to identify, as is sometimes claimed. The closer an audio signal is to the source across these four parameters, the higher its fidelity." - Ethan Winer

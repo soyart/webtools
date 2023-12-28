@@ -6,7 +6,7 @@ I use 3 shells on Arch Linux. First is `bash`, because it is required by base, a
 
 ## But why `ksh`? Why don't just use the POSIX shells?
 
-After [moving my webserver to OpenBSD](/blog/2020/bsdbox/), I found that most of my scripts are full of _bashisms_. While purging bashisms from my scripts and trying to conform to POSIX standards, I noticed that POSIX shells do not actually support arrays, let alone associative arrays which are used too expensively in my scripts. This is big, sad, bad news, since I could no longer use the very fast `dash` to execute my old scripts. I know there's a way to hack around this, but I was too tired to change all my scripts to NOT use arrays.
+After [moving my webserver to OpenBSD](/blog/2020/openbsd-server/), I found that most of my scripts are full of _bashisms_. While purging bashisms from my scripts and trying to conform to POSIX standards, I noticed that POSIX shells do not actually support arrays, let alone associative arrays which are used too expensively in my scripts. This is big, sad, bad news, since I could no longer use the very fast `dash` to execute my old scripts. I know there's a way to hack around this, but I was too tired to change all my scripts to NOT use arrays.
 
 So I looked for another standardized shell, not `bash` because I'm too cool. My quick criteria would be a shell with full POSIX support, with additional array and associative array support, and preferably a shell used by people I admire (lol). And then I figured out that I have been using one for a while, albeit on OpenBSD. The shell is KornShell (`ksh`), a _de facto_ descendant of the original Bourne shell.
 

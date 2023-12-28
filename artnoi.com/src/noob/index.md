@@ -353,7 +353,7 @@ AND C.id IN
 ## <a name="others"></a>
 
 [Arch Linux cheat sheet](/cheat/arch/)  
-[Arch Linux ZFS root](/blog/2019/zfsarch.html)  
+[Arch Linux ZFS root](/blog/2019/arch-zfs.html)  
 [ZFS cheat sheet](/cheat/zfs/)  
 [Device Mapper - LUKS and LVM](/cheat/device-mapper/)  
 [Git cheat sheet](/cheat/git/)

@@ -4,7 +4,7 @@ Aug 13, 2022
 
 [After my old servers were compromised](/blog/2022/reset/), the first thing I do is to setup a new OpenBSD webserver. This makes sense, because of how OpenBSD is wonderfully suited for this task. The fact that the operating system ships with HTTP server, a well written `relayd(8)` for level-3 redirection and level-7 relays, a robust firewall (`pf(4)`), a robust VPN driver built into the kernel (`wg(4)`), and finally, a native ACME client `acme-client(1)`!
 
-Out of the box, OpenBSD is perfect right at the beginning for being a secure webserver! Ever since I first wrote the [tutorial to create an OpenBSD webserver in 2020](/blog/2020/bsdbox/), nothing (in the eye of the users) about the software has changed, but one thing has changed - I have more experience now. When I first wrote that article, I was not working in tech industry, did not write any programs other than shitty shell scripts, and tended to overengineer stuff.
+Out of the box, OpenBSD is perfect right at the beginning for being a secure webserver! Ever since I first wrote the [tutorial to create an OpenBSD webserver in 2020](/blog/2020/openbsd-server/), nothing (in the eye of the users) about the software has changed, but one thing has changed - I have more experience now. When I first wrote that article, I was not working in tech industry, did not write any programs other than shitty shell scripts, and tended to overengineer stuff.
 
 This time, it'll be different. Everything will only be added if needed. Before we dive to the config files, let's first discuss my desired HTTP server behavior.
 

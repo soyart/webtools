@@ -12,7 +12,7 @@ This guide covers the basic interface configuration on both operating systems, a
 
 ## WireGuard on OpenBSD
 
-OpenBSD is [my webserver operating system](/blog/2020/bsdbox/) - **it comes complete** with all the server tools I need. WireGuard functionality was also available on OpenBSD as external packages `wireguard-go` and `wireguard-tools`. Just recently, the OpenBSD developers decided they would include WireGuard code into their base networking stack with their 6.8 _Release_, removing the need for external packages. This means that OpenBSD is even more complete as a server operating system for me. Next is how we can configure the `wg(4)` interface (or `tun(4)` in pre-6.8 OpenBSD).
+OpenBSD is [my webserver operating system](/blog/2020/openbsd-server/) - **it comes complete** with all the server tools I need. WireGuard functionality was also available on OpenBSD as external packages `wireguard-go` and `wireguard-tools`. Just recently, the OpenBSD developers decided they would include WireGuard code into their base networking stack with their 6.8 _Release_, removing the need for external packages. This means that OpenBSD is even more complete as a server operating system for me. Next is how we can configure the `wg(4)` interface (or `tun(4)` in pre-6.8 OpenBSD).
 
 Note: WireGuard servers which act as VPN routers must have IP routing enabled, if you are only using Wireguard to connect peers, then you can skip this step:
 
@@ -57,7 +57,7 @@ After editting the file, reboot, and at the next boot we can check the `wg0` int
 
 ### Pre 6.8 - using `wireguard-go` and `wireguard-tools`
 
-The VPS I use to run this website is on OpenBSD ([originally 6.7](/blog/2020/bsdbox/)), and WireGuard is also available on the platform as installable packages `wireguard-go` which is the WireGuard implementation in Go, and `wireguard-tools` which provides user-space WireGuard tools like `wg-quick(8)` (`wireguard-tools` depends on `bash` - FYI) etc.
+The VPS I use to run this website is on OpenBSD ([originally 6.7](/blog/2020/openbsd-server/)), and WireGuard is also available on the platform as installable packages `wireguard-go` which is the WireGuard implementation in Go, and `wireguard-tools` which provides user-space WireGuard tools like `wg-quick(8)` (`wireguard-tools` depends on `bash` - FYI) etc.
 
 With the packages, we can generate our keys locally:
 

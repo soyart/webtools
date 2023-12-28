@@ -2,6 +2,8 @@ Oct 8, [2019](/blog/2019/)
 
 # Stuff I use (and love)
 
+This is not a show-off!
+
 ## Audio
 
 ### Headphones

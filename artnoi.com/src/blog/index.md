@@ -14,6 +14,6 @@ The blog posts are sorted from most recent (newest first).
 
 ## **Pre-2019**
 
-[Audio Fidelity](/blog/etc/audiofidel/)
+[Audio Fidelity](/blog/etc/audio-fidelity/)
 
 [artnoi.wordpress.com](https://artnoi.wordpress.com)

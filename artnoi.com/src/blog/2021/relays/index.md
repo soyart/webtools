@@ -4,7 +4,7 @@ I have some spare time, so I decided to write how I put this website together wi
 
 # Building HTTPS relays and reverse proxies for artnoi.com
 
-I have been using [my OpenBSD box](/blog/2020/bsdbox/) to serve this website since last year, and it has been running strong. However, using only `httpd(8)` to serve this website also has one downside - _downtime_, which is quite annoying when you have to do some maintenance tasks.
+I have been using [my OpenBSD box](/blog/2020/openbsd-server/) to serve this website since last year, and it has been running strong. However, using only `httpd(8)` to serve this website also has one downside - _downtime_, which is quite annoying when you have to do some maintenance tasks.
 
 I thought about adding another webserver, but then I realized if I was going to make my web stack more complex than needed, why _not_ build a load-balancer or reverse proxies too this time, so that I don't have to worry about downtime when one of the webservers is taken down.
 
