@@ -30,7 +30,7 @@ Currently all my root filesystems reside on slower mSATA Samsung SSD (running at
 
 ### [Arch Linux](https://en.wikipedia.org/wiki/Linux_distribution)
 
-My daily driver. Highly customizable and configurable. There are 2 Arch installations on the X230, [one on LUKS](https://cheat.artnoi.com/lvm) and [one on ZFS](/blog/zfsarch.html).
+My daily driver. Highly customizable and configurable. There are 2 Arch installations on the X230, [one on LUKS](https://cheat.artnoi.com/lvm) and [one on ZFS](/blog/arch-zfs.html).
 
 ### [Void Linux](https://voidlinux.org)
 

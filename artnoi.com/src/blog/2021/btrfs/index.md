@@ -21,7 +21,7 @@ To use Btrfs, we need userspace utilities `btrfs` and other Btrfs programs. On A
 
 ## Why not ZFS?
 
-Because of ZFS license incompatibility with Linux's GPLv2, [installing root on ZFS is tiring](/blog/2019/zfsarch/), especially when the only bootable Linux system you have is a live USB.
+Because of ZFS license incompatibility with Linux's GPLv2, [installing root on ZFS is tiring](/blog/2019/arch-zfs/), especially when the only bootable Linux system you have is a live USB.
 
 So I was looking for a Linux-native ZFS replacement, that has support for [Copy-on-Write](https://en.wikipedia.org/wiki/Copy-on-write), [snapshots](<https://en.wikipedia.org/wiki/Snapshot_(computer_storage)>), [logical volume management](https://en.wikipedia.org/wiki/Logical_volume_management), [transparent disk encryption](https://en.wikipedia.org/wiki/Full_disk_encryption), and transparent compression as my new root filesystem.
 

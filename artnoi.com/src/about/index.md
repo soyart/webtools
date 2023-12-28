@@ -1,8 +1,9 @@
 # A bit about your host
 
-Hello, world! I'm Prem Phansuriyanon, a finance student turned self-taught programmer.
-I first learned Go and TypeScript, and now I'm learning Rust. I'm an aspiring
-system programmer, because I like programming and [messing up with my computers](os.html).
+Hello, world! I'm Prem Phansuriyanon, a finance student turned
+self-taught programmer and sometimes senior software bug engineer.
+
+My current job is mostly Go back-end, although I'm an aspiring system programmer.
 
 ## Contact
 

@@ -45,7 +45,7 @@ is used on this website.
 The website partially uses monospaced [TTF Hack](https://sourcefoundry.org/hack/),
 which is my desktop and terminal font face, with blue-ish color scheme from [Iceberg](https://github.com/cocopon/iceberg.vim).
 
-<s>artnoi.com is [served using OpenBSD `httpd(8)` and `relayd(8)`](/blog/2022/openbsd-webserver).</s>
+<s>artnoi.com is [served using OpenBSD `httpd(8)` and `relayd(8)`](/blog/2022/openbsd-https).</s>
 
-As of Nov 2023, artnoi.com is served using [GitHub Pages](https://docs.github.com/en/pages), and built using [webtools](https://github.com/soyart/webtools).
-webtools internally uses [ssg](https://rgz.ee/bin/ssg).
+As of Nov 2023, artnoi.com is served using [GitHub Pages](https://docs.github.com/en/pages),
+and built from Markdown using [webtools](https://github.com/soyart/webtools).
