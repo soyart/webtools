@@ -4,6 +4,6 @@
 
   Last updated: Nov, 2013
 
-- [docx][./nov-2023.docx]
+- [docx](./nov-2023.docx)
 
   Last updated: Nov, 2013
