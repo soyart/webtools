@@ -2,7 +2,9 @@
 
 The blog posts are sorted from most recent (newest first).
 
-## [2023](/blog/2023)
+## [2024](/blog/2024/)
+
+## [2023](/blog/2023/)
 
 ## [2022](/blog/2022/)
 
