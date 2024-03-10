@@ -13,7 +13,7 @@ the most reliable among Thai mobile banking apps.
 
 As the bank's retail customer, I think highly of KPlus - most
 of my banking is done through the app. Let's just say it's why
-I though KBTG must have been really good at software engineering,
+I thought KBTG must have been really good at software engineering,
 and is a legitimate tech company owned by a bank.
 
 This blog post will be about my bad experience and why I left.
@@ -28,18 +28,22 @@ for me (I thought the interviewers seemed dumb technically).
 
 But I accepted the offer any way.
 
-I was assigned to a all-new-joiner squad working on some upcoming
+I was assigned to an all-new-joiner squad working on some upcoming
 app product. It's a very simple app - more like a front-end for
 databases and bank's legacy core banking software.
 
 I learned that there are 3 tiers of SWEs at KBTG - a normal one
 (e.g. me), "advanced", and senior. I was the only squad member to
-not had been an advanced SWE. Other team SWEs also joined together.
+not had been an advanced SWE.
+
+Other team members also joined together and worked together before.
 They all came from the same place (another Thai bank), and they
-came here because their followed their manager.
+came here because their followed their manager. I later heard from
+a friend that their previous workplace was purging old, incompetent
+engineers, replacing them with younger, more competent newjoiners.
 
 I also learned that the project we're working has been developed
-by an outsourcer company for 2 years already.
+by an outsourced company for 2 years already.
 
 ### Stupid, buggy code
 
@@ -59,12 +63,13 @@ In short, it was not clean at all. The only clean part about the
 project's code is code directories.
 
 What's worse than the stupid pattern is the outright buggy code
-written by the so-called "advanced" and senior KBTG devs.
+written by the so-called "advanced" and senior KBTG devs. These devs
+don't even know the difference between encoding and encryption.
 
 The code never cared about concurrency bug. After 2 yearts in
 development, **no repositories had any databse transactional control code**.
 
-This results in bug for every sprint demo, and I suspect
+This results in bugs in every sprint demo, and I suspect
 most of them is due to the concurrency problems.
 
 ### Stupid architecture
@@ -72,9 +77,7 @@ most of them is due to the concurrency problems.
 > Not code structure
 
 They are also obsessed with microservices. And I have yet to found
-another project with such stupid microservice architecture.
-
-It's as if they map each microservice to an SQL table.
+another system that had done microservice this wrong.
 
 They some how managed to build microservice system *without*
 any of the usual benefits from the pattern.
@@ -84,11 +87,11 @@ stupid useless services, and they did not at all care about problems
 in distributed systems. They never discuss read skew, write skew,
 mutexes, or consensus.
 
-They cared so much about code coverage, yet they only tested stupid
-happy cases.
+They cared so much about code coverage, yet they only wrote tests
+for happy cases.
 
 The result is an abomination of a system that's highly unreliable,
-difficult to debug and verify performance.
+difficult to debug and impossible to verify performance.
 
 ### Incompetent developers
 
@@ -97,8 +100,10 @@ Most of them have "advanced" or senior titles, but none of them would
 fit my personal standard for senior devs.
 
 All of them had no interest in having ownership of their code.
-They only focused on delivering their buggy stupid code at the end of
-the sprints. They never mentioned the word "tech debt" too, so it's
+They only focused on delivering their buggy, barely-working code
+at the end of the sprints.
+
+They never mentioned the word "tech debt" too, so it's
 only normal that the sprint demos usually had more failures than success.
 
 They are hell-bent on stupid code reviews, where stupid shit like
@@ -116,22 +121,27 @@ They also lack problem solving skills. One of the "advanced" idiots
 ALWAYS snapshot the error message and sent it to me to ask what caused
 the errors, and those messages are very simple and straightforward that
 had they had any normal human brain they should be able to figure it out
-(stuff like `file not found` or `port already in use`).
+already (stuff like `file not found` or `port already in use`).
 
-Their code style is also stupid. They don't follow any style guides,
-instead, they made up their own based on their (possibly) JavaScript
-backgrounds.
+They don't follow any style guides, instead, they made up their own rules
+based on their (possibly) JavaScript backgrounds.
 
 They always wanted to force their stupid, useless convention on me,
 pointing to their style guide reference. If their style was any good
 or logical, I'd not complain one bit. But it was just so idiotic I had
-to raise hand.
+to raise hand. Even worse is when they reject my PR citing their stupid
+rules like interfaces should be in alphabetical order, while their recently
+merged PRs clearly violated this rule. They did not reply to my comment
+pointing out that this is so useless even they themselves forget to see it
+because it serves no real purpose.
 
-When I told them that this is incorrect convention for Go, they ignored it,
-citing efforts. They used to reject my code that follows Uber Go style guide,
+When I told them that some of their rules are outright violates Go convention,
+they ignored it, citing efforts.
+
+They used to reject my code that follows Google and Uber Go style guide,
 which is the one they said they followed. When I told them that this is
-not right according to Go, Google, or Uber style guides, they simply said
-"they had their own rules" and continue to name files like JavaScript,
+not right according to Google, or Uber style guides, they simply said
+"oh, we have our own rules" and continue to name files like JavaScript,
 which led to buggy GitLab runner from case-insensitive server filesystem.
 
 These people had no idea that they are bad devs, despite having worked
@@ -141,7 +151,7 @@ One of them even spells Go (Golang) differently 5 times in their resume.
 
 Yes, they are that stupid, but they think they are worthy of being called senior.
 
-### Incompetent business employees
+### Incompetent bank employees
 
 This Thai bank is well known for harbouring incompetent companies. It's a
 very large bank, and most employees got to work here because
@@ -153,7 +163,7 @@ found out the BRD was shit).
 
 Let's say the BRD had 10 lines. 8 of them was wrong. We worked in 2-week sprints,
 and my BRDs usually stayed invalid for a full week. This is because the BA
-took days to resolve bad BRDs.
+took days to resolve one bad bullet point or line in the BRDs.
 
 The worst thing about this is the business-side employees who knew little SQL,
 but knew it enough for their managers to let them design SQL schemas. This led
@@ -167,7 +177,7 @@ most of the times just meant the front-end works.
 This is why our equally stupid outsourced devs had been "delivering" this
 project for 2 years, yet nothing works. The secret is that these outsourced
 devs only did demo with mocked back-end. I just can't fathom the stupidity
-of every one here.
+of every one of them here.
 
 Even the incompenent devs knew that the business employees were idiots.
 
@@ -175,33 +185,33 @@ Even the incompenent devs knew that the business employees were idiots.
 
 KBTG advertises itself as "Thailand and ASEAN leading tech company".
 
-In reality, it's just KBank subsidiary with a lot of incompetents.
-They manage, run, and think like a bank.
+In reality, it's just KBank subsidiary with a lot of incompetent people.
+They manage, run, and think like a large bank. Their culture is even more
+conservative than my brokerage's, which is my first job.
 
-The CEO usually sweet talks about how KBTG is so great, full of talents
+The CEO usually brags about how KBTG is so great, full of talents
 (going so far as to say everyone working here is top talent).
 
 He emphasizes how KBTG is actively doing AI development, while in reality,
 I've yet to see any employees, code, emails discussing about AI, nor any other
-cool tech stuff he sells.
+cool tech stuff that he sells daily to the press.
 
 The company does not even want to improve. They want everything to be the same.
 They don't develop talents, they simply horde talents hoping that it will cure
-the organizational stupidity.
+their organization's collective stupidity.
  
 # My departure
 
-With all of the things I saw, I just couldn't stay. I have a feeling that
-if I stayed, my own brain cells would simply rot from interacting with these people.
-
 I once respected all SWEs - I used to think that 80% of devs are smart people,
-and the rest being the lucky dumbsters.
+and the rest being the lucky dumbsters or "script kiddies".
 
-Joining KBTG changed that view. I now think SWE is just like any other jobs.
+Joining KBTG changed that view. I now think SWE is just like any other professions.
 
-I also hate working in very large corporations like KBank now. These companies
-are too big to fail, and they have so many people. Because they are too big
-to fail, they don't need to do everything in a smart way.
+I also hate working in very large corporations like KBank now.
+
+These companies are too big to fail, and they have so many people.
+Because they are too big to fail, they know they don't need to do everything in a smart
+way. They can just throw their weight around and get profits.
 
 This Thai bank wouldn't go bankrupt because an app is toilet material, or
 if the app never launches. There's simply no need for the org to be well optimized,
@@ -209,3 +219,10 @@ or dismiss incompetent people. Some of them don't actually do anything.
 
 This is why I left KBTG: I don't want to be familiarized with idiocy and incompetence.
 I don't want to think that the shit they do is "good enough".
+
+I don't want to endure seeing the least intelligent professionals I've ever seen
+circlejerk themselves to dry deaths.
+
+With all of the things I saw, I just couldn't stay. I have a feeling that
+if I stayed, my own brain cells would simply rot from interacting with these people.
+
