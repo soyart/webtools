@@ -5,7 +5,7 @@
 [KBTG](https://kbtg.tech) is the tech arm of Thai bank [KBank](http://www.kasikornbank.com/).
 Its mission is to help propel KBank with technologies, e.g.
 developing apps for the bank's customers, ATM software, or the bank's
-internal tools.
+internal software.
 
 Its premiere product is KPlus, KBank's mobile banking app.
 KPlus is known for having nice UX, fast, and overall the best and
@@ -33,24 +33,34 @@ app product. It's a very simple app - more like a front-end for
 databases and bank's legacy core banking software.
 
 I learned that there are 3 tiers of SWEs at KBTG - a normal one
-(e.g. me), "advanced", and senior. I was the only squad member to
-not had been an advanced SWE.
+(e.g. me), "advanced", and senior. I was the only normal engineer
+(not advanced, not senior) in the entire squad.
 
-Other team members also joined together and worked together before.
+Other squad members joined together and worked together before.
 They all came from the same place (another Thai bank), and they
 came here because their followed their manager. I later heard from
 a friend that their previous workplace was purging old, incompetent
-engineers, replacing them with younger, more competent newjoiners.
+engineers, replacing them with younger, more competent new joiners.
 
 I also learned that the project we're working has been developed
-by an outsourced company for 2 years already.
+by an outsourced company for 2 years already. In late 2023, around
+25-30 SWEs were working on the product, which was still in beta.
+
+So an outsourced company had been working on KBTG products for 2
+years, and in 2023 KBTG hired more people, including me,
+to ship this product within their release timeline because the
+outsourced teams lack the resource to launch this apparently very
+simple app in time.
 
 ### Stupid, buggy code
 
 The moment I cloned the code and read it, I was cursing whoever
 wrote that piece of shit software. I wished them occasional comatose.
 
-The code is super bad - it follows a very stupid interpretation
+I'm not to say that my code is any good, but it sure was better
+than theirs.
+
+Their code is super bad - it follows a very stupid interpretation
 of "Clean Architecture", where they focused on the wrong part
 about the pattern (they did not even read the book).
 
@@ -95,9 +105,13 @@ difficult to debug and impossible to verify performance.
 
 ### Incompetent developers
 
-Bug perhaps what really ground my gears there was the people I work with.
+What really ground my gears there was the people I worked with.
 Most of them have "advanced" or senior titles, but none of them would
 fit my personal standard for senior devs.
+
+#### No ownership among the devs
+
+> Of all the devs I work with here, only 3 were considered competent
 
 All of them had no interest in having ownership of their code.
 They only focused on delivering their buggy, barely-working code
@@ -106,8 +120,7 @@ at the end of the sprints.
 They never mentioned the word "tech debt" too, so it's
 only normal that the sprint demos usually had more failures than success.
 
-They are hell-bent on stupid code reviews, where stupid shit like
-naming, alphabet order, and other cliche, cargo-cult stuff.
+#### Lack of intelligence
 
 All of them that I worked with are what we call "cargo-cult developer" -
 a grouping of SWEs who only do something because someone told them
@@ -123,15 +136,40 @@ the errors, and those messages are very simple and straightforward that
 had they had any normal human brain they should be able to figure it out
 already (stuff like `file not found` or `port already in use`).
 
+Another area that will highlight their lack of intelligence is how they
+setup the test environments. The outsourcers, who had been working on
+this product for 2 years, thought it was a bright idea to setup development
+environment such that the proudction SQL constraints are to be disabled
+in test environment.
+
+They said they did so because "development velocity". My squad members also
+thought this was right.
+
+Yes, they fucking skip `NOT NULL` and other foreign key constraints in
+their test environment, so they would not have found bugs which would
+slow them down. I'd always told them that this is bad, because query bugs
+will for sure unexpectedly surface in production.
+
+And, you guess the results, they ALWAYS had query bugs when testing
+in SIT-like environments. This constraint issue, coupled with their
+low intellect, kept the outsourced company to deliver the product due to
+these bugs.
+
+#### Stupid code reviews
+
+They are hell-bent on stupid code reviews, where stupid shit like
+naming, alphabet order, and other cliche, cargo-cult stuff.
+
 They don't follow any style guides, instead, they made up their own rules
 based on their (possibly) JavaScript backgrounds.
 
 They always wanted to force their stupid, useless convention on me,
-pointing to their style guide reference. If their style was any good
-or logical, I'd not complain one bit. But it was just so idiotic I had
-to raise hand. Even worse is when they reject my PR citing their stupid
+pointing to their style guide reference. If their style was any good or logical,
+I'd not complain one bit.
+
+Even worse is when they reject mys PR citing their stupid
 rules like interfaces should be in alphabetical order, while their recently
-merged PRs clearly violated this rule. They did not reply to my comment
+merged PRs also clearly violated this rule. They did not reply to my comment
 pointing out that this is so useless even they themselves forget to see it
 because it serves no real purpose.
 
