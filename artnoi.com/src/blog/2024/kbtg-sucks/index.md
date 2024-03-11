@@ -41,14 +41,30 @@ something like:
 > more people and pushed that count to 2500, so that we can be
 > **the best** in SEA"*.
 >
-> A 65 year old senior executive at one of SEA best tech companies
+> A 65 year old senior executive at one of SEA's best tech companies
 
 I kid you not, so they think they are "the best" because they have
-many people working for them. It's like saying the Thai government
-is one of the best government in the world, simply because they employ
-up to 2 million people, or North Korea army due to their number of
-personnel. (Coming back to think about it, I'd say this view matches
-their level of intellect)
+many people working for them.
+
+It's like saying the Thai government is one of the best government
+in the world, simply because they employ up to 2 million people,
+or NK's Korean People's Army has the most combat poweress due to
+their towering number of personnel. (Coming back to think about it,
+I'd say this kind of thinking matches the speaker level of awareness)
+
+The fact that they thought adding people will get them closer to
+their goal of being at the top also sounds weird. Sure, if they only
+acquired competent people and not bozo engineers or managers.
+
+They also keep telling us new joiners that they only have "the
+best of the best" people working for them, that everyone here is
+incredibly talented, despite their bar being set very low.
+
+They may argue that they provide some learning benefits in the
+employment package, but I have to tell you this: they only have
+very beginner courses. I feel like they are very cheap when it comes
+to employee learning resources. But you'll see why once you reach
+further down in this blog.
 
 ### Team
 
