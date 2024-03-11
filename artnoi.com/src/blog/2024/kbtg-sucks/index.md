@@ -21,7 +21,7 @@ real world experience, and why I had to leave there in a hurry.
 
 Note that this blog only represents my own view and experience,
 and there's a high chance that KBTG still had some few competent
-people working for them that I did not interact with.
+people left working for them that I had not interacted with.
 
 ## My experience
 
@@ -33,13 +33,13 @@ for me (I thought the interviewers seemed dumb technically).
 
 But I accepted the offer any way.
 
-The first day was orientation, and one of senior executives said
-something like:
+The first day was orientation, and one of senior executives welcomed us
+with some narcissistic theme that went something like:
 
-> *".. we're one of the best tech companies in the entire SE Asia.
+> ".. we're one of the best tech companies in the entire SE Asia.
 > We now have 1.5k employees (or something), but we aim to recruit
 > more people and pushed that count to 2500, so that we can be
-> **the best** in SEA"*.
+> **the best** in SEA"..
 >
 > A 65 year old senior executive at one of SEA's best tech companies
 
