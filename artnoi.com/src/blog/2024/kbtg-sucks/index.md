@@ -16,17 +16,41 @@ of my banking is done through the app. Let's just say it's why
 I thought KBTG must have been really good at software engineering,
 and is a legitimate tech company owned by a bank.
 
-This blog post will be about my bad experience and why I left.
+This blog post will attempt to debunk that, using my 3-month
+real world experience, and why I had to leave there in a hurry.
+
+Note that this blog only represents my own view and experience,
+and there's a high chance that KBTG still had some few competent
+people working for them that I did not interact with.
 
 ## My experience
 
-### Joining
+### Joining and red flags
 
 I joined KBTG in Oct 2023 as a software engineer. My intuition during
 the interview with other KBTG employees raised a lot of red flags
 for me (I thought the interviewers seemed dumb technically).
 
 But I accepted the offer any way.
+
+The first day was orientation, and one of senior executives said
+something like:
+
+> *".. we're one of the best tech companies in the entire SE Asia.
+> We now have 1.5k employees (or something), but we aim to recruit
+> more people and pushed that count to 2500, so that we can be
+> **the best** in SEA"*.
+>
+> A 65 year old senior executive at one of SEA best tech companies
+
+I kid you not, so they think they are "the best" because they have
+many people working for them. It's like saying the Thai government
+is one of the best government in the world, simply because they employ
+up to 2 million people, or North Korea army due to their number of
+personnel. (Coming back to think about it, I'd say this view matches
+their level of intellect)
+
+### Team
 
 I was assigned to an all-new-joiner squad working on some upcoming
 app product. It's a very simple app - more like a front-end for
@@ -52,10 +76,10 @@ to ship this product within their release timeline because the
 outsourced teams lack the resource to launch this apparently very
 simple app in time.
 
-### Stupid, buggy code
+### Worst possible code
 
-The moment I cloned the code and read it, I was cursing whoever
-wrote that piece of shit software. I wished them occasional comatose.
+The first time I took a look at it, I was cursing whoever
+wrote that piece of junk software.
 
 I'm not to say that my code is any good, but it sure was better
 than theirs.
@@ -79,6 +103,9 @@ don't even know the difference between encoding and encryption.
 The code never cared about concurrency bug. After 2 yearts in
 development, **no repositories had any databse transactional control code**.
 
+They cared so much about code coverage, yet they only wrote tests
+for happy cases.
+
 This results in bugs in every sprint demo, and I suspect
 most of them is due to the concurrency problems.
 
@@ -96,9 +123,6 @@ They build highly coupled services, they always want to create new
 stupid useless services, and they did not at all care about problems
 in distributed systems. They never discuss read skew, write skew,
 mutexes, or consensus.
-
-They cared so much about code coverage, yet they only wrote tests
-for happy cases.
 
 The result is an abomination of a system that's highly unreliable,
 difficult to debug and impossible to verify performance.
@@ -150,7 +174,14 @@ their test environment, so they would not have found bugs which would
 slow them down. I'd always told them that this is bad, because query bugs
 will for sure unexpectedly surface in production.
 
-And, you guess the results, they ALWAYS had query bugs when testing
+With broken dev database, developers had to write a version of the code
+that operates without foreign key constraints, proper row ID,
+and another version for production databases.
+
+Some of them did not even bother to notice that code written to work
+on development environment is very likely to be broken on production.
+
+And, you guess it, they ALWAYS had database constraint-related bugs when testing
 in SIT-like environments. This constraint issue, coupled with their
 low intellect, kept the outsourced company to deliver the product due to
 these bugs.
