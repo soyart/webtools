@@ -4,43 +4,39 @@
 
 > Note: this blog post is mostly about SQL ORM
 
-After 3 years of programming web backend and other services,
+After some years of programming web back-end and other services,
 I've come to think very negatively about ORM in general.
 
-I had no such problems about ORM in my first 2 years, simply
-because most things I did with SQL back then as a junior dev was simple,
-and my then-company's projects rarely change the SQL schema.
+I had no problems with ORM during my first 2 years in the industry.
+This is simply because most things I did with SQL back then as a
+junior dev was very simple and straightforward. We rarely changed
+the SQL schemas, and when we did, it was easy.
 
 All that changed when I went on to work in a bank
-with very weird Oracle SQL and schemas.
+with very weird Oracle SQL and schemas designed by stupid BAs
+who thought they were smart after taking a business people's
+SQL course.
 
 ## What made ORM attractive?
 
 To most newbie programmers, ORM seems like the right choice.
 
 We were taught that programming is about abstraction, and that
-abstraction is core - we can focus on our problem solving logic
-instead of worrying about database interaction.
+abstraction is programming. And so we believed that we should stop
+worrying about database interaction.
 
-In Go, I was attracted to gorm the fact that I can just declare my
-SQL table schema as well as its cardinality in the type definition.
+In Go, I was attracted to gorm the fact that I could just declare my
+SQL table schema as well as its cardinality in the struct type
+definition.
 
-I can then quickly prototype my app with such velocity when common
-queries can be called with stuff like `Find`, `Delete`, etc.
-
-I avoided learning advanced SQL for years simply because my 1st company
-did not use much SQL, and when I needed to, I can just use ORM.
-
-When I taught a bootcamp, I even told my participants to just stick
-to ORM and that little SQL knowledge is okay.
-
-In other words, ORM is okay or even good enough for simple database
-operations.
+I had somehow managed to avoid learning advanced SQL for 2 years,
+simply because my 1st company did not use much SQL. Plus when I had to,
+I told myself I could just use ORM.
 
 ## ORM is complex
 
-Each ORM frameworks are complex, and generally come with opinionated
-assumptions about how they are going to be used.
+Each ORM frameworks are *incredibly* complex, and generally come
+with opinionated assumptions about how they are going to be used.
 
 They also hide something from us. For example, most ORMs will do
 a `SELECT *` even if we only ask it to fetch a single column.
@@ -68,9 +64,14 @@ when using ORM, even though most ORMs already provide features like
 When using ORM, the most fine-grained controls of these SQL executions
 are usually done using some of these `Suffix` stuff.
 
+Another reason that ORM needlessly increases complexity for our code
+is that ORM usually comes with framework-specific way to define
+database interactions. Adding another "language" (the ORM definitions)
+is of course going to make our code require more context to read.
+
 ## ORM is not standardized
 
-Sometimes at my 1st company, we needed to make changes to database code.
+Sometimes at my previous company, we needed to make changes to database code.
 Most of the times it's due to race condition, or new features needed
 complex queries.
 
