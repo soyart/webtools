@@ -16,11 +16,11 @@ Here's my quick intro:
 
 See my embarassing code on [my GitHub](https://github.com/soyart).
 
-Or you read my unpopular opinions on [my Twitter](https://twitter.com/artnoi).
+Or you can read my unpopular opinions on [my Twitter](https://twitter.com/artnoi).
 
 ## Credits
 
-The website partially uses monospaced [TTF Hack](https://sourcefoundry.org/hack/),
+The website partially uses monospace [TTF Hack](https://sourcefoundry.org/hack/),
 which is my desktop and terminal font face, with blue-ish color scheme from
 [Iceberg](https://github.com/cocopon/iceberg.vim).
 
