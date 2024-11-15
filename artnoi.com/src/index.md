@@ -15,7 +15,7 @@ Here's my quick intro:
 - love to share my shitty code projects to the world
 
 See my embarassing code on [my GitHub](https://github.com/soyart),
-and my notes on [notes.artnoi.com](https://notes.artnoi.com).
+and my notes on [notes.artnoi.com](https://notes.artnoi.com/#/all-pages).
 
 Or you can read my unpopular opinions on [my Twitter](https://twitter.com/artnoi).
 
