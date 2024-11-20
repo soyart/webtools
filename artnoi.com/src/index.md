@@ -19,6 +19,16 @@ and my notes on [notes.artnoi.com](https://notes.artnoi.com/#/all-pages).
 
 Or you can read my unpopular opinions on [my Twitter](https://twitter.com/artnoi).
 
+## Contacts
+
+- [pphansuriyanon@gmail.com](mailto:pphansuriyanon@gmail.com)
+
+- [twitter.com/artnoi](https://twitter.com/artnoi)
+
+- [github.com/soyart](https://github.com/soyart)
+
+- [gitlab.com/artnoi](https://gitlab.com/artnoi)
+
 ## Credits
 
 The website partially uses monospace [TTF Hack](https://sourcefoundry.org/hack/),
