@@ -7,9 +7,9 @@ Its mission is to help propel KBank with technologies, e.g.
 developing end-user apps for the bank's customers, ATM software,
 or the bank's own internal tools and systems.
 
-Its premiere product is, KPlus, is KBank's mobile banking app.
-KPlus is known for being fast, and  the most reliable among mobile
-banking apps from any Thai banks.
+Its premiere product, KPlus, is KBank's mobile banking app.
+KPlus is known for being the fastest and the most reliable
+among Thai mobile banking apps.
 
 As a bank's retail customer, I think (and still do) highly of KPlus -
 most of my banking is done through the app. Let's just say it's why
@@ -17,7 +17,7 @@ I'd thought KBTG must have been really good at software engineering,
 and that it's a legitimate tech company.
 
 This blog post will attempt to debunk that, using my 3-month
-real world experience, and why I had to leave there in a hurry.
+experience with the company, and why I had to leave there in a hurry.
 
 > Note that this blog only represents my own view and experience,
 > and there's a high chance that KBTG still had some few competent
@@ -78,7 +78,7 @@ The app is incredibly simple - more like a front-end for SQL databases
 and bank's legacy core banking software running in their mainframes.
 
 I also learned that the project we're working had been developed
-by an outsourced company for 2 years already. In late 2023, around
+by an outsourcers for 2 years already. In late 2023, around
 25-30 SWEs were working on the product, which was still in beta.
 
 So, an outsourced company had been working on KBTG products for 2
@@ -95,7 +95,7 @@ outsourced teams couldn't.
 ### Worst possible code
 
 The first time I took a look at it, I was cursing whoever
-wrote that piece of shit software.
+wrote that piece of shit, antichrist software.
 
 I'm not gonna say that my code is any good, but it sure was better
 than theirs.
