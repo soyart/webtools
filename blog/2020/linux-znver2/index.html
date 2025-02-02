@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Artnoi.com</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="keywords" content="artnoi, Prem Phansuriyanon">
+  <meta name="author" content="@artnoi">
+  <meta charset="UTF-8">
+  <link href="/style.css" rel="stylesheet">
+</head>
+
+<body>
+  <ul class="navbar">
+    <li><a href="/"><img src="/toplogo.png" alt="Artnoi.com" class="logo">artnoi</a></li>
+    <li class="f-right"><a href="/cheat/">cheat</a></li>
+    <li class="f-right"><a href="https://notes.artnoi.com/#/all-pages">notes</a></li>
+    <li class="f-right"><a href="/blog/">blog</a></li>
+  </ul><p>Dec 20, <a href="/blog/2020/">2020</a></p>
+
+<h1 id="building-zen2-optimized-kernel-on-arch-linux">Building Zen2-optimized kernel on Arch Linux</h1>
+
+<p>The Linux kernel includes multiple options and modules for AMD Zen2 x86 architecture. The vanilla kernel (<code>linux</code>) shipped by Arch does not include such configuration, so to get the most out of Zen2 CPUs on Arch, I will have to custom build my kernel.</p>
+
+<h2 id="using-aur-linux-znver2">Using AUR - <code>linux-znver2</code></h2>
+
+<p>The Arch User Repositories include kernel package <code>linux-amd-znver2</code> which is similar to the versatile vanilla Arch Linux kernel (<code>linux</code>), but with AMD Zen2 optimizations and other AMD-platform options. This is good enough for me, because it includes all the modules (both essential and bloated), thus ensuring that my system will work correctly should it need to load some extra modules.</p>
+
+<h2 id="customizing-linux-znver2">Customizing <code>linux-znver2</code></h2>
+
+<p>But because unused modules <em>will</em> be compiled, its presence alone wastes build time. I don&rsquo;t want to build USB support for my PlayStation2 controller on my AMD laptop. This is when I began to find a way to customing the kernel build option (<code>config</code>) further, and led me to write this article as a note to myself.</p>
+
+<h4 id="caveats">Caveats</h4>
+
+<p>Be sure that the module dependencies for those modules in <code>HOOKS</code> section of <code>mkinitcpio.conf</code> are available. The same is true for other <code>-dkms</code> modules.</p>
+
+<h3 id="make-options-i-used"><code>make</code> options I used</h3>
+
+<p>It&rsquo;s best to read the kernel <code>README</code> before attempting to build the kernel. The official descriptions <code>make XXconfig</code> lists below can be found on the <a href="https://github.com/torvalds/linux/blob/master/Documentation/admin-guide/README.rst">README file</a>.</p>
+
+<ul>
+<li><code>make localmodconfig</code> - Will use <code>lsmod</code> (or <code>$LSMOD</code> shell variable to the file containing target machine&rsquo;s <code>lsmod</code> output) to determine which modules will be built. The result will be a very streamlined kernel.</li>
+<li><code>make nconfig</code> - <code>ncurses</code> menu for customizing <code>config</code> (<code>Kconfig</code>). Dubbed new <code>menuconfig</code>. Good for manually removing/adding modules without corrupting the <code>config</code> file.</li>
+<li><code>make menuconfig</code> - deprecated, use <code>nconfig</code> instead.</li>
+<li><code>make olddefconfig</code> - Uses old <code>config</code>, defaults for new options. This is default for our <code>linux-amd-znver2</code> package.
+So, to customize <code>config</code> after using our <code>lsmod</code> as a template, add these lines to <code>prepare()</code> section of <code>PKGBUILD</code>:
+make localmodconfig
+make nconfig
+Optionally, use <code>LSMOD=/path/to/file</code>:
+make LSMOD=/tmp/lsmod localmodconfig
+make nconfig</li>
+</ul>
+
+<h3 id="the-idea">The idea</h3>
+
+<p>The process is simple, but a bit time consuming. First you need to build a vanilla <code>linux-znver2</code>, and then after verifying that it works with your system, tries to minimize the extra modules and decides which ones should be built in or made as LKM. The main criteria to me when deciding whether to build it into the kernel, or as loadable kernel modules in <code>/usr/lib</code>, is the resulting <code>initramfs</code> size.</p>
+<hr>
+<p><a href="#top">Back to top</a></p>
+<hr>
+<footer>
+	<p>Copyright (c) 2019 - 2023 Prem Phansuriyanon</p>
+	<p>Verbatim copying and redistribution of this entire page are permitted provided this notice is preserved</p>
+</footer>
+</body>
+
+</html>

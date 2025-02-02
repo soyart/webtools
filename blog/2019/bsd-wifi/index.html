@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Artnoi.com</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="keywords" content="artnoi, Prem Phansuriyanon">
+  <meta name="author" content="@artnoi">
+  <meta charset="UTF-8">
+  <link href="/style.css" rel="stylesheet">
+</head>
+
+<body>
+  <ul class="navbar">
+    <li><a href="/"><img src="/toplogo.png" alt="Artnoi.com" class="logo">artnoi</a></li>
+    <li class="f-right"><a href="/cheat/">cheat</a></li>
+    <li class="f-right"><a href="https://notes.artnoi.com/#/all-pages">notes</a></li>
+    <li class="f-right"><a href="/blog/">blog</a></li>
+  </ul><p>Aug 3, <a href="/blog/2019/">2019</a></p>
+
+<h1 id="freebsd-12-0-enabling-wi-fi-on-thinkpad-x230">FreeBSD 12.0: Enabling Wi-Fi on ThinkPad X230</h1>
+
+<h2 id="thinkpad-x230-wifi-on-freebsd-12-0-intel-centrino-advanced-n-6025-network-card">ThinkPad X230 WiFi on FreeBSD 12.0 (Intel Centrino Advanced-N 6025 network card)</h2>
+
+<p>During FreeBSD installation you should be prompted to configure IPv4 and IPv6 for your network interfaces. I have never successfully configured any wireless interfaces with this menu during installation, be it on my 2013 iMac or on this Lenovo machine, so I expected it to fail and just connect the laptop via Ethernet first to configure em0 interface to fetch and install FreeBSD patches with <code>freebsd-update</code>.</p>
+
+<blockquote>
+<p>You don&rsquo;t need working Ethernet in order to get WiFi working, just finish the installation normally <strong>without</strong> configuring <code>wlan0</code> and reboot. Yes, we will manually configure the WiFi to work after we reboot into our freshly installed FreeBSD 12.0.</p>
+</blockquote>
+
+<h2 id="when-to-enable-ntpd">When to enable <code>ntpd</code></h2>
+
+<p>Upon successful boot, if there is no internet connection and if you set <code>ntpd</code> to &lsquo;enabled&rsquo; during installation, then the <code>ntpd</code> daemon will complain a lot and mess up with your serial console output, so I recommend not to enable <code>ntpd</code> yet before you setup your wireless networking. You can always enable ntpd later as easily as by adding an entry in <code>/etc/rc.conf</code> file or issuing <code>sysrc</code> command.</p>
+
+<h3 id="getting-hardware-information">Getting hardware information:</h3>
+
+<p>Upon reboot, check your network interface cards by issuing (as root):</p>
+
+<pre><code class="language-shell">sysctl net.wlan.devices;
+</code></pre>
+
+<p>On X230, the command should return <code>iwn0</code> (Intel Centrino Advanced-N 6025).</p>
+
+<h3 id="edit-etc-rc-conf">Edit <code>/etc/rc.conf</code>:</h3>
+
+<p>Now that we know which device will be our <code>wlan0</code> interface, we will edit the <code>/etc/rc.conf</code> file so that <code>iwn0</code> is configured as <code>wlan0</code>, and set the correct regulation for our wireless connection (check your own country code and regulatory domain, for example FCC for US, ETSI for UK, APAC for TH), and that after the handshake we would like to use DHCP.</p>
+
+<blockquote>
+<p>You can explicitly choose static IP but for the sake of simplicity I will go for DHCP. If you choose to go without DHCP, make sure to supply your network, subnet, and default gateway addresses.</p>
+</blockquote>
+
+<pre><code class="language-shell"> # [ /etc/rc.conf ]
+
+ wlans_iwn0=&quot;wlan0&quot;
+ create_args_wlan0=&quot;country TH regdomain APAC&quot;
+ ifconfig_wlan0=&quot;WPA SYNCDHCP&quot;
+</code></pre>
+
+<p><a href="step3"></a></p>
+
+<h3 id="edit-boot-loader-conf">Edit <code>/boot/loader.conf</code>:</h3>
+
+<p>Now that we know the device, add the following entries to <code>/boot/loader.conf</code> file to tell FreeBSD to load the relevant wireless networking modules (we actually won&rsquo;t need to tell it to load the drivers or firmware because it is usually loaded for us, but I&rsquo;ll just leave them commented out here in case it&rsquo;s useful for other people):</p>
+
+<pre><code class="language-shell"> # [ /boot/loader.conf ]
+
+ #if_iwn_load=&quot;YES&quot;
+ #iwn6000fw_load=&quot;YES&quot;
+ #iwn6000g2afw_load=&quot;YES&quot;
+ #iwn6000g2bfw_load=&quot;YES&quot;
+ #iwn6050fw_load=&quot;YES&quot;
+ wlan_scan_ap_load=&quot;YES&quot;
+ wlan_scan_sta_load=&quot;YES&quot;
+ wlan_wep_load=&quot;YES&quot;
+ wlan_ccmp_load=&quot;YES&quot;
+ wlan_tkip_load=&quot;YES&quot;
+</code></pre>
+
+<h3 id="wpa2-authentication">WPA2 authentication</h3>
+
+<p>We&rsquo;re almost done, except that we have not yet populated our WPA configuration file with our SSID (Wi Fi name) and PSK (pre-shared key or your typical WiFi password). Now add the following entry to <code>/etc/wpa_supplicant.conf</code>:</p>
+
+<pre><code> # [ /etc/wpa_supplicant.conf ]
+
+ ctrl_interface=/var/run/wpa_supplicant
+ ctrl_interface_group=wheel
+
+ network={
+   ssid=&quot;YOURWIFI&quot;
+   scan_ssid=1
+   psk=&quot;YOURPASSWORD&quot;
+ }
+</code></pre>
+
+<h3 id="reboot">Reboot</h3>
+
+<p>Reboot now, the next boot&rsquo;s splash screen should tell us if <code>iwn0</code> is already loaded or not - if not and the connection failed, try adding the lines with driver loading statements from above to <code>/boot/loader.conf</code> and reboot and see if it works. If <code>iwn0</code> is loaded but there is no wlan0 carrier anyway, try editing <code>/etc/wpa_supplicant.conf</code> and <code>/etc/rc.conf</code> and reload <code>netif</code> by issuing (as root):</p>
+
+<pre><code class="language-shell">service netif restart;
+</code></pre>
+
+<h2 id="unrelated-how-to-dualboot-uefi-freebsd-and-linux-with-one-efi-partition-using-grub2">Unrelated: How to dualboot UEFI FreeBSD and Linux with one EFI partition using GRUB2</h2>
+
+<p>The FreeBSD installer has guided steps so the installation was easy and smooth, except the disk partition part where I decided not to create an EFI partition for FreeBSD, because I hated having 2 EFI partitions on the same disk.</p>
+
+<p>The trick here is to to copy EFI boot program <code>BOOTx64.efi</code> (i.e. from the live USB) to the existing EFI partition on my disk, and then use other system&rsquo;s <code>grub2</code> to automatically detect the EFI boot program and create a boot entry for our FreeBSD.</p>
+
+<p>So we will use an existing Linux system that you want to dual-boot FreeBSD with to copy the EFI file to the EFI partition, the destination path in the FAT32 partition should be <code>\EFI\FreeBSD\BOOTx64.efi</code>.</p>
+
+<blockquote>
+<p>As of writing this blog post, I was using Manjaro Linux, which mounts its EFI partition under <code>/boot/efi</code>, so I copied <code>BOOTx64.efi</code> to <code>/boot/efi/EFI/FreeBSD/BOOTx64.efi</code>.</p>
+</blockquote>
+
+<p>Then I edited the <code>40_custom</code> file in <code>/etc/grub.d</code> to look something like:</p>
+
+<pre><code># [ /etc/grub.d/40_custom ]
+
+# FreeBSD was installed without creating its own FAT32 EFI partition
+# The EFI boot file in this case is located on disk 0, GPT partition 4
+# The FreeBSD root filesystem is UFS
+
+menuentry &quot;FreeBSD&quot; --class freebsd --class bsd --class os {
+ insmod bsd
+ insmod ufs2
+ chainloader (hd0,gpt4)/EFI/FreeBSD/BOOTx64.efi
+}
+</code></pre>
+
+<p>Then, update <code>grub</code> configuration file (on Arch Linux) with:</p>
+
+<pre><code class="language-shell">sudo update-grub;
+</code></pre>
+
+<p>Manjaro-shipped <code>grub</code> should detect FreeBSD installation as &lsquo;unknown Linux distrobution&rsquo;. Then reboot, and your <code>grub</code> menu should now present you with an entry for FreeBSD.</p>
+
+<blockquote>
+<p>Note: this was written back in 2019 and may no longer be relevant.</p>
+</blockquote>
+<hr>
+<p><a href="#top">Back to top</a></p>
+<hr>
+<footer>
+	<p>Copyright (c) 2019 - 2023 Prem Phansuriyanon</p>
+	<p>Verbatim copying and redistribution of this entire page are permitted provided this notice is preserved</p>
+</footer>
+</body>
+
+</html>

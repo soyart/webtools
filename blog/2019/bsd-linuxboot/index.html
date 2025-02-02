@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Artnoi.com</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="keywords" content="artnoi, Prem Phansuriyanon">
+  <meta name="author" content="@artnoi">
+  <meta charset="UTF-8">
+  <link href="/style.css" rel="stylesheet">
+</head>
+
+<body>
+  <ul class="navbar">
+    <li><a href="/"><img src="/toplogo.png" alt="Artnoi.com" class="logo">artnoi</a></li>
+    <li class="f-right"><a href="/cheat/">cheat</a></li>
+    <li class="f-right"><a href="https://notes.artnoi.com/#/all-pages">notes</a></li>
+    <li class="f-right"><a href="/blog/">blog</a></li>
+  </ul><p>Aug 3, <a href="/blog/2019/">2019</a></p>
+
+<h1 id="freebsd-12-0-efi-dual-boot-with-gnu-linux">FreeBSD 12.0: EFI dual-boot with GNU/Linux</h1>
+
+<p>The FreeBSD installation using the live installer was easy and smooth, except the disk partition part where I decided not to create an EFI partition for FreeBSD, because I hated having 2 EFI partitions on the same disk.</p>
+
+<p>The trick here is to to copy EFI boot program <code>BOOTx64.efi</code> (i.e. from the live USB) to the existing EFI partition on my disk, and then use other system&rsquo;s <code>grub2</code> to automatically detect the EFI boot program and create a boot entry for our FreeBSD.</p>
+
+<p>So we will use an existing Linux system that you want to dual-boot FreeBSD with to copy the EFI file to the EFI partition, the destination path in the FAT32 partition should be <code>\EFI\FreeBSD\BOOTx64.efi</code>.</p>
+
+<blockquote>
+<p>As of writing this blog post, I was using Manjaro Linux, which mounts its EFI partition under <code>/boot/efi</code>, so I copied <code>BOOTx64.efi</code> to <code>/boot/efi/EFI/FreeBSD/BOOTx64.efi</code>.</p>
+</blockquote>
+
+<p>Then I edited the <code>40_custom</code> file in <code>/etc/grub.d</code> to look something like:</p>
+
+<pre><code># [ /etc/grub.d/40_custom ]
+
+# FreeBSD was installed without creating its own FAT32 EFI partition
+# The EFI boot file in this case is located on disk 0, GPT partition 4
+# The FreeBSD root filesystem is UFS
+
+menuentry &quot;FreeBSD&quot; --class freebsd --class bsd --class os {
+ insmod bsd
+ insmod ufs2
+ chainloader (hd0,gpt4)/EFI/FreeBSD/BOOTx64.efi
+}
+</code></pre>
+
+<p>Then, update <code>grub</code> configuration file (on Arch Linux) with:</p>
+
+<pre><code class="language-shell">sudo update-grub;
+</code></pre>
+
+<p>Manjaro-shipped <code>grub</code> should detect FreeBSD installation as &lsquo;unknown Linux distrobution&rsquo;. Then reboot, and your <code>grub</code> menu should now present you with an entry for FreeBSD.</p>
+
+<blockquote>
+<p>Note: this was written back in 2019 and may no longer be relevant.</p>
+</blockquote>
+<hr>
+<p><a href="#top">Back to top</a></p>
+<hr>
+<footer>
+	<p>Copyright (c) 2019 - 2023 Prem Phansuriyanon</p>
+	<p>Verbatim copying and redistribution of this entire page are permitted provided this notice is preserved</p>
+</footer>
+</body>
+
+</html>
