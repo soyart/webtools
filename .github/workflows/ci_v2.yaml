@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - artnoi.com
+      - ssg-go-artnoi.com
 
 jobs:
   build-deploy-pages:
