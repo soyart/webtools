@@ -4,8 +4,9 @@ webtools is a GitHub Pages wrapper for [ssg](https://github.com/soyart/ssg).
 
 > See [ssg](https://github.com/soyart/webtools) before using webtools
 
-It provides a GitHub Actions workflow entrypoint, `ci_v2.yaml`, which uses Nix to build
-ssg-go executables and uses the executables to build our website(s).
+It provides a GitHub Actions workflow entrypoint, [`ci_v2.yaml`](./.github/workflows/ci_v2.yaml),
+which uses Nix to build ssg-go executables and uses the executables to build our website(s) via
+[`pages_v2.yaml`](./.github/workflows/pages_v2.yaml).
 
 # Hosting with GitHub Pages
 

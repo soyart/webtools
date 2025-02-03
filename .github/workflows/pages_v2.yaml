@@ -3,25 +3,24 @@ name: pages-v2
 on:
   workflow_call:
     inputs:
-      # Site key to build, must be defined in manifest.json
-      sitekey:
-        type: string
-        required: true
-
-      # Target directory
       dist:
         type: string
         required: true
+        description: Build directory, i.e. the where the built static site files are put into.
 
-      # Target branch to copy `dist` to
       deploy_branch:
         type: string
         required: true
+        description: |
+          Target deploy branch name.
+          When building from branch 'example.com', it's recommended to set deploy_branch to 'deploy/example.com' or 'publish/example.com'
 
-      # If true, the deploy branch will only contain artifacts from the last commit
       wipe_deploy_branch:
         type: boolean
         required: true
+        description: |
+          Option to wipe deploy branch when deploying.
+          If true, the deploy branch will only contain artifacts from the last commit
 
       # Custom domain name. This will create file CNAME at the root of dist to be copied to deploy branch
       cname:
