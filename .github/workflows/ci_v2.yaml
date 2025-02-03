@@ -3,14 +3,14 @@ name: ci-v2
 on:
   push:
     branches:
-      - master
+      - artnoi.com
 
 jobs:
   build-deploy-pages:
     name: Build GitHub Pages using ssg
     uses: ./.github/workflows/ssg-pages.yaml
     with:
-      dist: ./johndoe.com/dist
-      deploy_branch: test-pages-workflow/johndoe.com
+      dist: ./artnoi.com/dist
+      deploy_branch: publish/artnoi.com
       wipe_deploy_branch: true
-      cname: johndoe.com
+      cname: artnoi.com
