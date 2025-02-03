@@ -14,10 +14,6 @@
 				"force": true,
 				"target": "./johndoe.com/src/_footer.html"
 			},
-			"./johndoe.com/resc/fonts": {
-				"force": true,
-				"target": "./johndoe.com/dist/fonts"
-			},
 			"./johndoe.com/resc/style.css": {
 				"force": true,
 				"target": "./johndoe.com/dist/style.css"
@@ -29,6 +25,10 @@
 			"./johndoe.com/resc/logo.svg": {
 				"force": true,
 				"target": "./johndoe.com/dist/logo.svg"
+			},
+			"./shared/fonts": {
+				"force": true,
+				"target": "./johndoe.com/src/fonts"
 			},
 			"./shared/logos/github.png": {
 				"force": true,
