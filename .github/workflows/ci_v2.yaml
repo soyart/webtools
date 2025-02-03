@@ -1,0 +1,18 @@
+name: ci-v2
+
+on:
+  push:
+    branches:
+      - johndoe.com
+
+jobs:
+  build-deploy-pages:
+    name: Build GitHub Pages
+    uses: ./.github/workflows/pages_v2.yaml
+    with:
+      sitekey: johndoe.com
+      dist: ./johndoe.com/dist
+      deploy_branch: test-publish/johndoe.com
+      wipe_deploy_branch: true
+      cname: johndoe.com
+     

@@ -1,0 +1,119 @@
+name: pages-v2
+
+on:
+  workflow_call:
+    inputs:
+      # Site key to build, must be defined in manifest.json
+      sitekey:
+        type: string
+        required: true
+
+      # Target directory
+      dist:
+        type: string
+        required: true
+
+      # Target branch to copy `dist` to
+      deploy_branch:
+        type: string
+        required: true
+
+      # If true, the deploy branch will only contain artifacts from the last commit
+      wipe_deploy_branch:
+        type: boolean
+        required: true
+
+      # Custom domain name. This will create file CNAME at the root of dist to be copied to deploy branch
+      cname:
+        type: string
+        required: false
+
+env:
+  SSG_GO_RELEASE: release-ssg-go
+  SSG_GO_BIN_ZIP: ssg-go-x86_64_linux.zip
+
+jobs:
+  build:
+    name: Build static sites
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Nix
+        uses: cachix/install-nix-action@v30
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - id: release-ssg-go
+        name: Download ssg-go release
+        uses: robinraju/release-downloader@v1
+        with:
+          repository: 'soyart/ssg'
+          latest: true
+          zipBall: true # Source?
+          extract: true
+          out-file-path: ${{ env.SSG_GO_RELEASE }}
+
+      - name: Inspect release
+        env:
+          RELEASE_NAME: ${{ steps.release-ssg-go.outputs.release_name }}
+        run: |
+          echo "Inspecting release tag"
+          echo ${{ steps.release-ssg-go.outputs.tag_name }}
+
+          echo "Inspecting raw release name"
+          release_name=$RELEASE_NAME
+          echo "$release_name"
+
+          echo "Inspecting substituted release name"
+          release_name="${release_name#Release }" # trim prefix
+          echo "$release_name"
+
+          echo "Inspecting source zip archive"
+          release_name="ssg-${release_name}.zip"
+          echo "$release_name"
+
+          echo "Inspecting $(pwd) after downloading release"
+          tree .
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # For some reasons, clean: false does not work now.
+          # This forces us to use nix build from GitHub remote
+          # and not from the downloaded release in step release-ssg-go.
+          #
+          # We'll use the output of release-ssg-go to construct
+          # a nix build source URL in step below.
+          clean: false
+
+      - name: Prepare ssg-go executable(s)
+        env:
+          RELEASE_TAG: ${{ steps.release-ssg-go.outputs.tag_name }}
+        run: |
+          echo "Inspecting $(pwd) before building ssg-go with nix"
+          tree .
+
+          # actions/checkout wiped our ssg source pulled earlier.
+          nix build "github:soyart/ssg?ref=$RELEASE_TAG#soyweb"
+          echo "Inspecting built soyweb"
+          tree .
+
+      - name: Build from /manifest.json
+        run: |
+          echo "Inspecting before building"
+          tree .
+          [ -f ./manifest.json ] && ./result/bin/ssg-manifest build --gen-index --min-html --min-html-copy --min-css --min-js
+          echo "Inspecting after building"
+          tree .
+
+      # Prepare CNAME for GitHub Pages with custom domain
+      - name: CNAME ${{ inputs.cname }}
+        if: inputs.cname != ''
+        run: echo ${{ inputs.cname }} > ${{ inputs.dist }}/CNAME
+
+      - name: Deploy to ${{ inputs.deploy_branch }}
+        uses: peaceiris/actions-gh-pages@364c31d33bb99327c77b3a5438a83a357a6729ad # v3.4.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: ${{ inputs.deploy_branch }}
+          publish_dir: ${{ inputs.dist }}
+          force_orphan: $ {{ inputs.wipe_deploy_branch }}
