@@ -1,70 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-  <title>Artnoi.com</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="keywords" content="artnoi, Prem Phansuriyanon">
-  <meta name="author" content="@artnoi">
-  <meta charset="UTF-8">
-  <link href="/style.css" rel="stylesheet">
-</head>
-
-<body>
-  <ul class="navbar">
-    <li><a href="/"><img src="/toplogo.png" alt="Artnoi.com" class="logo">artnoi</a></li>
-    <li class="f-right"><a href="/cheat/">cheat</a></li>
-    <li class="f-right"><a href="https://notes.artnoi.com/#/all-pages">notes</a></li>
-    <li class="f-right"><a href="/blog/">blog</a></li>
-  </ul><p>Sep 19, <a href="/blog/2020/">2020</a></p>
-
-<p>Last reviewed: Feb, 2021</p>
-
-<h1 id="artnoi-com-is-now-on-openbsd">artnoi.com is now on OpenBSD!</h1>
-
-<p><a href="blog/2020/openbsd/">After a few days on OpenBSD</a>, I have made my mind to move the webserver from Digitalocean <a href="https://freebsd.org">FreeBSD</a> VPS (pre-installed on ZFS) to my custom OpenBSD installation on Vultr (Here is a random <a href="https://cryptsus.com/blog/wireguard-vpn-privacy-server-on-a-vultr-cloud-vps-on-openbsd-6.6-with-full-disk-encryption.html?fbclid=IwAR1tRIZ9iXhV2HN3eDp_8Y1nrqjzW14Ko-rxph5lYHdfeOs4pSOkIKqsUUQ">guide I found on Google for encrypted installation</a>).</p>
-
-<p>The process took me ~30 minutes from spinning up a fresh VM to when everything including HTTPS is ready. Because Poudriere is no longer needed, ports.artnoi.com is no longer available.</p>
-
-<h2 id="why-openbsd">Why OpenBSD?</h2>
-
-<p>OpenBSD&rsquo;s base comes <strong>complete</strong> with all the software required to build a secure and simple webserver, namely:</p>
-
-<ul>
-<li><p><code>httpd(8)</code> simple webserver</p></li>
-
-<li><p><code>relayd(8)</code> relay and proxy, <code>httpd</code> is actually based on <code>relayd</code></p></li>
-
-<li><p><code>pf(4)</code> packet filter, some of the best firewall software</p></li>
-
-<li><p><code>wg(4)</code> small, fast, and secure VPN originally for Linux</p></li>
-
-<li><p><code>acme-client(1)</code> <a href="https://en.wikipedia.org/wiki/Automated_Certificate_Management_Environment">ACME</a> client</p></li>
-
-<li><p><code>openssh(8)</code> secure remote shell</p></li>
-</ul>
-
-<h2 id="httpd-vs-nginx">httpd vs NGINX</h2>
-
-<blockquote>
-<p>TLDR: NGINX is used only as my HTTPS front-end for the clients to establish secure connections.</p>
-</blockquote>
-
-<p>Although I am very impressed with <a href="https://nginx.com">NGINX</a>&rsquo;s webserver performance, I find OpenBSD&rsquo;s <code>httpd(8)</code> to be just good enough to serve a mostly static text website, so I switched my main webserver from NGINX to <code>httpd(8)</code>.</p>
-
-<p>Then I found out that it is currently impossible to change error page on OpenBSD <code>http(8)</code>, but that can be mitigated with proxies.</p>
-
-<p>I do however continue to use NGINX to serve <a href="https://docs.pi-hole.net/guides/nginx-configuration">bloated web pages</a>, and as relays (proxies) for my HTTPS front-end. I tried OpenBSD&rsquo;s <code>relayd(8)</code> as internet-facing reverse proxy. But because I&rsquo;m a noob, my <code>relay.conf(5)</code> had some <em>minor</em> with TLS, where it seemed my server did not serve all the certificates needed. This was very small, and barely noticable that desktop users won&rsquo;t even notice this, since the incomplete handshake was acceptable to Firefox and Chrome (both of which I believe have root certficates that could actually verify my incomplete certificate).</p>
-
-<p>So I have to use NGINX as my internet-facing reverse proxy for now, though I still put OpenBSD <code>relayd(8)</code> behind NGINX to actually proxy connection to the actual webservers, filter incoming HTTP headers, and actively load-balance the hosts through Wireguard tunnel.</p>
-
-<h2 id="configuring-httpd-8">Configuring httpd(8)</h2>
-
-<h3 id="simple-httpd-conf-5">Simple httpd.conf(5)</h3>
-
-<p>This configuration is for serving simple HTTP website on non-standard port 8080</p>
-
-<pre><code>## GLOBAL configuration
+<!doctype html><html lang=en><title>Artnoi.com</title><meta name=viewport content="width=device-width,initial-scale=1"><meta name=keywords content="artnoi,Prem Phansuriyanon"><meta name=author content="@artnoi"><meta charset=UTF-8><link href=/style.css rel=stylesheet><ul class=navbar><li><a href=/><img src=/toplogo.png alt=Artnoi.com class=logo>artnoi</a><li class=f-right><a href=/cheat/>cheat</a><li class=f-right><a href=https://notes.artnoi.com/#/all-pages>notes</a><li class=f-right><a href=/blog/>blog</a></ul><p>Sep 19, <a href=/blog/2020/>2020</a><p>Last reviewed: Feb, 2021<h1 id=artnoi-com-is-now-on-openbsd>artnoi.com is now on OpenBSD!</h1><p><a href=blog/2020/openbsd/>After a few days on OpenBSD</a>, I have made my mind to move the webserver from Digitalocean <a href=https://freebsd.org>FreeBSD</a> VPS (pre-installed on ZFS) to my custom OpenBSD installation on Vultr (Here is a random <a href="https://cryptsus.com/blog/wireguard-vpn-privacy-server-on-a-vultr-cloud-vps-on-openbsd-6.6-with-full-disk-encryption.html?fbclid=IwAR1tRIZ9iXhV2HN3eDp_8Y1nrqjzW14Ko-rxph5lYHdfeOs4pSOkIKqsUUQ">guide I found on Google for encrypted installation</a>).<p>The process took me ~30 minutes from spinning up a fresh VM to when everything including HTTPS is ready. Because Poudriere is no longer needed, ports.artnoi.com is no longer available.<h2 id=why-openbsd>Why OpenBSD?</h2><p>OpenBSD&rsquo;s base comes <strong>complete</strong> with all the software required to build a secure and simple webserver, namely:<ul><li><p><code>httpd(8)</code> simple webserver<li><p><code>relayd(8)</code> relay and proxy, <code>httpd</code> is actually based on <code>relayd</code><li><p><code>pf(4)</code> packet filter, some of the best firewall software<li><p><code>wg(4)</code> small, fast, and secure VPN originally for Linux<li><p><code>acme-client(1)</code> <a href=https://en.wikipedia.org/wiki/Automated_Certificate_Management_Environment>ACME</a> client<li><p><code>openssh(8)</code> secure remote shell</ul><h2 id=httpd-vs-nginx>httpd vs NGINX</h2><blockquote><p>TLDR: NGINX is used only as my HTTPS front-end for the clients to establish secure connections.</blockquote><p>Although I am very impressed with <a href=https://nginx.com>NGINX</a>&rsquo;s webserver performance, I find OpenBSD&rsquo;s <code>httpd(8)</code> to be just good enough to serve a mostly static text website, so I switched my main webserver from NGINX to <code>httpd(8)</code>.<p>Then I found out that it is currently impossible to change error page on OpenBSD <code>http(8)</code>, but that can be mitigated with proxies.<p>I do however continue to use NGINX to serve <a href=https://docs.pi-hole.net/guides/nginx-configuration>bloated web pages</a>, and as relays (proxies) for my HTTPS front-end. I tried OpenBSD&rsquo;s <code>relayd(8)</code> as internet-facing reverse proxy. But because I&rsquo;m a noob, my <code>relay.conf(5)</code> had some <em>minor</em> with TLS, where it seemed my server did not serve all the certificates needed. This was very small, and barely noticable that desktop users won&rsquo;t even notice this, since the incomplete handshake was acceptable to Firefox and Chrome (both of which I believe have root certficates that could actually verify my incomplete certificate).<p>So I have to use NGINX as my internet-facing reverse proxy for now, though I still put OpenBSD <code>relayd(8)</code> behind NGINX to actually proxy connection to the actual webservers, filter incoming HTTP headers, and actively load-balance the hosts through Wireguard tunnel.<h2 id=configuring-httpd-8>Configuring httpd(8)</h2><h3 id=simple-httpd-conf-5>Simple httpd.conf(5)</h3><p>This configuration is for serving simple HTTP website on non-standard port 8080<pre><code>## GLOBAL configuration
 
 httpd_ip = &quot;127.0.0.1&quot;
 
@@ -88,26 +22,8 @@ server &quot;artnoi.com&quot; {
   listen on $httpd_ip port 8080
   root &quot;/htdocs/html-artnoi.com&quot;
 }
-</code></pre>
-
-<p>Check <code>httpd(8)</code> configuration <code>/etc/httpd.conf</code> with:</p>
-
-<pre><code class="language-shell">httpd -n -f /etc/httpd.conf;
-</code></pre>
-
-<p>If you want to run <code>httpd(8)</code> as daemon, configure <code>rc(8)</code>.</p>
-
-<h2 id="http-with-tls-using-httpd-8-and-acme-client-1">HTTP with TLS using httpd(8) and acme-client(1)</h2>
-
-<p>We can configure HTTPS on OpenBSD <code>http(8)</code> with out any external packages. There is an article on <a href="https://www.openbsdhandbook.com">OpenBSD Handbook</a></p>
-
-<p>services/webserver/ssl) on how to do this. In short, you first set up <code>httpd(8)</code> to be ready to handle <a href="https://en.wikipedia.org/wiki/Automated_Certificate_Management_Environment">ACME</a> challenges via simple port 80 HTTP. (OpenBSD ships with a production-ready ACME client <code>acme-client(1)</code>! How about that!?).</p>
-
-<h3 id="configuring-acme-client-1">Configuring acme-client(1)</h3>
-
-<p>We will be using <em>production</em> server here</p>
-
-<pre><code>authority letsencrypt {
+</code></pre><p>Check <code>httpd(8)</code> configuration <code>/etc/httpd.conf</code> with:<pre><code class=language-shell>httpd -n -f /etc/httpd.conf;
+</code></pre><p>If you want to run <code>httpd(8)</code> as daemon, configure <code>rc(8)</code>.<h2 id=http-with-tls-using-httpd-8-and-acme-client-1>HTTP with TLS using httpd(8) and acme-client(1)</h2><p>We can configure HTTPS on OpenBSD <code>http(8)</code> with out any external packages. There is an article on <a href=https://www.openbsdhandbook.com>OpenBSD Handbook</a><p>services/webserver/ssl) on how to do this. In short, you first set up <code>httpd(8)</code> to be ready to handle <a href=https://en.wikipedia.org/wiki/Automated_Certificate_Management_Environment>ACME</a> challenges via simple port 80 HTTP. (OpenBSD ships with a production-ready ACME client <code>acme-client(1)</code>! How about that!?).<h3 id=configuring-acme-client-1>Configuring acme-client(1)</h3><p>We will be using <em>production</em> server here<pre><code>authority letsencrypt {
   api url &quot;https://acme-v02.api.letsencrypt.org/directory&quot;
   account key &quot;/etc/acme/letsencrypt-privkey.pem&quot;
 }
@@ -119,17 +35,7 @@ domain artnoi.com {
   domain full chain certificate &quot;/etc/ssl/artnoi.com.fullchain.pem&quot;
   sign with letsencrypt
 }
-</code></pre>
-
-<h3 id="configuring-httpd-8-for-acme-challenges">Configuring httpd(8) for ACME challenges</h3>
-
-<p>Now, configure <code>httpd(8)</code> to properly handle ACME challenge connection when we later run <code>acme-client(1)</code>. You should read <a href="https://letsencrypt.org/how-it-works/">how Let&rsquo;s Encrypt ACME challenge works</a>.</p>
-
-<blockquote>
-<p>Only <code>server</code> directive (block) is shown</p>
-</blockquote>
-
-<pre><code>server &quot;artnoi.com&quot; {
+</code></pre><h3 id=configuring-httpd-8-for-acme-challenges>Configuring httpd(8) for ACME challenges</h3><p>Now, configure <code>httpd(8)</code> to properly handle ACME challenge connection when we later run <code>acme-client(1)</code>. You should read <a href=https://letsencrypt.org/how-it-works/>how Let&rsquo;s Encrypt ACME challenge works</a>.<blockquote><p>Only <code>server</code> directive (block) is shown</blockquote><pre><code>server &quot;artnoi.com&quot; {
   alias &quot;www.artnoi.com&quot;
   listen on $httpd_ip port 80
   root &quot;/htdocs/html-artnoi.com&quot;
@@ -140,28 +46,8 @@ domain artnoi.com {
     request strip 2
   }
 }
-</code></pre>
-
-<h3 id="obtaining-let-s-encrypt-certificate">Obtaining Let&rsquo;s Encrypt Certificate</h3>
-
-<p>After you are done configuring <code>acme-client.conf(5)</code> and <code>httpd.conf(5)</code>, use <code>acme-client(1)</code> to get challenge the our webserver and obtain Let&rsquo;s Encrypt certificates on OpenBSD:</p>
-
-<pre><code># acme-client -v artnoi.com;
-</code></pre>
-
-<p>Based on our <code>acme-client.conf(5)</code>, our certificates should verify both artnoi.com and www.artnoi.com.</p>
-
-<p>If you fail, recheck <code>pf.conf(5)</code>, <code>httpd.conf(5)</code>, the DNS records for your domains, and the permission of <code>/var/www/htdocs/.well_known</code>.</p>
-
-<h2 id="enabling-http-with-tls-on-httpd-8-with-redirection-to-https">Enabling HTTP with TLS on httpd(8) (with redirection to HTTPS)</h2>
-
-<p>We now need 2 servers in <code>httpd.conf(5)</code>, first is the main server listening on 443 for HTTPS, the other listens on port 80 and is specifically for redirecting incoming HTTP to HTTPS.</p>
-
-<blockquote>
-<p>Only <code>server</code> directives (blocks) are shown, and note the <code>tls</code> option on HTTPS <code>listen</code> line.</p>
-</blockquote>
-
-<pre><code>server &quot;artnoi.com&quot; {
+</code></pre><h3 id=obtaining-let-s-encrypt-certificate>Obtaining Let&rsquo;s Encrypt Certificate</h3><p>After you are done configuring <code>acme-client.conf(5)</code> and <code>httpd.conf(5)</code>, use <code>acme-client(1)</code> to get challenge the our webserver and obtain Let&rsquo;s Encrypt certificates on OpenBSD:<pre><code># acme-client -v artnoi.com;
+</code></pre><p>Based on our <code>acme-client.conf(5)</code>, our certificates should verify both artnoi.com and www.artnoi.com.<p>If you fail, recheck <code>pf.conf(5)</code>, <code>httpd.conf(5)</code>, the DNS records for your domains, and the permission of <code>/var/www/htdocs/.well_known</code>.<h2 id=enabling-http-with-tls-on-httpd-8-with-redirection-to-https>Enabling HTTP with TLS on httpd(8) (with redirection to HTTPS)</h2><p>We now need 2 servers in <code>httpd.conf(5)</code>, first is the main server listening on 443 for HTTPS, the other listens on port 80 and is specifically for redirecting incoming HTTP to HTTPS.<blockquote><p>Only <code>server</code> directives (blocks) are shown, and note the <code>tls</code> option on HTTPS <code>listen</code> line.</blockquote><pre><code>server &quot;artnoi.com&quot; {
   alias &quot;www.artnoi.com&quot;
   listen on $httpd_ip tls port 443
 
@@ -187,20 +73,4 @@ server &quot;artnoi.com&quot; {
   # redirect to https
   block return 301 &quot;https://artnoi.com$REQUEST_URI&quot;
 }
-</code></pre>
-
-<p>Right now, httpd(8) should spawn 2 virtual servers, one on port 443 for HTTPS, and one on port 80 for HTTP. The one on port 80 will actually redirect to HTTPS port 443, if the request location is not <code>.well-known</code>, which is challenged by ACME certificate servers.</p>
-
-<p>You should be able to renew the certificates without having to change configuratiom, i.e. bring down your small website.</p>
-
-<p>Enjoy!</p>
-<hr>
-<p><a href="#top">Back to top</a></p>
-<hr>
-<footer>
-	<p>Copyright (c) 2019 - 2023 Prem Phansuriyanon</p>
-	<p>Verbatim copying and redistribution of this entire page are permitted provided this notice is preserved</p>
-</footer>
-</body>
-
-</html>
+</code></pre><p>Right now, httpd(8) should spawn 2 virtual servers, one on port 443 for HTTPS, and one on port 80 for HTTP. The one on port 80 will actually redirect to HTTPS port 443, if the request location is not <code>.well-known</code>, which is challenged by ACME certificate servers.<p>You should be able to renew the certificates without having to change configuratiom, i.e. bring down your small website.<p>Enjoy!<hr><p><a href=#top>Back to top</a><hr><footer><p>Copyright (c) 2019 - 2023 Prem Phansuriyanon<p>Verbatim copying and redistribution of this entire page are permitted provided this notice is preserved</footer>

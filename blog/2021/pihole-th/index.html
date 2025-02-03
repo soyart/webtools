@@ -1,110 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-  <title>Artnoi.com</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="keywords" content="artnoi, Prem Phansuriyanon">
-  <meta name="author" content="@artnoi">
-  <meta charset="UTF-8">
-  <link href="/style.css" rel="stylesheet">
-</head>
-
-<body>
-  <ul class="navbar">
-    <li><a href="/"><img src="/toplogo.png" alt="Artnoi.com" class="logo">artnoi</a></li>
-    <li class="f-right"><a href="/cheat/">cheat</a></li>
-    <li class="f-right"><a href="https://notes.artnoi.com/#/all-pages">notes</a></li>
-    <li class="f-right"><a href="/blog/">blog</a></li>
-  </ul><p>Jan 30, <a href="/blog/2021/">2021</a></p>
-
-<h1 id="pi-hole-ค-ออะไร">Pi-Hole คืออะไร</h1>
-
-<p><a href="https://pi-hole.net">Pi-Hole</a> เป็นหลุมดำที่บล็อคโฆษณาในระดับ DNS จึงไม่จำเป็นต้องมีการเชื่อมต่อที่ไม่จำเป็นไปที่เซอร์เวอร์โฆษณา ทำให้ Pi-Hole ช่วยเพิ่มความเร็วในการดาวน์โหลดหน้าเว็บ และทำงานได้เร็วกว่าการบล็อคโฆษณาแบบปกติบนบราวเซอร์มากๆ</p>
-
-<blockquote>
-<p>ชื่อ Pi-Hole มากจากคอมพิวเตอร์ (SBC) Raspberry Pi และหลุมดำ Black hole เนื่องจากผู้ใช้นิยมติดตั้ง Pi-Hole ลงบน Raspberry Pi (หรือ SBC อื่นๆ) เพราะคอพิวเตอร์จิ๋วพวกนี้ประหยัดไฟและราคาถูกครับ</p>
-</blockquote>
-
-<h1 id="pi-hole-ข-นเทพ">Pi-Hole ขั้นเทพ</h1>
-
-<p>ช่วงนี้ผมเริ่มเห็นคนไทยพูดคุยเรื่อง Pi-Hole มากขึ้นตามกลุ่ม hobbyist บนเฟซบุ๊ค แต่หลายๆคนยังใช้ Pi-Hole แบบเบสิคๆอยู่ วันนี้ผมเลยจะมาแนะนำวิธีทำ Pi-Hole ให้ปลอดภัยมากขึ้นครับ แต่ที่สำคัญกว่าคือเซ็ทอัพครั้งนี้สามารถทำได้บนหลายฮาร์ดแวร์และซอฟต์แวร์แพลตฟอร์มมากๆครับ</p>
-
-<h2 id="อะไรทำให-เทพ">อะไรทำให้เทพ?</h2>
-
-<p>ในทุกๆเซอร์เวอร์ที่ผมรัน Pi-Hole หลักๆเลยผมมักจะ:</p>
-
-<ul>
-<li><p>ทำให้ Pi-Hole คุยกับ client <a href="/blog/2021/wireguard-th/">ผ่าน WireGuard VPN เท่านั้น</a></p></li>
-
-<li><p>ใช้ TLS stub resolver อย่าง <code>stubby(1)</code> ที่สามาถทำ <a href="https://en.wikipedia.org/wiki/DNS_over_TLS">DNS-over-TLS (DoT)</a> พร้อมกับ <a href="https://en.wikipedia.org/wiki/Domain_Name_System_Security_Extensions">DNSSEC</a> เพื่อมารับช่วงต่อจาก Pi-Hole ครับ ถ้าจะให้พูดแบบทางการคือ DNS requests จะถูก wrap ด้วย TLS อนจะถูกส่งออกไปที่เซอร์เวอร์ DoT เพื่อความปลอดภัยที่สูงขึ้นครับ</p></li>
-
-<li><p>(เฉพาะเครื่องที่ต้องการติดตั้ง web interface เท่านั้น) แทนดีฟอลต์เว็บเซอร์เวอร์ <code>lightppd(8)</code> ด้วย <a href="https://nginx.com"><code>nginx(8)</code></a> (why not?) หากเลือกเส้นทางนี้เราจะต้องติดตั้ง <code>php-fpm</code> เพิ่ม และต้องเขียนไฟล์ตั้งค่าขึ้นเองสำหรับ PHP และ NGINX (why not อีกนั่นแหละครับ)</p></li>
-</ul>
-
-<blockquote>
-<p>หลังจากเราทำการติดตั้งซอฟต์แวร์เพิ่มเติมและตั้งค่าใหม่ตามนี้แล้ว DNS requests ของเราจะปลอดภัยขึ้นเยอะมากครับ เพราะ (1) ฝั่ง in-bound (จาก client) ก็มาแบบ VPN (2) ฝั่ง out-bound จะถูกส่งออกไปแบบ TLS เอาง่ายๆก็คือหากมีคนดักฟังหรือมี man-in-the-middle แล้วเค้าจะไม่เห็น DNS query ของเราเลยครับ</p>
-
-<p>และหากคุณเลือกที่จะใช้ WireGuard คุณก็จะสามารถใช้ Pi-Hole ได้ทุกที่บนอินเตอร์เน็ต แม้คุณจะอยู่นอกบ้าน หรือใช้เครื่อข่าย cellular ก็ตาม (ต้องใช้ DDNS หากไม่มี public IP address เป็นขอตัวเองครับ) อย่างที่ผมใช้ คือตั้งพีซี ThinkCentre เครื่องนึงไว้เป็นเซอร์เวอร์ WireGuard และ Pi-Hole โดยเฉพาะ ทำให้ผมสามารถบล็อคแอดได้ทุกที่ และคิวรี่อย่างปลอดภัย ใต้ร่ม VPN ครับ</p>
-</blockquote>
-
-<h2 id="เตร-ยมความพร-อมก-อน-start-เซอร-ว-สต-างๆ">เตรียมความพร้อมก่อน <em>start</em> เซอร์วิสต่างๆ</h2>
-
-<blockquote>
-<p>ผมแนะนำให้ผู้ใช้ Pi-Hole อ่านหน้า <a href="https://wiki.archlinux.org/index.php/Pi-hole#Configuration">Arch Wiki เกี่ยวกับ Pi-Hole</a></p>
-</blockquote>
-
-<h3 id="1-wireguard-vpn-และ-firewall">1. WireGuard VPN และ Firewall</h3>
-
-<p><a href="/blog/2021/wireguard-th/">ติดตั้งและตั้งค่า WireGuard VPN</a> หรือ VPN อื่นๆ รวมถึง Firewall ต่างๆ</p>
-
-<h3 id="2-tls-stub-resolver-ด-วย-stubby-1">2. TLS stub resolver (ด้วย <code>stubby(1)</code>)</h3>
-
-<blockquote>
-<p>ทำไมต้องมี <code>stubby(1)</code>?
-ถ้าจะให้ตอบแบบง่ายคือเพื่อให้ DNS queries ที่ออกจาก Pi-Hole เป็นแบบ <a href="https://en.wikipedia.org/wiki/DNS_over_TLS">DNS-over-TLS</a> เพื่อความเป็นส่วนตัวและความปลอดภัยครับ เพราะ Pi-Hole หรือ <code>dnsmasq(8)</code> ไม่สามารถทำ DNS-over-TLS ได้ โดยการทำ DNS-over-TLS ก็มี trade-off นั่นคือ latency นั่นเอง การตั้งปริมาณ Pi-Hole DNS cache ให้เหมาะสมกับการใช้งานจึงสำคัญ</p>
-</blockquote>
-
-<p>ติดตั้ง <code>stubby(1)</code> ด้วย package manager ในตัวอย่างนี้ผมจะใช้ <code>pacman</code> ของ Arch Linux</p>
-
-<pre><code class="language-shell">pacman -S stubby;
-</code></pre>
-
-<p>ตั้งค่า <code>stubby(1)</code> ที่ <code>/etc/stubby/stubby.yml</code> โดยเราสามารถแก้ไขตามที่ต้องการ <a href="https://wiki.archlinux.org/index.php/Stubby">ตามที่ Arch Wiki แนะนำ</a>ได้เลยครับ ผมมักจะตั้งค่า DNSSEC และ policy ให้ strict ครับ แต่คุณเลือกได้ตามใจเลย แค่อย่าลืมแก้ไข <code>listen_address</code> ใน <code>stubby.yml</code> ให้ <code>stubby</code> ฟัง DNS requests ที่ loopback address (inet = <code>127.0.0.1</code>, inet6=<code>::1</code>) port อื่นที่ไม่ใช่ <code>53</code> นะครับ เพราะ Pi-Hole จะฟังที่พอร์ต <code>53</code> พอดีครับ <strong>แล้วก็ต้องปิดเซอร์วิสอื่นๆที่ฟังอยู่ที่พอร์ต <code>53</code> ด้วยครับไม่งั้น Pi-Hole จะสตาร์ทไม่ติดเพราะพอร์ตไม่ว่าง</strong></p>
-
-<p>ในตัวอย่างนี้จะใช้พอร์ต <code>5369</code> สำหรับ <code>stubby(1)</code> จึงต้องแก้ฟิล์ด <code>listen_address</code> ให้เป็น:</p>
-
-<pre><code>listen_addresses:
+<!doctype html><html lang=en><title>Artnoi.com</title><meta name=viewport content="width=device-width,initial-scale=1"><meta name=keywords content="artnoi,Prem Phansuriyanon"><meta name=author content="@artnoi"><meta charset=UTF-8><link href=/style.css rel=stylesheet><ul class=navbar><li><a href=/><img src=/toplogo.png alt=Artnoi.com class=logo>artnoi</a><li class=f-right><a href=/cheat/>cheat</a><li class=f-right><a href=https://notes.artnoi.com/#/all-pages>notes</a><li class=f-right><a href=/blog/>blog</a></ul><p>Jan 30, <a href=/blog/2021/>2021</a><h1 id=pi-hole-ค-ออะไร>Pi-Hole คืออะไร</h1><p><a href=https://pi-hole.net>Pi-Hole</a> เป็นหลุมดำที่บล็อคโฆษณาในระดับ DNS จึงไม่จำเป็นต้องมีการเชื่อมต่อที่ไม่จำเป็นไปที่เซอร์เวอร์โฆษณา ทำให้ Pi-Hole ช่วยเพิ่มความเร็วในการดาวน์โหลดหน้าเว็บ และทำงานได้เร็วกว่าการบล็อคโฆษณาแบบปกติบนบราวเซอร์มากๆ<blockquote><p>ชื่อ Pi-Hole มากจากคอมพิวเตอร์ (SBC) Raspberry Pi และหลุมดำ Black hole เนื่องจากผู้ใช้นิยมติดตั้ง Pi-Hole ลงบน Raspberry Pi (หรือ SBC อื่นๆ) เพราะคอพิวเตอร์จิ๋วพวกนี้ประหยัดไฟและราคาถูกครับ</blockquote><h1 id=pi-hole-ข-นเทพ>Pi-Hole ขั้นเทพ</h1><p>ช่วงนี้ผมเริ่มเห็นคนไทยพูดคุยเรื่อง Pi-Hole มากขึ้นตามกลุ่ม hobbyist บนเฟซบุ๊ค แต่หลายๆคนยังใช้ Pi-Hole แบบเบสิคๆอยู่ วันนี้ผมเลยจะมาแนะนำวิธีทำ Pi-Hole ให้ปลอดภัยมากขึ้นครับ แต่ที่สำคัญกว่าคือเซ็ทอัพครั้งนี้สามารถทำได้บนหลายฮาร์ดแวร์และซอฟต์แวร์แพลตฟอร์มมากๆครับ<h2 id=อะไรทำให-เทพ>อะไรทำให้เทพ?</h2><p>ในทุกๆเซอร์เวอร์ที่ผมรัน Pi-Hole หลักๆเลยผมมักจะ:<ul><li><p>ทำให้ Pi-Hole คุยกับ client <a href=/blog/2021/wireguard-th/>ผ่าน WireGuard VPN เท่านั้น</a><li><p>ใช้ TLS stub resolver อย่าง <code>stubby(1)</code> ที่สามาถทำ <a href=https://en.wikipedia.org/wiki/DNS_over_TLS>DNS-over-TLS (DoT)</a> พร้อมกับ <a href=https://en.wikipedia.org/wiki/Domain_Name_System_Security_Extensions>DNSSEC</a> เพื่อมารับช่วงต่อจาก Pi-Hole ครับ ถ้าจะให้พูดแบบทางการคือ DNS requests จะถูก wrap ด้วย TLS อนจะถูกส่งออกไปที่เซอร์เวอร์ DoT เพื่อความปลอดภัยที่สูงขึ้นครับ<li><p>(เฉพาะเครื่องที่ต้องการติดตั้ง web interface เท่านั้น) แทนดีฟอลต์เว็บเซอร์เวอร์ <code>lightppd(8)</code> ด้วย <a href=https://nginx.com><code>nginx(8)</code></a> (why not?) หากเลือกเส้นทางนี้เราจะต้องติดตั้ง <code>php-fpm</code> เพิ่ม และต้องเขียนไฟล์ตั้งค่าขึ้นเองสำหรับ PHP และ NGINX (why not อีกนั่นแหละครับ)</ul><blockquote><p>หลังจากเราทำการติดตั้งซอฟต์แวร์เพิ่มเติมและตั้งค่าใหม่ตามนี้แล้ว DNS requests ของเราจะปลอดภัยขึ้นเยอะมากครับ เพราะ (1) ฝั่ง in-bound (จาก client) ก็มาแบบ VPN (2) ฝั่ง out-bound จะถูกส่งออกไปแบบ TLS เอาง่ายๆก็คือหากมีคนดักฟังหรือมี man-in-the-middle แล้วเค้าจะไม่เห็น DNS query ของเราเลยครับ<p>และหากคุณเลือกที่จะใช้ WireGuard คุณก็จะสามารถใช้ Pi-Hole ได้ทุกที่บนอินเตอร์เน็ต แม้คุณจะอยู่นอกบ้าน หรือใช้เครื่อข่าย cellular ก็ตาม (ต้องใช้ DDNS หากไม่มี public IP address เป็นขอตัวเองครับ) อย่างที่ผมใช้ คือตั้งพีซี ThinkCentre เครื่องนึงไว้เป็นเซอร์เวอร์ WireGuard และ Pi-Hole โดยเฉพาะ ทำให้ผมสามารถบล็อคแอดได้ทุกที่ และคิวรี่อย่างปลอดภัย ใต้ร่ม VPN ครับ</blockquote><h2 id=เตร-ยมความพร-อมก-อน-start-เซอร-ว-สต-างๆ>เตรียมความพร้อมก่อน <em>start</em> เซอร์วิสต่างๆ</h2><blockquote><p>ผมแนะนำให้ผู้ใช้ Pi-Hole อ่านหน้า <a href=https://wiki.archlinux.org/index.php/Pi-hole#Configuration>Arch Wiki เกี่ยวกับ Pi-Hole</a></blockquote><h3 id=1-wireguard-vpn-และ-firewall>1. WireGuard VPN และ Firewall</h3><p><a href=/blog/2021/wireguard-th/>ติดตั้งและตั้งค่า WireGuard VPN</a> หรือ VPN อื่นๆ รวมถึง Firewall ต่างๆ<h3 id=2-tls-stub-resolver-ด-วย-stubby-1>2. TLS stub resolver (ด้วย <code>stubby(1)</code>)</h3><blockquote><p>ทำไมต้องมี <code>stubby(1)</code>?
+ถ้าจะให้ตอบแบบง่ายคือเพื่อให้ DNS queries ที่ออกจาก Pi-Hole เป็นแบบ <a href=https://en.wikipedia.org/wiki/DNS_over_TLS>DNS-over-TLS</a> เพื่อความเป็นส่วนตัวและความปลอดภัยครับ เพราะ Pi-Hole หรือ <code>dnsmasq(8)</code> ไม่สามารถทำ DNS-over-TLS ได้ โดยการทำ DNS-over-TLS ก็มี trade-off นั่นคือ latency นั่นเอง การตั้งปริมาณ Pi-Hole DNS cache ให้เหมาะสมกับการใช้งานจึงสำคัญ</blockquote><p>ติดตั้ง <code>stubby(1)</code> ด้วย package manager ในตัวอย่างนี้ผมจะใช้ <code>pacman</code> ของ Arch Linux<pre><code class=language-shell>pacman -S stubby;
+</code></pre><p>ตั้งค่า <code>stubby(1)</code> ที่ <code>/etc/stubby/stubby.yml</code> โดยเราสามารถแก้ไขตามที่ต้องการ <a href=https://wiki.archlinux.org/index.php/Stubby>ตามที่ Arch Wiki แนะนำ</a>ได้เลยครับ ผมมักจะตั้งค่า DNSSEC และ policy ให้ strict ครับ แต่คุณเลือกได้ตามใจเลย แค่อย่าลืมแก้ไข <code>listen_address</code> ใน <code>stubby.yml</code> ให้ <code>stubby</code> ฟัง DNS requests ที่ loopback address (inet = <code>127.0.0.1</code>, inet6=<code>::1</code>) port อื่นที่ไม่ใช่ <code>53</code> นะครับ เพราะ Pi-Hole จะฟังที่พอร์ต <code>53</code> พอดีครับ <strong>แล้วก็ต้องปิดเซอร์วิสอื่นๆที่ฟังอยู่ที่พอร์ต <code>53</code> ด้วยครับไม่งั้น Pi-Hole จะสตาร์ทไม่ติดเพราะพอร์ตไม่ว่าง</strong><p>ในตัวอย่างนี้จะใช้พอร์ต <code>5369</code> สำหรับ <code>stubby(1)</code> จึงต้องแก้ฟิล์ด <code>listen_address</code> ให้เป็น:<pre><code>listen_addresses:
   - 127.0.0.1@5369
   -  0::1@5369
-</code></pre>
-
-<p>อย่าลืมเว้นวรรค indent ให้ถูกต้องนะครับ ไม่งั้นไฟล์ <code>.yml</code> จะใช้งานไม่ได้ หลังจากเขียนไฟล์เสร็จ ลองเทสต์ว่าใช้ได้รึป่าวด้วยการรัย <code>$ stubby;</code> ครับ หากไม่มี error ก็ enable หรือ start <code>stubby.service</code> ได้เลยครับ:</p>
-
-<pre><code class="language-shell">systemctl enable --now stubby;
-</code></pre>
-
-<p>หลังจากนั้น ให้ทดสอบการเชื่อมต่อแบบ DNS-over-TLS ด้วยการ query ไปที่ listen address ของ <code>stubby.service</code> ครับ:</p>
-
-<pre><code class="language-shell">dig @localhost -p 53690 artnoi.com;
-</code></pre>
-
-<p>แล้วรอดูว่าได้ answer ถูกต้องไหม หากถูกต้องก็ข้ามไปสเตปต่อไปได้เลยครับ</p>
-
-<h3 id="3-nginx-แทน-lighttpd">3. NGINX แทน lighttpd</h3>
-
-<p>ติดตั้ง <code>php(1)</code> และ <code>php-fpm(8)</code> และ <code>nginx(8)</code>:</p>
-
-<pre><code class="language-shell">pacman -S php php-fpm nginx-mainline;
-</code></pre>
-
-<p>จากนั้น ให้แก้ไขไฟล์ตั้งค่า <code>/etc/php.ini</code> <code>/etc/nginx/nginx.conf</code></p>
-
-<h4 id="etc-php-php-ini"><code>/etc/php/php.ini</code></h4>
-
-<p>ตามที่ Arch Wiki แนะนำ โดยย่อๆ คือเพิ่ม <code>extensions</code> (จำเป็น) และ <code>open_basedir</code> (ไม่ใส่ก็ได้แต่ผมใส่เพื่อความปลอดภัยครับ และถ้าคิดจะใส่แล้วก็ควรใส่ให้ครบครับ) ในไฟล์ <code>php.ini</code></p>
-
-<pre><code># /etc/php/php.ini
+</code></pre><p>อย่าลืมเว้นวรรค indent ให้ถูกต้องนะครับ ไม่งั้นไฟล์ <code>.yml</code> จะใช้งานไม่ได้ หลังจากเขียนไฟล์เสร็จ ลองเทสต์ว่าใช้ได้รึป่าวด้วยการรัย <code>$ stubby;</code> ครับ หากไม่มี error ก็ enable หรือ start <code>stubby.service</code> ได้เลยครับ:<pre><code class=language-shell>systemctl enable --now stubby;
+</code></pre><p>หลังจากนั้น ให้ทดสอบการเชื่อมต่อแบบ DNS-over-TLS ด้วยการ query ไปที่ listen address ของ <code>stubby.service</code> ครับ:<pre><code class=language-shell>dig @localhost -p 53690 artnoi.com;
+</code></pre><p>แล้วรอดูว่าได้ answer ถูกต้องไหม หากถูกต้องก็ข้ามไปสเตปต่อไปได้เลยครับ<h3 id=3-nginx-แทน-lighttpd>3. NGINX แทน lighttpd</h3><p>ติดตั้ง <code>php(1)</code> และ <code>php-fpm(8)</code> และ <code>nginx(8)</code>:<pre><code class=language-shell>pacman -S php php-fpm nginx-mainline;
+</code></pre><p>จากนั้น ให้แก้ไขไฟล์ตั้งค่า <code>/etc/php.ini</code> <code>/etc/nginx/nginx.conf</code><h4 id=etc-php-php-ini><code>/etc/php/php.ini</code></h4><p>ตามที่ Arch Wiki แนะนำ โดยย่อๆ คือเพิ่ม <code>extensions</code> (จำเป็น) และ <code>open_basedir</code> (ไม่ใส่ก็ได้แต่ผมใส่เพื่อความปลอดภัยครับ และถ้าคิดจะใส่แล้วก็ควรใส่ให้ครบครับ) ในไฟล์ <code>php.ini</code><pre><code># /etc/php/php.ini
 
 [...]
 extension=pdo_sqlite
@@ -113,26 +15,8 @@ extension=sockets
 extension=sqlite3
 [...]
 open_basedir = /srv/http/pihole:/run/pihole-ftl/pihole-FTL.port:/run/log/pihole/pihole.log:/run/log/pihole-ftl/pihole-FTL.log:/etc/pihole:/etc/hosts:/etc/hostname:/etc/dnsmasq.d/02-pihole-dhcp.conf:/etc/dnsmasq.d/03-pihole-wildcard.conf:/etc/dnsmasq.d/04-pihole-static-dhcp.conf:/var/log/lighttpd/error.log:/proc/meminfo:/proc/cpuinfo:/sys/class/thermal/thermal_zone0/temp:/tmp
-</code></pre>
-
-<blockquote>
-<p><code>open_basedir</code> จะจำกัดการเข้าถึงไฟล์ซิสเต็มของ PHP ทำให้อุ่นใจว่าจะไม่มีโปรแกรม PHP ไปอ่านหรือเขียนไฟลฺ์นอกเหนือจาก path ที่กำหนดไว้ใน <code>open_basedir</code> ครับ</p>
-
-<p>บน VPS จะไม่มีโฟลเดอร์ <code>/sys/class/thermal/*</code> หากติดตั้ง Pi-Hole และเว็บอินเตอรฺ์เฟซบน VPS ผมไม่แนะนำให้ใส่ <code>/sys/class/thermal/thermal_zone0/temp</code> ใน <code>open_basedir</code> ครับ</p>
-</blockquote>
-
-<h4 id="etc-nginx"><code>/etc/nginx</code></h4>
-
-<p>เขียนไฟล์ตั้งค่าเว็บเซอร์เวอร์ <code>nginx.conf</code> ซึ่งเราไปดูจาก <a href="https://wiki.archlinux.org/index.php/Pi-hole#Nginx_instead_of_Lighttpd">Arch Wiki</a> หรือจะดู<a href="https://docs.pi-hole.net/guides/webserver/nginx/">ไกด์ของ Pi-Hole</a>เลยก็ได้ครับ หลักๆเลยคือเราจะแก้ไขไฟล์ตั้งค่า <code>nginx.conf</code> สำหรับการตั้งค่าทั่วไปของ NGINX และไฟลฺ์ <code>conf.d/pihole.conf</code> สำหรับการตั้งค่า NGINX เพื่อเสริฟ Pi-Hole</p>
-
-<p>หลังจากเขียนไฟล์เสร็จแล้วเราต้อง<a href="https://wiki.archlinux.org/index.php/Pi-hole#Nginx_instead_of_Lighttpd">แก้ไขเซอร์วิสไฟล์ตาม Arch Wiki</a> สำหรับ PHP Fast Process Manager <code>php-fpm.service</code></p>
-
-<pre><code># systemctl edit php-fpm.service;
-</code></pre>
-
-<p>แก้ไข (override) <code>php-fpm.service</code> ด้วยการเติม <code>ReadWritePaths</code> ไปในช่วง <code>[Service]</code> ซึ่งจะสัมพันธ์กับ <code>open_basedir</code> ใน <code>php.ini</code>:</p>
-
-<pre><code>[Service]
+</code></pre><blockquote><p><code>open_basedir</code> จะจำกัดการเข้าถึงไฟล์ซิสเต็มของ PHP ทำให้อุ่นใจว่าจะไม่มีโปรแกรม PHP ไปอ่านหรือเขียนไฟลฺ์นอกเหนือจาก path ที่กำหนดไว้ใน <code>open_basedir</code> ครับ<p>บน VPS จะไม่มีโฟลเดอร์ <code>/sys/class/thermal/*</code> หากติดตั้ง Pi-Hole และเว็บอินเตอรฺ์เฟซบน VPS ผมไม่แนะนำให้ใส่ <code>/sys/class/thermal/thermal_zone0/temp</code> ใน <code>open_basedir</code> ครับ</blockquote><h4 id=etc-nginx><code>/etc/nginx</code></h4><p>เขียนไฟล์ตั้งค่าเว็บเซอร์เวอร์ <code>nginx.conf</code> ซึ่งเราไปดูจาก <a href=https://wiki.archlinux.org/index.php/Pi-hole#Nginx_instead_of_Lighttpd>Arch Wiki</a> หรือจะดู<a href=https://docs.pi-hole.net/guides/webserver/nginx/>ไกด์ของ Pi-Hole</a>เลยก็ได้ครับ หลักๆเลยคือเราจะแก้ไขไฟล์ตั้งค่า <code>nginx.conf</code> สำหรับการตั้งค่าทั่วไปของ NGINX และไฟลฺ์ <code>conf.d/pihole.conf</code> สำหรับการตั้งค่า NGINX เพื่อเสริฟ Pi-Hole<p>หลังจากเขียนไฟล์เสร็จแล้วเราต้อง<a href=https://wiki.archlinux.org/index.php/Pi-hole#Nginx_instead_of_Lighttpd>แก้ไขเซอร์วิสไฟล์ตาม Arch Wiki</a> สำหรับ PHP Fast Process Manager <code>php-fpm.service</code><pre><code># systemctl edit php-fpm.service;
+</code></pre><p>แก้ไข (override) <code>php-fpm.service</code> ด้วยการเติม <code>ReadWritePaths</code> ไปในช่วง <code>[Service]</code> ซึ่งจะสัมพันธ์กับ <code>open_basedir</code> ใน <code>php.ini</code>:<pre><code>[Service]
 ReadWritePaths = /srv/http/pihole
 ReadWritePaths = /run/pihole-ftl/pihole-FTL.port
 ReadWritePaths = /run/log/pihole/pihole.log
@@ -145,78 +29,16 @@ ReadWritePaths = /proc/meminfo
 ReadWritePaths = /proc/cpuinfo
 ReadWritePaths = /sys/class/thermal/thermal_zone0/temp
 ReadWritePaths = /tmp
-</code></pre>
-
-<blockquote>
-<p>บน VPS จะไม่มีโฟลเดอร์ <code>/sys/class/thermal/*</code> หากติดตั้ง Pi-Hole และเว็บอินเตอรฺ์เฟซบน VPS ผมไม่แนะนำให้ใส่ <code>/sys/class/thermal/thermal_zone0/temp</code> ใน <code>ReadWritePaths</code> ครับ</p>
-</blockquote>
-
-<h2 id="enable-เซอร-ว-สท-เก-ยวก-บ-pi-hole-และ-pi-hole-web-interface">Enable เซอร์วิสที่เกี่ยวกับ Pi-Hole และ Pi-Hole web interface</h2>
-
-<p>หลังจากแก้ไขทุกไฟล์เรียบร้อยครบทุกไฟล์ตาม Arch Wiki แล้ว เราก็ enable เซอร์วิสต่างๆทิ้งไว้ แล้วรีบูทครับ:</p>
-
-<pre><code class="language-shell">systemctl enable pihole-FTL.service nginx.service php-fpm.service;
+</code></pre><blockquote><p>บน VPS จะไม่มีโฟลเดอร์ <code>/sys/class/thermal/*</code> หากติดตั้ง Pi-Hole และเว็บอินเตอรฺ์เฟซบน VPS ผมไม่แนะนำให้ใส่ <code>/sys/class/thermal/thermal_zone0/temp</code> ใน <code>ReadWritePaths</code> ครับ</blockquote><h2 id=enable-เซอร-ว-สท-เก-ยวก-บ-pi-hole-และ-pi-hole-web-interface>Enable เซอร์วิสที่เกี่ยวกับ Pi-Hole และ Pi-Hole web interface</h2><p>หลังจากแก้ไขทุกไฟล์เรียบร้อยครบทุกไฟล์ตาม Arch Wiki แล้ว เราก็ enable เซอร์วิสต่างๆทิ้งไว้ แล้วรีบูทครับ:<pre><code class=language-shell>systemctl enable pihole-FTL.service nginx.service php-fpm.service;
 reboot;
-</code></pre>
-
-<blockquote>
-<p>ไม่ต้องรีบูทก็ได้นะครับ ใช้ <code>systemctl enable --now</code> แทนได้ หากไม่สามารถเริ่มเซอร์วิสได้ ให้ลองเช็ค Arch Wiki ซ้ำอีกรอบครับ ส่วนมากที่ผมพลาดจะเป็นการตั้งค่า PHP</p>
-</blockquote>
-
-<h2 id="ต-งค-า-pi-hole-dns">ตั้งค่า Pi-Hole DNS</h2>
-
-<p>พอบูทขึ้นมาเสร็จแล้ว ตั้งค่าพาสเวิร์ดของ admin web interface ด้วย:</p>
-
-<pre><code class="language-shell">pihole -a -p;
-</code></pre>
-
-<p>แล้วตั้งค่า default DNS upstream ไปที่ listen address ของ <code>stubby</code>:</p>
-
-<pre><code class="language-shell">pihole -a setdns '127.0.0.1#53690';
-</code></pre>
-
-<p>แล้วอัพเดทบล็อคลิสต์ (gravity)</p>
-
-<pre><code class="language-shell">pihole -g;
-</code></pre>
-
-<p>แก้ <code>/etc/resolv.conf</code> บนเครื่อง Pi-Hole ของเรา ให้ใช้ localhost พอร์ต 53 สำหรับ resolve โดเมน (address สำหรับเครื่องเราเองคือ <code>127.0.0.1</code> หรือ loopback address สำหรับเครื่อง Pi-Hole เองครับ):</p>
-
-<pre><code class="language-shell">echo '127.0.0.1' &gt; /etc/resolv.conf;
-</code></pre>
-
-<p>หากคุณใช้ <code>openresolv</code> ผมคงไม่ต้องอธิบายว่าต้องทำยังไง ถูกไหมครับ? 5555</p>
-
-<h2 id="เร-มใช-งาน-pi-hole-dns-และ-web-interface">เริ่มใช้งาน Pi-Hole DNS และ web interface</h2>
-
-<p>เราสามารถเข้าถึง web interface ผ่าน web browser ที่ IP address ของ Pi-Hole ครับ ซึ่งถ้าหากคุณใช้ WireGuard ตามที่ผมแนะนำในข้อหนึ่ง คุณก็สามารถใช้ WireGuard IP address เพื่อโหลดหน้าเว็บผ่าน VPN ได้ครับ ลองเข้าไปเซ็ทอัพอะรดูก่อนครับ</p>
-
-<p>พอเสร็จแล้วก็ลอง query ไปที่ Pi-Hole ของเรา:</p>
-
-<pre><code class="language-shell">dig @localhost artnoi.com;
-</code></pre>
-
-<p>หรือคิวรี่ผ่าน VPN ในที่นี่ขอสมมติว่า WireGuard IP ของ Pi-Hole คือ <code>10.0.0.1</code></p>
-
-<pre><code class="language-shell">dig @10.0.0.1 artnoi.com;
-</code></pre>
-
-<p>โดยเราสามารถตั้งค่า WireGuard บนเครื่อง client ให้ใช้ DNS server เป็น Pi-Hole ได้ด้วยการเปลี่ยน <code>[Interface]: DNS = $PiHoleWGIP</code> เช่นในกรณีนี้ที่สมมติว่า WireGuard VPN network มี IP address เท่ากับ <code>10.0.0.0/24</code>:</p>
-
-<pre><code>[Interface]
+</code></pre><blockquote><p>ไม่ต้องรีบูทก็ได้นะครับ ใช้ <code>systemctl enable --now</code> แทนได้ หากไม่สามารถเริ่มเซอร์วิสได้ ให้ลองเช็ค Arch Wiki ซ้ำอีกรอบครับ ส่วนมากที่ผมพลาดจะเป็นการตั้งค่า PHP</blockquote><h2 id=ต-งค-า-pi-hole-dns>ตั้งค่า Pi-Hole DNS</h2><p>พอบูทขึ้นมาเสร็จแล้ว ตั้งค่าพาสเวิร์ดของ admin web interface ด้วย:<pre><code class=language-shell>pihole -a -p;
+</code></pre><p>แล้วตั้งค่า default DNS upstream ไปที่ listen address ของ <code>stubby</code>:<pre><code class=language-shell>pihole -a setdns '127.0.0.1#53690';
+</code></pre><p>แล้วอัพเดทบล็อคลิสต์ (gravity)<pre><code class=language-shell>pihole -g;
+</code></pre><p>แก้ <code>/etc/resolv.conf</code> บนเครื่อง Pi-Hole ของเรา ให้ใช้ localhost พอร์ต 53 สำหรับ resolve โดเมน (address สำหรับเครื่องเราเองคือ <code>127.0.0.1</code> หรือ loopback address สำหรับเครื่อง Pi-Hole เองครับ):<pre><code class=language-shell>echo '127.0.0.1' &gt; /etc/resolv.conf;
+</code></pre><p>หากคุณใช้ <code>openresolv</code> ผมคงไม่ต้องอธิบายว่าต้องทำยังไง ถูกไหมครับ? 5555<h2 id=เร-มใช-งาน-pi-hole-dns-และ-web-interface>เริ่มใช้งาน Pi-Hole DNS และ web interface</h2><p>เราสามารถเข้าถึง web interface ผ่าน web browser ที่ IP address ของ Pi-Hole ครับ ซึ่งถ้าหากคุณใช้ WireGuard ตามที่ผมแนะนำในข้อหนึ่ง คุณก็สามารถใช้ WireGuard IP address เพื่อโหลดหน้าเว็บผ่าน VPN ได้ครับ ลองเข้าไปเซ็ทอัพอะรดูก่อนครับ<p>พอเสร็จแล้วก็ลอง query ไปที่ Pi-Hole ของเรา:<pre><code class=language-shell>dig @localhost artnoi.com;
+</code></pre><p>หรือคิวรี่ผ่าน VPN ในที่นี่ขอสมมติว่า WireGuard IP ของ Pi-Hole คือ <code>10.0.0.1</code><pre><code class=language-shell>dig @10.0.0.1 artnoi.com;
+</code></pre><p>โดยเราสามารถตั้งค่า WireGuard บนเครื่อง client ให้ใช้ DNS server เป็น Pi-Hole ได้ด้วยการเปลี่ยน <code>[Interface]: DNS = $PiHoleWGIP</code> เช่นในกรณีนี้ที่สมมติว่า WireGuard VPN network มี IP address เท่ากับ <code>10.0.0.0/24</code>:<pre><code>[Interface]
 PrivateKey = eNf8P2Jx8UvBYLOmK2ToaUBrLNOpaByqWcv+GeWQ/20=
 Address = 10.0.0.2/24
 DNS = 10.0.0.1
-</code></pre>
-
-<p>เพียงเท่านี้ ทุกครั้งที่คุณเชื่อมต่อเครือข่าย VPN ของคุณ เครื่องคุณก็จะใช้โฮสต์ 10.0.0.1 ที่มี Pi-Hole อยู่แล้ว ไว้ใช้เป็น Ad-blocking DNS sinkhole over VPN ครับ</p>
-<hr>
-<p><a href="#top">Back to top</a></p>
-<hr>
-<footer>
-	<p>Copyright (c) 2019 - 2023 Prem Phansuriyanon</p>
-	<p>Verbatim copying and redistribution of this entire page are permitted provided this notice is preserved</p>
-</footer>
-</body>
-
-</html>
+</code></pre><p>เพียงเท่านี้ ทุกครั้งที่คุณเชื่อมต่อเครือข่าย VPN ของคุณ เครื่องคุณก็จะใช้โฮสต์ 10.0.0.1 ที่มี Pi-Hole อยู่แล้ว ไว้ใช้เป็น Ad-blocking DNS sinkhole over VPN ครับ<hr><p><a href=#top>Back to top</a><hr><footer><p>Copyright (c) 2019 - 2023 Prem Phansuriyanon<p>Verbatim copying and redistribution of this entire page are permitted provided this notice is preserved</footer>

@@ -1,60 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-  <title>Artnoi.com</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="keywords" content="artnoi, Prem Phansuriyanon">
-  <meta name="author" content="@artnoi">
-  <meta charset="UTF-8">
-  <link href="/style.css" rel="stylesheet">
-</head>
-
-<body>
-  <ul class="navbar">
-    <li><a href="/"><img src="/toplogo.png" alt="Artnoi.com" class="logo">artnoi</a></li>
-    <li class="f-right"><a href="/cheat/">cheat</a></li>
-    <li class="f-right"><a href="https://notes.artnoi.com/#/all-pages">notes</a></li>
-    <li class="f-right"><a href="/blog/">blog</a></li>
-  </ul><p><h1>ZFS cheat sheet</h1></p>
-
-<h2 id="arch-linux-installation-on-zfs-root-blog-2019-arch-zfs"><a href="/blog/2019/arch-zfs/">Arch Linux installation on ZFS root</a></h2>
-
-<p>Installing Arch Linux on a ZFS root helps with system backup thanks to its copy-on-write snapshot capabilities - and if you are running on old hard disk(s), ZFS ensures that data integrity is not compromised, although at the cost of system resource, especially memory. ZFS snapshots are also effective against ransomware attacks.</p>
-
-<h2 id="optimum-zpool-ashift-value">Optimum zpool <code>ashift</code> value</h2>
-
-<blockquote>
-<p>Zpool <code>ashift</code> property can only be set during pool creation.</p>
-</blockquote>
-
-<p>There are two methods to determine the <code>ashift</code> value</p>
-
-<ul>
-<li><p>(1) first is by focusing on compatibility by always using <code>ashift=12</code></p></li>
-
-<li><p>(2) is to use whatever <code>ashift</code> value that match your disk physical sector. Use <code>fdisk -l</code> to get your physical sector information.</p></li>
-</ul>
-
-<p>I usually go with <code>ahift=12</code>, despite most of my SSDs being 512-byte.</p>
-
-<h3 id="using-ashift-12">Using <code>ashift=12</code></h3>
-
-<p>Using <code>ashift=12</code> is beneficial because most of the newer hard drives out there have 4096 byte (4K) sector, and 4K sector can hold 512-byte sectors just fine. By using <code>ashift=12</code> on 512 byte disk, we can rest assured that we can expand or backup the pool out to 4K disks just fine.</p>
-
-<p><a href="https://wiki.archlinux.org/index.php/ZFS#Advanced_Format_disks">Arch Wiki</a> recommends people to always use <code>ashift=12</code> for this reason, plus some insight that a &ldquo;vdev of 512 byte disk will not experience performance issues, but a 4k disk using 512 byte sector will&rdquo;.</p>
-
-<h3 id="using-ashift-with-value-matching-disk-physical-sector-size">Using <code>ashift</code> with value matching disk physical sector size</h3>
-
-<p>Use <code># fdisk -l</code> or <code>$ lsblk -S -o NAME,PHY_SEC</code> to get the disk physical sector size. After we get the sector size, we can then specify (at the pool creation) <code>-o ashift=9</code> for 512 byte sector, <code>ashift=12</code> for 4k sector (Advanced Format), and <code>ashift=13</code> for 8k sector disk (mostly newer SSDs).</p>
-
-<p>I personally recommend that we use <code>ashift=12</code> for compatibility reasons.</p>
-
-<h2 id="creating-zfs-root-for-arch-linux">Creating ZFS root for Arch Linux</h2>
-
-<p>The command below will create a proper ZPOOL and ZFS datasets for Arch Linux root:</p>
-
-<pre><code class="language-shell">zpool create -f -o ashift=12 -o autoexpand=on -R /mnt \
+<!doctype html><html lang=en><title>Artnoi.com</title><meta name=viewport content="width=device-width,initial-scale=1"><meta name=keywords content="artnoi,Prem Phansuriyanon"><meta name=author content="@artnoi"><meta charset=UTF-8><link href=/style.css rel=stylesheet><ul class=navbar><li><a href=/><img src=/toplogo.png alt=Artnoi.com class=logo>artnoi</a><li class=f-right><a href=/cheat/>cheat</a><li class=f-right><a href=https://notes.artnoi.com/#/all-pages>notes</a><li class=f-right><a href=/blog/>blog</a></ul><p><h1>ZFS cheat sheet</h1><h2 id=arch-linux-installation-on-zfs-root-blog-2019-arch-zfs><a href=/blog/2019/arch-zfs/>Arch Linux installation on ZFS root</a></h2><p>Installing Arch Linux on a ZFS root helps with system backup thanks to its copy-on-write snapshot capabilities - and if you are running on old hard disk(s), ZFS ensures that data integrity is not compromised, although at the cost of system resource, especially memory. ZFS snapshots are also effective against ransomware attacks.<h2 id=optimum-zpool-ashift-value>Optimum zpool <code>ashift</code> value</h2><blockquote><p>Zpool <code>ashift</code> property can only be set during pool creation.</blockquote><p>There are two methods to determine the <code>ashift</code> value<ul><li><p>(1) first is by focusing on compatibility by always using <code>ashift=12</code><li><p>(2) is to use whatever <code>ashift</code> value that match your disk physical sector. Use <code>fdisk -l</code> to get your physical sector information.</ul><p>I usually go with <code>ahift=12</code>, despite most of my SSDs being 512-byte.<h3 id=using-ashift-12>Using <code>ashift=12</code></h3><p>Using <code>ashift=12</code> is beneficial because most of the newer hard drives out there have 4096 byte (4K) sector, and 4K sector can hold 512-byte sectors just fine. By using <code>ashift=12</code> on 512 byte disk, we can rest assured that we can expand or backup the pool out to 4K disks just fine.<p><a href=https://wiki.archlinux.org/index.php/ZFS#Advanced_Format_disks>Arch Wiki</a> recommends people to always use <code>ashift=12</code> for this reason, plus some insight that a &ldquo;vdev of 512 byte disk will not experience performance issues, but a 4k disk using 512 byte sector will&rdquo;.<h3 id=using-ashift-with-value-matching-disk-physical-sector-size>Using <code>ashift</code> with value matching disk physical sector size</h3><p>Use <code># fdisk -l</code> or <code>$ lsblk -S -o NAME,PHY_SEC</code> to get the disk physical sector size. After we get the sector size, we can then specify (at the pool creation) <code>-o ashift=9</code> for 512 byte sector, <code>ashift=12</code> for 4k sector (Advanced Format), and <code>ashift=13</code> for 8k sector disk (mostly newer SSDs).<p>I personally recommend that we use <code>ashift=12</code> for compatibility reasons.<h2 id=creating-zfs-root-for-arch-linux>Creating ZFS root for Arch Linux</h2><p>The command below will create a proper ZPOOL and ZFS datasets for Arch Linux root:<pre><code class=language-shell>zpool create -f -o ashift=12 -o autoexpand=on -R /mnt \
     -O acltype=posixacl \
     -O relatime=on \
     -O xattr=sa \
@@ -68,33 +12,13 @@
     -O keyformat=passphrase \
     -O keylocation=prompt \
     zroot /dev/disk/by-id/id-to-partition-partx;
-</code></pre>
-
-<h2 id="opening-and-mounting-encrypted-zfs-datasets">Opening and mounting encrypted ZFS datasets</h2>
-
-<p>First we import the pool:</p>
-
-<pre><code class="language-shell">zpool import &lt;POOLNAME&gt;;
+</code></pre><h2 id=opening-and-mounting-encrypted-zfs-datasets>Opening and mounting encrypted ZFS datasets</h2><p>First we import the pool:<pre><code class=language-shell>zpool import &lt;POOLNAME&gt;;
 zpool import -a; # All available pools
-</code></pre>
-
-<p>Then we load the encryption key:</p>
-
-<pre><code class="language-shell">zfs load-key &lt;DATASET&gt;;
+</code></pre><p>Then we load the encryption key:<pre><code class=language-shell>zfs load-key &lt;DATASET&gt;;
 zfs load-key -a; # All datasets
-</code></pre>
-
-<p>And lastly we can mount the opened datasets:</p>
-
-<pre><code class="language-shell">zfs mount &lt;DATASET&gt;;
+</code></pre><p>And lastly we can mount the opened datasets:<pre><code class=language-shell>zfs mount &lt;DATASET&gt;;
 zfs mount -a; # All datasets
-</code></pre>
-
-<h2 id="renaming-zfs-datasets">Renaming ZFS datasets</h2>
-
-<p>We can just use <code>zfs rename</code> to rename datasets. For example, let&rsquo;s say we have an Arch Linux install on a disk, and we have the following ZFS datasets for use with our Arch installation.</p>
-
-<pre><code class="language-shell">zfs list
+</code></pre><h2 id=renaming-zfs-datasets>Renaming ZFS datasets</h2><p>We can just use <code>zfs rename</code> to rename datasets. For example, let&rsquo;s say we have an Arch Linux install on a disk, and we have the following ZFS datasets for use with our Arch installation.<pre><code class=language-shell>zfs list
 
 NAME                  USED  AVAIL    REFER  MOUNTPOINT
 mypool                4.58G 236G192K none
@@ -104,11 +28,7 @@ mypool/cache          1.12G 236G     192K   /mypool/cache
 mypool/cache/makepkg  42.2M 236G     42.2M  /var/cache/makepkg
 mypool/cache/pacman   1.08G 236G     1.08G  /var/cache/pacman
 mypool/go              153M 236G     153M   /home/artnoi/go
-</code></pre>
-
-<p>But what if we want to install another Void Linux install? That would be bad, since <code>mypool/go</code> directory would be mounted on the Void install at <code>/home/artnoi/go</code> too! And that may break our Void&rsquo;s and Arch&rsquo;s Go toolchain. To prevent that, we can create a new dataset <code>mypool/archlinux</code>, and move relavant datasets to be children of <code>mypool/archlinux</code>:</p>
-
-<pre><code class="language-shell">sudo zfs create mypool/archlinux;
+</code></pre><p>But what if we want to install another Void Linux install? That would be bad, since <code>mypool/go</code> directory would be mounted on the Void install at <code>/home/artnoi/go</code> too! And that may break our Void&rsquo;s and Arch&rsquo;s Go toolchain. To prevent that, we can create a new dataset <code>mypool/archlinux</code>, and move relavant datasets to be children of <code>mypool/archlinux</code>:<pre><code class=language-shell>sudo zfs create mypool/archlinux;
 sudo zfs rename mypool/cache mypool/archlinux/cache;
 sudo zfs rename mypool/go mypool/archlinux/go;
 
@@ -123,107 +43,23 @@ mypool/archlinux/cache         1.12G 236G  192K  /mypool/cache
 mypool/archlinux/cache/makepkg 42.2M 236G  42.2M /var/cache/makepkg
 mypool/archlinux/cache/pacman  1.08G 236G  1.08G /var/cache/pacman
 mypool/archlinux/go            153M  236G  153M  /home/artnoi/go
-</code></pre>
-
-<p>And now we can configure which datasets to mount with <code>zfs-mount.service</code>! On Void, we can totally discard <code>mypool/archlinux</code>.</p>
-
-<h2 id="zfs-snapshots">ZFS snapshots</h2>
-
-<p>Creating ZFS snapshot is as easy as:</p>
-
-<pre><code class="language-shell">zfs snapshot &lt;dataset@name&gt;;
+</code></pre><p>And now we can configure which datasets to mount with <code>zfs-mount.service</code>! On Void, we can totally discard <code>mypool/archlinux</code>.<h2 id=zfs-snapshots>ZFS snapshots</h2><p>Creating ZFS snapshot is as easy as:<pre><code class=language-shell>zfs snapshot &lt;dataset@name&gt;;
 zfs snapshot tank@2020-02-01;
-</code></pre>
-
-<p>And list them with <code>-t</code> (type):</p>
-
-<pre><code class="language-shell">zfs list -t snapshot;
-</code></pre>
-
-<h3 id="sending-zfs-snapshots">Sending ZFS snapshots</h3>
-
-<p>ZFS datasets can be sent and received locally, remotely, or incrementally. See this <a href="https://docs.oracle.com/cd/E18752_01/html/819-5461/gbchx.html">Oracle guide for sending/receiving ZFS snapshots</a>.</p>
-
-<p>Simple dataset can be sent with <code>send</code> and received locally with <code>recv</code> command:</p>
-
-<pre><code class="language-shell">zfs send tank@2020-02-01 | zfs recv bak/tank;
-</code></pre>
-
-<p>Or sent remotely with <code>ssh</code>:</p>
-
-<pre><code class="language-shell">zfs send tank@2020-02-01 | ssh mynas zfs recv nas/tank;
-</code></pre>
-
-<p>Or remotely and incrementally with <code>-i</code>:</p>
-
-<pre><code class="language-shell">zfs send -i tank@2019 tank@2020 | ssh mynas zfs recv nas/tank;
-</code></pre>
-
-<p>Same with above, but in <em>shortcut</em> form:</p>
-
-<pre><code class="language-shell">zfs send -i 2019 tank@2020 | ssh mynas zfs recv nas/tank;
-</code></pre>
-
-<p>My ZFS datasets are encrypted, so to recursively send the raw snapshot to a backup pool I usually use:</p>
-
-<pre><code class="language-shell">zfs send -Rwv tank@2020-02-01 | zfs recv -Fv bak/tank;
-</code></pre>
-
-<p>Note that you can omit <code>-v</code> option if you don&rsquo;t want verbose output.
+</code></pre><p>And list them with <code>-t</code> (type):<pre><code class=language-shell>zfs list -t snapshot;
+</code></pre><h3 id=sending-zfs-snapshots>Sending ZFS snapshots</h3><p>ZFS datasets can be sent and received locally, remotely, or incrementally. See this <a href=https://docs.oracle.com/cd/E18752_01/html/819-5461/gbchx.html>Oracle guide for sending/receiving ZFS snapshots</a>.<p>Simple dataset can be sent with <code>send</code> and received locally with <code>recv</code> command:<pre><code class=language-shell>zfs send tank@2020-02-01 | zfs recv bak/tank;
+</code></pre><p>Or sent remotely with <code>ssh</code>:<pre><code class=language-shell>zfs send tank@2020-02-01 | ssh mynas zfs recv nas/tank;
+</code></pre><p>Or remotely and incrementally with <code>-i</code>:<pre><code class=language-shell>zfs send -i tank@2019 tank@2020 | ssh mynas zfs recv nas/tank;
+</code></pre><p>Same with above, but in <em>shortcut</em> form:<pre><code class=language-shell>zfs send -i 2019 tank@2020 | ssh mynas zfs recv nas/tank;
+</code></pre><p>My ZFS datasets are encrypted, so to recursively send the raw snapshot to a backup pool I usually use:<pre><code class=language-shell>zfs send -Rwv tank@2020-02-01 | zfs recv -Fv bak/tank;
+</code></pre><p>Note that you can omit <code>-v</code> option if you don&rsquo;t want verbose output.
 For incremental sending (the recipient pool already contains the base
-snapshot):</p>
-
-<pre><code class="language-shell">zfs send -Rwvi tank@2020-02-01 tank@2020-02-20 | zfs recv -Fv bak/tank;
-</code></pre>
-
-<h2 id="resizing-zvol">Resizing ZVOL</h2>
-
-<pre><code class="language-shell">zfs set volsize=4G &lt;DATASET&gt;;
-</code></pre>
-
-<h2 id="attaching-a-storage-device-to-zpool-mirroring">Attaching a storage device to ZPOOL (mirroring)</h2>
-
-<p>According to <a href="https://docs.oracle.com/cd/E19253-01/819-5461/gazgw/index.html">Orcale&rsquo;s
+snapshot):<pre><code class=language-shell>zfs send -Rwvi tank@2020-02-01 tank@2020-02-20 | zfs recv -Fv bak/tank;
+</code></pre><h2 id=resizing-zvol>Resizing ZVOL</h2><pre><code class=language-shell>zfs set volsize=4G &lt;DATASET&gt;;
+</code></pre><h2 id=attaching-a-storage-device-to-zpool-mirroring>Attaching a storage device to ZPOOL (mirroring)</h2><p>According to <a href=https://docs.oracle.com/cd/E19253-01/819-5461/gazgw/index.html>Orcale&rsquo;s
 guide</a>,
-we can add a device to a <code>zpool</code> to create a mirror with:</p>
-
-<pre><code class="language-shell">zpool attach zeepool &lt;DEVICE0&gt; &lt;DEVICE1&gt;;
+we can add a device to a <code>zpool</code> to create a mirror with:<pre><code class=language-shell>zpool attach zeepool &lt;DEVICE0&gt; &lt;DEVICE1&gt;;
 zpool attach zeepool sda3 nvme0n1p3;
-</code></pre>
-
-<p>Or, on Arch Linux where they recommend that you use <code>/dev/disk-by-id</code> for persistent storage naming:</p>
-
-<pre><code class="language-shell">zpool attach zeepool /dev/disk/by-id/disk0 /dev/disk/by-id/disk1;
-</code></pre>
-
-<p>After attaching, the magic of ZFS resilvering should mirror (clone) your pool to the new drive. Now that the pool is two-way mirrored, attaching one more device to the pool should create a three-way mirrored pool, and it goes on and on (Note that this won&rsquo;t create a RAID-Z or anything else - just mirrors).</p>
-
-<h2 id="sharing-zfs-datasets-with-nfs">Sharing ZFS datasets with NFS</h2>
-
-<blockquote>
-<p>On Arch Linux, install <code>nfsutils</code></p>
-</blockquote>
-
-<p>NFS sharing of ZFS datasets can be toggled on/off with property <code>sharenfs</code>. Just use <code>zfs set sharenfs</code> to configure NFS share on ZFS.</p>
-
-<p>Default share:</p>
-
-<pre><code class="language-shell">zfs set sharenfs=on tank/mydataset;
-</code></pre>
-
-<p>NFS share with permissions:</p>
-
-<pre><code class="language-shell">zfs set sharenfs=&quot;rw=@10.2.0.0/24,ro=@10.3.0.0/24&quot;;
-</code></pre>
-
-<p>This will enable NFS share with read/write permission for 10.2.0.0/24 network, and read-only permission with 10.3.0.0/24 network.</p>
-<hr>
-<p><a href="#top">Back to top</a></p>
-<hr>
-<footer>
-	<p>Copyright (c) 2019 - 2023 Prem Phansuriyanon</p>
-	<p>Verbatim copying and redistribution of this entire page are permitted provided this notice is preserved</p>
-</footer>
-</body>
-
-</html>
+</code></pre><p>Or, on Arch Linux where they recommend that you use <code>/dev/disk-by-id</code> for persistent storage naming:<pre><code class=language-shell>zpool attach zeepool /dev/disk/by-id/disk0 /dev/disk/by-id/disk1;
+</code></pre><p>After attaching, the magic of ZFS resilvering should mirror (clone) your pool to the new drive. Now that the pool is two-way mirrored, attaching one more device to the pool should create a three-way mirrored pool, and it goes on and on (Note that this won&rsquo;t create a RAID-Z or anything else - just mirrors).<h2 id=sharing-zfs-datasets-with-nfs>Sharing ZFS datasets with NFS</h2><blockquote><p>On Arch Linux, install <code>nfsutils</code></blockquote><p>NFS sharing of ZFS datasets can be toggled on/off with property <code>sharenfs</code>. Just use <code>zfs set sharenfs</code> to configure NFS share on ZFS.<p>Default share:<pre><code class=language-shell>zfs set sharenfs=on tank/mydataset;
+</code></pre><p>NFS share with permissions:<pre><code class=language-shell>zfs set sharenfs=&quot;rw=@10.2.0.0/24,ro=@10.3.0.0/24&quot;;
+</code></pre><p>This will enable NFS share with read/write permission for 10.2.0.0/24 network, and read-only permission with 10.3.0.0/24 network.<hr><p><a href=#top>Back to top</a><hr><footer><p>Copyright (c) 2019 - 2023 Prem Phansuriyanon<p>Verbatim copying and redistribution of this entire page are permitted provided this notice is preserved</footer>

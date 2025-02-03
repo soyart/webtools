@@ -1,142 +1,20 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-  <title>Artnoi.com</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="keywords" content="artnoi, Prem Phansuriyanon">
-  <meta name="author" content="@artnoi">
-  <meta charset="UTF-8">
-  <link href="/style.css" rel="stylesheet">
-</head>
-
-<body>
-  <ul class="navbar">
-    <li><a href="/"><img src="/toplogo.png" alt="Artnoi.com" class="logo">artnoi</a></li>
-    <li class="f-right"><a href="/cheat/">cheat</a></li>
-    <li class="f-right"><a href="https://notes.artnoi.com/#/all-pages">notes</a></li>
-    <li class="f-right"><a href="/blog/">blog</a></li>
-  </ul><p>Dec 21, <a href="/blog/2020/">2020</a></p>
-
-<h1 id="switching-to-iwd-8">Switching to <code>iwd(8)</code></h1>
-
-<h2 id="my-use-case">My use case</h2>
-
-<p>I usually connect my laptops with either (1) Wi-Fi, (2) iOS tethering, and (3) Ethernet. The last one seems to work out of the box on most Linux distribution fresh installs, but the first two don&rsquo;t necessarily. Speaking of Wi-Fi, usually, one would use <code>wpa_supplicant</code> or one of its peers to manually manage wireless networks, or full-fledged network managers like Systemd <code>systemd-networkd</code>, Red Hat&rsquo;s <code>NetworkManager</code>, Arch Linux <code>netctl</code>, etc., to automatically handle the wireless network connections.</p>
-
-<h2 id="replacing-networkmanager-https-wiki-archlinux-org-index-php-networkmanager">Replacing <a href="https://wiki.archlinux.org/index.php/NetworkManager">NetworkManager</a></h2>
-
-<p>I have been a fan of NetworkManager since installing my <a href="https://voidlinux.org">Void Linux</a> installation last year, because it eliminated the lengthy process of setting up the wireless networks. On Arch, I still used it on my laptop/desktop installations, as it works great with <code>nm-applet</code>, a systray utility that sits on my status bar. However, after some decisions, I decided to ditch NetworkManager and its applet altogether to switch myself to using <code>iwd(8)</code> (<code>iwctl(1)</code>) full time.</p>
-
-<h2 id="why-iwd-8">Why <code>iwd(8)</code>?</h2>
-
-<p><code>iwd</code> is much more lightweight, and it is not difficult to use at all. The storage footprint alone justifies my transition. In addition, it also does one thing and does it better than NetworkManager. Since Ethernet interface(s) usually work(s) out of the box, and I only need the full-fledged NetworkManager to bring up the wireless interfaces (and config its credentials), and nothing else, why not replace it with something whose only purpose is to setting up wireless networks?</p>
-
-<h2 id="using-iwd-8">Using <code>iwd(8)</code></h2>
-
-<p><code>iwd</code> daemon can controlled by <code>iwctl(1)</code>, and <code>iwctl(1)</code> can be used in both interactive command-line mode (think GNU <code>fdisk(8)</code>) and <em>traditional</em> non-interactive command-line mode. The <code>iwd(8)</code> daemon itself can be run as a background daemon.</p>
-
-<p>First, enable the daemon:</p>
-
-<pre><code class="language-shell">systemctl enable --now iwd
-</code></pre>
-
-<p>Then, use <code>iwctl(1)</code> to bring up interactive shell to control the daemon:</p>
-
-<blockquote>
-<p>Note <code>iwctl</code> in interactive mode also has Tab autocomplete</p>
-</blockquote>
-
-<pre><code class="language-shell">iwctl
-</code></pre>
-
-<p>At the prompt, get the device list (wireless adaptors/cards) with:</p>
-
-<pre><code>[iwd]# device list
-</code></pre>
-
-<p>Let&rsquo;s say we have <code>wlan0</code> interface, we can use it in station mode to find nearby available networks:</p>
-
-<pre><code>[iwd]# station wlan0 get-networks
-</code></pre>
-
-<p>Connect to the access point if your desired AP&rsquo;s SSID shows up on previous commands:</p>
-
-<pre><code>[iwd]# station wlan0 connect &quot;MY_HOME_WIFI&quot;
-</code></pre>
-
-<p>The commands above can also be used in non-interactive mode, which is useful for shell scripting:</p>
-
-<pre><code class="language-shell">iwctl device list;
+<!doctype html><html lang=en><title>Artnoi.com</title><meta name=viewport content="width=device-width,initial-scale=1"><meta name=keywords content="artnoi,Prem Phansuriyanon"><meta name=author content="@artnoi"><meta charset=UTF-8><link href=/style.css rel=stylesheet><ul class=navbar><li><a href=/><img src=/toplogo.png alt=Artnoi.com class=logo>artnoi</a><li class=f-right><a href=/cheat/>cheat</a><li class=f-right><a href=https://notes.artnoi.com/#/all-pages>notes</a><li class=f-right><a href=/blog/>blog</a></ul><p>Dec 21, <a href=/blog/2020/>2020</a><h1 id=switching-to-iwd-8>Switching to <code>iwd(8)</code></h1><h2 id=my-use-case>My use case</h2><p>I usually connect my laptops with either (1) Wi-Fi, (2) iOS tethering, and (3) Ethernet. The last one seems to work out of the box on most Linux distribution fresh installs, but the first two don&rsquo;t necessarily. Speaking of Wi-Fi, usually, one would use <code>wpa_supplicant</code> or one of its peers to manually manage wireless networks, or full-fledged network managers like Systemd <code>systemd-networkd</code>, Red Hat&rsquo;s <code>NetworkManager</code>, Arch Linux <code>netctl</code>, etc., to automatically handle the wireless network connections.<h2 id=replacing-networkmanager-https-wiki-archlinux-org-index-php-networkmanager>Replacing <a href=https://wiki.archlinux.org/index.php/NetworkManager>NetworkManager</a></h2><p>I have been a fan of NetworkManager since installing my <a href=https://voidlinux.org>Void Linux</a> installation last year, because it eliminated the lengthy process of setting up the wireless networks. On Arch, I still used it on my laptop/desktop installations, as it works great with <code>nm-applet</code>, a systray utility that sits on my status bar. However, after some decisions, I decided to ditch NetworkManager and its applet altogether to switch myself to using <code>iwd(8)</code> (<code>iwctl(1)</code>) full time.<h2 id=why-iwd-8>Why <code>iwd(8)</code>?</h2><p><code>iwd</code> is much more lightweight, and it is not difficult to use at all. The storage footprint alone justifies my transition. In addition, it also does one thing and does it better than NetworkManager. Since Ethernet interface(s) usually work(s) out of the box, and I only need the full-fledged NetworkManager to bring up the wireless interfaces (and config its credentials), and nothing else, why not replace it with something whose only purpose is to setting up wireless networks?<h2 id=using-iwd-8>Using <code>iwd(8)</code></h2><p><code>iwd</code> daemon can controlled by <code>iwctl(1)</code>, and <code>iwctl(1)</code> can be used in both interactive command-line mode (think GNU <code>fdisk(8)</code>) and <em>traditional</em> non-interactive command-line mode. The <code>iwd(8)</code> daemon itself can be run as a background daemon.<p>First, enable the daemon:<pre><code class=language-shell>systemctl enable --now iwd
+</code></pre><p>Then, use <code>iwctl(1)</code> to bring up interactive shell to control the daemon:<blockquote><p>Note <code>iwctl</code> in interactive mode also has Tab autocomplete</blockquote><pre><code class=language-shell>iwctl
+</code></pre><p>At the prompt, get the device list (wireless adaptors/cards) with:<pre><code>[iwd]# device list
+</code></pre><p>Let&rsquo;s say we have <code>wlan0</code> interface, we can use it in station mode to find nearby available networks:<pre><code>[iwd]# station wlan0 get-networks
+</code></pre><p>Connect to the access point if your desired AP&rsquo;s SSID shows up on previous commands:<pre><code>[iwd]# station wlan0 connect &quot;MY_HOME_WIFI&quot;
+</code></pre><p>The commands above can also be used in non-interactive mode, which is useful for shell scripting:<pre><code class=language-shell>iwctl device list;
 iwctl station wlan0 get-networks;
 iwctl station wlan0 connect &quot;MY_HOME_WIFI&quot;;
-</code></pre>
-
-<h2 id="iwd-8-configuration"><code>iwd(8)</code> configuration</h2>
-
-<blockquote>
-<p>See also: <a href="https://wiki.archlinux.org/index.php/Iwd">Arch Wiki on <code>iwd(1)</code></a></p>
-</blockquote>
-
-<p>If you only followed the instructions above on fresh Arch machine, you should be able to verify your AP&rsquo;s PSK (password) with the wireless router, but you will NOT get any IP address on that interface (and thus no internet). This is because by default, <code>iwd(8)</code> only manage &ldquo;wireless&rdquo; interfaces, and not the interface&rsquo;s IP addresses or other options like routing and DNS server. Those actions must be performed by other programs, e.g. NetworkManager or <code>systemd-networkd</code> (shipped in Arch&rsquo;s <code>base</code>). In this example, we will use <code>systemd-networkd</code> to help during DHCP lease.</p>
-
-<p>To have <code>iwd</code> configure the wireless interfaces to <em>usable</em> state, add these lines to <code>/etc/iwd/main.conf</code>:</p>
-
-<pre><code>[General]
+</code></pre><h2 id=iwd-8-configuration><code>iwd(8)</code> configuration</h2><blockquote><p>See also: <a href=https://wiki.archlinux.org/index.php/Iwd>Arch Wiki on <code>iwd(1)</code></a></blockquote><p>If you only followed the instructions above on fresh Arch machine, you should be able to verify your AP&rsquo;s PSK (password) with the wireless router, but you will NOT get any IP address on that interface (and thus no internet). This is because by default, <code>iwd(8)</code> only manage &ldquo;wireless&rdquo; interfaces, and not the interface&rsquo;s IP addresses or other options like routing and DNS server. Those actions must be performed by other programs, e.g. NetworkManager or <code>systemd-networkd</code> (shipped in Arch&rsquo;s <code>base</code>). In this example, we will use <code>systemd-networkd</code> to help during DHCP lease.<p>To have <code>iwd</code> configure the wireless interfaces to <em>usable</em> state, add these lines to <code>/etc/iwd/main.conf</code>:<pre><code>[General]
 EnableNetworkConfiguration=true
-</code></pre>
-
-<p>This should get <code>iwd</code> to configure IP addresses, routes, and obtains relevant DNS server information from the wireless network&rsquo;s DHCP server.</p>
-
-<h2 id="ios-usb-wi-fi-tethering">iOS USB/Wi-Fi tethering</h2>
-
-<p>The main idea is to (1) pair the iOS device, and (2) get the IP address (DHCP lease) from the iOS device. Without NetworkManager or network managing daemons in place, DHCP lease may break, causing our machine to lose internet connection. If that happens, simply renew the DHCP lease.</p>
-
-<blockquote>
-<p>I disabled Bluetooth on my laptop, and I use <code>systemd-networkd</code> will be used instead of other DHCP clients, because it is already in Arch <code>base</code>.</p>
-</blockquote>
-
-<p>iOS Wi-Fi tethering should already work if you were successful with <code>iwd</code>. If you plan to use wired tethered networks, you will need iOS device driver support. First, install <code>libimobiledevice</code> to provide driver support for wired tethering:</p>
-
-<pre><code class="language-shell">pacman -S libimobiledevice;
-</code></pre>
-
-<p>After the package is installed, pair the device:</p>
-
-<pre><code class="language-shell">idevicepair pair;
-</code></pre>
-
-<p>Then, try to figure out the interface name for the iOS-connected USB interface (usually <code>enp7s0f3u2c4i2</code>):</p>
-
-<pre><code class="language-shell">ip a;
-</code></pre>
-
-<p>If the interface still has no IP address, use any DHCP client to acquire new lease (in this case, <code>systemd-networkd</code> or <code>networkctl</code> on <code>enp7s0f3u2c4i2</code>):</p>
-
-<pre><code class="language-shell">networkctl renew enp7s0f3u2c4i2;
-</code></pre>
-
-<p>And recheck your IP address. If the interface finally got its own IP address from the iOS device, then you should be able to connect to the internet. Remember the steps, or even better, the main idea behind connecting to iOS hotspots.</p>
-
-<h3 id="systemd-networkd-and-ios-tethering"><code>systemd-networkd</code> and iOS tethering</h3>
-
-<p>If you are lazy like I am, then you probably want to have <code>systemd-networkd</code> automatically manage the interface and its DHCP lease. To do just that, add a <code>.network</code> config file in <code>/etc/systemd/network</code> (in this case <code>20-ios-usb.network</code>):</p>
-
-<pre><code>[Match]
+</code></pre><p>This should get <code>iwd</code> to configure IP addresses, routes, and obtains relevant DNS server information from the wireless network&rsquo;s DHCP server.<h2 id=ios-usb-wi-fi-tethering>iOS USB/Wi-Fi tethering</h2><p>The main idea is to (1) pair the iOS device, and (2) get the IP address (DHCP lease) from the iOS device. Without NetworkManager or network managing daemons in place, DHCP lease may break, causing our machine to lose internet connection. If that happens, simply renew the DHCP lease.<blockquote><p>I disabled Bluetooth on my laptop, and I use <code>systemd-networkd</code> will be used instead of other DHCP clients, because it is already in Arch <code>base</code>.</blockquote><p>iOS Wi-Fi tethering should already work if you were successful with <code>iwd</code>. If you plan to use wired tethered networks, you will need iOS device driver support. First, install <code>libimobiledevice</code> to provide driver support for wired tethering:<pre><code class=language-shell>pacman -S libimobiledevice;
+</code></pre><p>After the package is installed, pair the device:<pre><code class=language-shell>idevicepair pair;
+</code></pre><p>Then, try to figure out the interface name for the iOS-connected USB interface (usually <code>enp7s0f3u2c4i2</code>):<pre><code class=language-shell>ip a;
+</code></pre><p>If the interface still has no IP address, use any DHCP client to acquire new lease (in this case, <code>systemd-networkd</code> or <code>networkctl</code> on <code>enp7s0f3u2c4i2</code>):<pre><code class=language-shell>networkctl renew enp7s0f3u2c4i2;
+</code></pre><p>And recheck your IP address. If the interface finally got its own IP address from the iOS device, then you should be able to connect to the internet. Remember the steps, or even better, the main idea behind connecting to iOS hotspots.<h3 id=systemd-networkd-and-ios-tethering><code>systemd-networkd</code> and iOS tethering</h3><p>If you are lazy like I am, then you probably want to have <code>systemd-networkd</code> automatically manage the interface and its DHCP lease. To do just that, add a <code>.network</code> config file in <code>/etc/systemd/network</code> (in this case <code>20-ios-usb.network</code>):<pre><code>[Match]
 Name=enp7s0f3u2c4i2
 
 [Network]
 DHCP=yes
-</code></pre>
-
-<p>That should do the trick, though sometimes it fails, but you can always do <code>networkctl(1)</code> to renew DHCP lease.</p>
-<hr>
-<p><a href="#top">Back to top</a></p>
-<hr>
-<footer>
-	<p>Copyright (c) 2019 - 2023 Prem Phansuriyanon</p>
-	<p>Verbatim copying and redistribution of this entire page are permitted provided this notice is preserved</p>
-</footer>
-</body>
-
-</html>
+</code></pre><p>That should do the trick, though sometimes it fails, but you can always do <code>networkctl(1)</code> to renew DHCP lease.<hr><p><a href=#top>Back to top</a><hr><footer><p>Copyright (c) 2019 - 2023 Prem Phansuriyanon<p>Verbatim copying and redistribution of this entire page are permitted provided this notice is preserved</footer>

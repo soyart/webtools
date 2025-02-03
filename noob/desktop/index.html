@@ -1,70 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-  <title>Artnoi.com</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="keywords" content="artnoi, Prem Phansuriyanon">
-  <meta name="author" content="@artnoi">
-  <meta charset="UTF-8">
-  <link href="/style.css" rel="stylesheet">
-</head>
-
-<body>
-  <ul class="navbar">
-    <li><a href="/"><img src="/toplogo.png" alt="Artnoi.com" class="logo">artnoi</a></li>
-    <li class="f-right"><a href="/cheat/">cheat</a></li>
-    <li class="f-right"><a href="https://notes.artnoi.com/#/all-pages">notes</a></li>
-    <li class="f-right"><a href="/blog/">blog</a></li>
-  </ul><h1 id="my-arch-linux-x11-desktop-setup">My Arch Linux X11 desktop setup</h1>
-
-<blockquote>
-<p>See this <a href="/blog/2021/sway/">blog post</a> for my Sway (Wayland) setup</p>
-</blockquote>
-
-<h2 id="dotfiles">dotfiles</h2>
-
-<p>See my <a href="https://gitlab.com/artnoi-staple/unix/dotfiles">dotfiles git repository</a> for my dotfiles.</p>
-
-<h2 id="why-do-you-have-to-write-about-your-own-desktop">Why do you have to write about your own desktop?</h2>
-
-<p>Arch&rsquo;s DIY mentality means that you can create your own destop environment from the various software packages, and thus to configure the desktop, one would have to study various programs in the Arch wiki. This means that finding documentation specific for one&rsquo;s own desktop setup is very difficult.</p>
-
-<p>I have multiple computers, so I think it is not unwise to document my own desktop setups for future reference. This guide is divided into 2 parts - Wayland and X Windows System.</p>
-
-<h2 id="my-wayland-desktop-components">My Wayland desktop components</h2>
-
-<ol>
-<li><p><strong>Wayland compositor</strong>: <code>sway</code> - volume control and brightness control is configured as hotkeys in <code>sway</code> <a href="https://gitlab.com/artnoi-staple/unix/-/blob/master/dotfiles/general/config/sway/config">configuration</a>.</p></li>
-
-<li><p><strong>Taskbar</strong>: <code>swaybar</code>, this status bar uses the same shell configuration as my X11 <code>dwm</code> <a href="https://gitlab.com/artnoi-staple/unix/-/blob/master/dotfiles/general/config/dwm/dwmbar.sh">dwmbar.sh</a>. This configuration can be used in both <code>dwm</code> and <code>sway</code>. It needs my whole dotfile to function properly tho, because it uses <code>WAYLAND</code> enviroment variable which is exported from <a href="https://gitlab.com/artnoi-staple/unix/-/blob/master/dotfiles/general/.kshrc">.kshrc</a> or <a href="https://gitlab.com/artnoi-staple/unix/-/blob/master/dotfiles/general/.bash_profile">.bash_profile</a>.</p></li>
-
-<li><p><strong>Launcher</strong>: <code>wofi</code>, which is Wayland <code>dmenu</code> and <code>rofi</code> replacement. I have <code>dmenu</code> aliased to <code>wofi -d</code> (which is <code>dmenu</code>-compatible mode) so that I can still use my <code>dmenu</code>-based script.</p></li>
-</ol>
-
-<h2 id="my-x-windows-desktop-components">My X Windows desktop components</h2>
-
-<p>The components are the display server, the window manager, the compositor, the menu launcher, and the applets.</p>
-
-<ol>
-<li><p><strong>Display server</strong>: X Window System (from <code>xorg-server</code> package)</p></li>
-
-<li><p><strong>Window managers</strong>: <code>bspwm</code> (tiling), <code>openbox</code> (stacking)</p></li>
-
-<li><p><strong>Compositor</strong>: <code>picom</code> (formerly <code>compton</code>)</p></li>
-
-<li><p><strong>Taskbar</strong>: <code>tint2</code></p></li>
-
-<li><p><strong>Applets</strong>: <code>xfce4-power-manager</code>, <code>volumeicon</code></p></li>
-</ol>
-
-<h2 id="x-configuration">X configuration</h2>
-
-<p>Arch&rsquo;s <code>xorg-*</code> packages are sane enough to run on most hardware without configuration. However, on very new hardware, sometimes the default configuration is not optimized for the hardware, resulting in artifacts or screen tear, as I have experienced in my new <a href="/blog/t14/">T14 (AMD) laptop</a>. This is why most of my X configuration is about hardware. Below are some of my X configs in <code>/etc/X11/xorg.conf.d</code></p>
-
-<h3 id="x-config-change-input-method-languages-with-alt-space">X config: change input method (languages) with alt+space</h3>
-
-<pre><code class="language-shell"># 00-keybord.conf
+<!doctype html><html lang=en><title>Artnoi.com</title><meta name=viewport content="width=device-width,initial-scale=1"><meta name=keywords content="artnoi,Prem Phansuriyanon"><meta name=author content="@artnoi"><meta charset=UTF-8><link href=/style.css rel=stylesheet><ul class=navbar><li><a href=/><img src=/toplogo.png alt=Artnoi.com class=logo>artnoi</a><li class=f-right><a href=/cheat/>cheat</a><li class=f-right><a href=https://notes.artnoi.com/#/all-pages>notes</a><li class=f-right><a href=/blog/>blog</a></ul><h1 id=my-arch-linux-x11-desktop-setup>My Arch Linux X11 desktop setup</h1><blockquote><p>See this <a href=/blog/2021/sway/>blog post</a> for my Sway (Wayland) setup</blockquote><h2 id=dotfiles>dotfiles</h2><p>See my <a href=https://gitlab.com/artnoi-staple/unix/dotfiles>dotfiles git repository</a> for my dotfiles.<h2 id=why-do-you-have-to-write-about-your-own-desktop>Why do you have to write about your own desktop?</h2><p>Arch&rsquo;s DIY mentality means that you can create your own destop environment from the various software packages, and thus to configure the desktop, one would have to study various programs in the Arch wiki. This means that finding documentation specific for one&rsquo;s own desktop setup is very difficult.<p>I have multiple computers, so I think it is not unwise to document my own desktop setups for future reference. This guide is divided into 2 parts - Wayland and X Windows System.<h2 id=my-wayland-desktop-components>My Wayland desktop components</h2><ol><li><p><strong>Wayland compositor</strong>: <code>sway</code> - volume control and brightness control is configured as hotkeys in <code>sway</code> <a href=https://gitlab.com/artnoi-staple/unix/-/blob/master/dotfiles/general/config/sway/config>configuration</a>.<li><p><strong>Taskbar</strong>: <code>swaybar</code>, this status bar uses the same shell configuration as my X11 <code>dwm</code> <a href=https://gitlab.com/artnoi-staple/unix/-/blob/master/dotfiles/general/config/dwm/dwmbar.sh>dwmbar.sh</a>. This configuration can be used in both <code>dwm</code> and <code>sway</code>. It needs my whole dotfile to function properly tho, because it uses <code>WAYLAND</code> enviroment variable which is exported from <a href=https://gitlab.com/artnoi-staple/unix/-/blob/master/dotfiles/general/.kshrc>.kshrc</a> or <a href=https://gitlab.com/artnoi-staple/unix/-/blob/master/dotfiles/general/.bash_profile>.bash_profile</a>.<li><p><strong>Launcher</strong>: <code>wofi</code>, which is Wayland <code>dmenu</code> and <code>rofi</code> replacement. I have <code>dmenu</code> aliased to <code>wofi -d</code> (which is <code>dmenu</code>-compatible mode) so that I can still use my <code>dmenu</code>-based script.</ol><h2 id=my-x-windows-desktop-components>My X Windows desktop components</h2><p>The components are the display server, the window manager, the compositor, the menu launcher, and the applets.<ol><li><p><strong>Display server</strong>: X Window System (from <code>xorg-server</code> package)<li><p><strong>Window managers</strong>: <code>bspwm</code> (tiling), <code>openbox</code> (stacking)<li><p><strong>Compositor</strong>: <code>picom</code> (formerly <code>compton</code>)<li><p><strong>Taskbar</strong>: <code>tint2</code><li><p><strong>Applets</strong>: <code>xfce4-power-manager</code>, <code>volumeicon</code></ol><h2 id=x-configuration>X configuration</h2><p>Arch&rsquo;s <code>xorg-*</code> packages are sane enough to run on most hardware without configuration. However, on very new hardware, sometimes the default configuration is not optimized for the hardware, resulting in artifacts or screen tear, as I have experienced in my new <a href=/blog/t14/>T14 (AMD) laptop</a>. This is why most of my X configuration is about hardware. Below are some of my X configs in <code>/etc/X11/xorg.conf.d</code><h3 id=x-config-change-input-method-languages-with-alt-space>X config: change input method (languages) with alt+space</h3><pre><code class=language-shell># 00-keybord.conf
 
 Section &quot;InputClass&quot;
   Identifier &quot;system-keyboard&quot;
@@ -74,11 +8,7 @@ Section &quot;InputClass&quot;
   Option &quot;XkbVariant&quot; &quot;&quot;
   Option &quot;XkbOptions&quot; &quot;grp:alt_space_toggle&quot;
 EndSection
-</code></pre>
-
-<h3 id="x-config-amdgpu">X config: AMDGPU</h3>
-
-<pre><code class="language-shell"># 20-amdgpu.conf
+</code></pre><h3 id=x-config-amdgpu>X config: AMDGPU</h3><pre><code class=language-shell># 20-amdgpu.conf
 
 Section &quot;Device&quot;
   Identifier &quot;AMD&quot;
@@ -91,11 +21,7 @@ Section &quot;Screen&quot;
   Identifier &quot;MyScreen&quot;
   DefaultDepth 30
 EndSection
-</code></pre>
-
-<h3 id="x-config-synaptics">X config: Synaptics</h3>
-
-<pre><code class="language-shell"># 70-synaptics.conf
+</code></pre><h3 id=x-config-synaptics>X config: Synaptics</h3><pre><code class=language-shell># 70-synaptics.conf
 
 Section &quot;InputClass&quot;
   Identifier &quot;touchpad&quot;
@@ -117,57 +43,7 @@ Section &quot;InputClass&quot;
   Option &quot;FingerHigh&quot; &quot;50&quot;
   Option &quot;MaxTapTime&quot; &quot;125&quot;
 EndSection
-</code></pre>
-
-<h2 id="compositor">Compositor</h2>
-
-<p>The compositor is used (usually with window manager) for display compositing to perform funny effects. I don&rsquo;t like fancy compositing, so <a href="https://gitlab.com/artnoi-staple/unix/-/blob/master/dotfiles/linux/arch/picom.conf">my <code>picom.conf</code></a> is actually a few lines.</p>
-
-<h2 id="window-managers">Window managers</h2>
-
-<h3 id="bspwm">Bspwm</h3>
-
-<p><code>bspwm</code> is a lightweight tiling window manager. <strong>It only manages windows, and does nothing else, not even handling keyboard hotkeys.</strong> Instead, the hotkeys and their associated commands are handled by a seperate program, usually <code>sxhkd</code>.</p>
-
-<p>When <code>bspwm</code> is used in <code>.xinitrc</code>, the window manager first reads it config files <code>bspwmrc</code> and <code>autostart</code>.</p>
-
-<h4 id="basic-bspwm-configuration">Basic <code>bspwm</code> configuration</h4>
-
-<p><code>bspwmrc</code> stores <code>bspwm</code>-specific configurations, and it is essentially a shell script with several <code>bspc</code> lines. To configure <code>bspwm</code> window manager options, edit <code>bspwmrc</code> file. To edit hotkey options, edit <code>sxhkdrc</code> file.</p>
-
-<p><code>autostart</code> stores shell script for programs that will be autostarted with <code>bspwm</code>, like the compositor and other applets.</p>
-
-<h3 id="openbox">OpenBox</h3>
-
-<p>OpenBox is a lightweight stacking window manager. OpenBox can be configured graphically with <code>obconf</code>, although it does not support advanced configurations. You will have to edit the config files for OpenBox if you need advanced customization.</p>
-
-<h4 id="basic-openbox-configuration">Basic <code>openbox</code> configuration</h4>
-
-<p><code>rc.xml</code> stores general configurations, like the hotkeys, while <code>menu.xml</code> stores right-click menu configurations.</p>
-
-<p><code>autostart</code> works like <code>bspwm</code>&rsquo;s <code>autostart</code>.</p>
-
-<h2 id="launcher">Launcher</h2>
-
-<h3 id="dmenu"><code>dmenu</code></h3>
-
-<p>I use <code>demenu</code> as interactive launchers. I map hotkeys to several shell scripts like <code>dmenugoogle</code>, <code>dmenufirefox</code>, and <code>dmenupower</code>. Configuration to the various <code>dmenu</code> scripts can be done by editting the <code>dmenu*</code> files, or editting <code>sxhkd</code> to map new hotkeys for the script on <code>bspwm</code>, and <code>rc.xml</code> on <code>openbox</code>.</p>
-
-<p><code>dmenu*</code> scripts are <a href="https://gitlab.com/artnoi-staple/unix/-/tree/master/sh-tools/bin">provided in <code>sh-tools/bin</code></a>.</p>
-
-<h2 id="taskbar-status-bar">Taskbar (status bar?)</h2>
-
-<p>I use <code>tint2</code> as a top taskbar. The applets are on the task bar.</p>
-
-<p>In addition to the applets, I also add <a href="https://gitlab.com/artnoi-staple/unix/-/tree/master/dotfiles/general/.config/tint2">my own shell script for <code>tint2</code> to display CPU temperature and fan speed</a>.</p>
-
-<h2 id="applets">Applets</h2>
-
-<p>The applets usually work correctly out-of-the-box, requiring no config to work. Nonetheless, you will have to config it to enable its features.</p>
-
-<p><code>volumeicon</code> does not enable the <code>XF86Audio*</code> hotkeys, which made it pretty useless on first run. You can configre it graphically, or edit its config (<code>~/.config/volumeicon</code>) with:</p>
-
-<pre><code>[Hotkeys]
+</code></pre><h2 id=compositor>Compositor</h2><p>The compositor is used (usually with window manager) for display compositing to perform funny effects. I don&rsquo;t like fancy compositing, so <a href=https://gitlab.com/artnoi-staple/unix/-/blob/master/dotfiles/linux/arch/picom.conf>my <code>picom.conf</code></a> is actually a few lines.<h2 id=window-managers>Window managers</h2><h3 id=bspwm>Bspwm</h3><p><code>bspwm</code> is a lightweight tiling window manager. <strong>It only manages windows, and does nothing else, not even handling keyboard hotkeys.</strong> Instead, the hotkeys and their associated commands are handled by a seperate program, usually <code>sxhkd</code>.<p>When <code>bspwm</code> is used in <code>.xinitrc</code>, the window manager first reads it config files <code>bspwmrc</code> and <code>autostart</code>.<h4 id=basic-bspwm-configuration>Basic <code>bspwm</code> configuration</h4><p><code>bspwmrc</code> stores <code>bspwm</code>-specific configurations, and it is essentially a shell script with several <code>bspc</code> lines. To configure <code>bspwm</code> window manager options, edit <code>bspwmrc</code> file. To edit hotkey options, edit <code>sxhkdrc</code> file.<p><code>autostart</code> stores shell script for programs that will be autostarted with <code>bspwm</code>, like the compositor and other applets.<h3 id=openbox>OpenBox</h3><p>OpenBox is a lightweight stacking window manager. OpenBox can be configured graphically with <code>obconf</code>, although it does not support advanced configurations. You will have to edit the config files for OpenBox if you need advanced customization.<h4 id=basic-openbox-configuration>Basic <code>openbox</code> configuration</h4><p><code>rc.xml</code> stores general configurations, like the hotkeys, while <code>menu.xml</code> stores right-click menu configurations.<p><code>autostart</code> works like <code>bspwm</code>&rsquo;s <code>autostart</code>.<h2 id=launcher>Launcher</h2><h3 id=dmenu><code>dmenu</code></h3><p>I use <code>demenu</code> as interactive launchers. I map hotkeys to several shell scripts like <code>dmenugoogle</code>, <code>dmenufirefox</code>, and <code>dmenupower</code>. Configuration to the various <code>dmenu</code> scripts can be done by editting the <code>dmenu*</code> files, or editting <code>sxhkd</code> to map new hotkeys for the script on <code>bspwm</code>, and <code>rc.xml</code> on <code>openbox</code>.<p><code>dmenu*</code> scripts are <a href=https://gitlab.com/artnoi-staple/unix/-/tree/master/sh-tools/bin>provided in <code>sh-tools/bin</code></a>.<h2 id=taskbar-status-bar>Taskbar (status bar?)</h2><p>I use <code>tint2</code> as a top taskbar. The applets are on the task bar.<p>In addition to the applets, I also add <a href=https://gitlab.com/artnoi-staple/unix/-/tree/master/dotfiles/general/.config/tint2>my own shell script for <code>tint2</code> to display CPU temperature and fan speed</a>.<h2 id=applets>Applets</h2><p>The applets usually work correctly out-of-the-box, requiring no config to work. Nonetheless, you will have to config it to enable its features.<p><code>volumeicon</code> does not enable the <code>XF86Audio*</code> hotkeys, which made it pretty useless on first run. You can configre it graphically, or edit its config (<code>~/.config/volumeicon</code>) with:<pre><code>[Hotkeys]
 up_enabled=true
 down_enabled=true
 mute_enabled=true
@@ -175,51 +51,5 @@ mute_enabled=true
 up=XF86AudioRaiseVolume
 down=XF86AudioLowerVolume
 mute=XF86AudioMute
-</code></pre>
-
-<p><code>xfce4-power-manager</code> by default does not put laptop in suspense after lid close. This can be easily configured graphically.</p>
-
-<h2 id="starting-x">Starting X</h2>
-
-<h2 id="startx"><code>startx</code></h2>
-
-<p><code>startx</code> will use <code>xinit</code> to start an X session. The <code>xinit</code> program will read its configuration from <code>.xinitrc</code>, which usually store another program name, like a window manager like <code>bspwm</code>.</p>
-
-<h3 id="xinitrc"><code>.xinitrc</code></h3>
-
-<p>The file <code>~/.xinitrc</code> is used by <code>xinit</code> when it is starting the X server. We usually put our target windows manager or desktop environment here. So, to switch window manager on the next X session, simply edit <code>.xinitrc</code> file.</p>
-
-<h3 id="xinitrc-example"><code>.xinitrc</code> example</h3>
-
-<p>Let&rsquo;s say the content of <code>.xinitrc</code> looks like this:</p>
-
-<pre><code class="language-shell">[[ -f $HOME/.Xresources ]] &amp;&amp; xrdb $HOME/.Xresources &amp; exec bspwm;
-</code></pre>
-
-<p>The flow of actions will look like this:</p>
-
-<ol>
-<li><p><code>xinit</code> starts the X server, and executes command for<code>.xinitrc</code>, which in this case is only sourcing <code>.Xresources</code> and <code>exec bspwm</code></p></li>
-
-<li><p><code>bspwm</code> is started and it looks for its own configuration files in <code>~/.config/bspwm</code></p></li>
-
-<li><p><code>bspwm</code> executes its config script <code>bspwmrc</code>, and the <code>autostart</code> files</p></li>
-
-<li><p><code>bspwm</code> starts itself, and via <code>autostart</code>, the compositor <code>picom</code> and the applets (and other programs you put in <code>autostart</code>)</p></li>
-
-<li><p>The commands in <code>autostart</code> file may execute extra scripts, like my <code>tint</code> CPU temperature and fan speed script.</p></li>
-
-<li><p>Boom, we have the GUI (if all went well)</p></li>
-</ol>
-
-<p>The same is also true for OpenBox, and many other minimal window managers.</p>
-<hr>
-<p><a href="#top">Back to top</a></p>
-<hr>
-<footer>
-	<p>Copyright (c) 2019 - 2023 Prem Phansuriyanon</p>
-	<p>Verbatim copying and redistribution of this entire page are permitted provided this notice is preserved</p>
-</footer>
-</body>
-
-</html>
+</code></pre><p><code>xfce4-power-manager</code> by default does not put laptop in suspense after lid close. This can be easily configured graphically.<h2 id=starting-x>Starting X</h2><h2 id=startx><code>startx</code></h2><p><code>startx</code> will use <code>xinit</code> to start an X session. The <code>xinit</code> program will read its configuration from <code>.xinitrc</code>, which usually store another program name, like a window manager like <code>bspwm</code>.<h3 id=xinitrc><code>.xinitrc</code></h3><p>The file <code>~/.xinitrc</code> is used by <code>xinit</code> when it is starting the X server. We usually put our target windows manager or desktop environment here. So, to switch window manager on the next X session, simply edit <code>.xinitrc</code> file.<h3 id=xinitrc-example><code>.xinitrc</code> example</h3><p>Let&rsquo;s say the content of <code>.xinitrc</code> looks like this:<pre><code class=language-shell>[[ -f $HOME/.Xresources ]] &amp;&amp; xrdb $HOME/.Xresources &amp; exec bspwm;
+</code></pre><p>The flow of actions will look like this:<ol><li><p><code>xinit</code> starts the X server, and executes command for<code>.xinitrc</code>, which in this case is only sourcing <code>.Xresources</code> and <code>exec bspwm</code><li><p><code>bspwm</code> is started and it looks for its own configuration files in <code>~/.config/bspwm</code><li><p><code>bspwm</code> executes its config script <code>bspwmrc</code>, and the <code>autostart</code> files<li><p><code>bspwm</code> starts itself, and via <code>autostart</code>, the compositor <code>picom</code> and the applets (and other programs you put in <code>autostart</code>)<li><p>The commands in <code>autostart</code> file may execute extra scripts, like my <code>tint</code> CPU temperature and fan speed script.<li><p>Boom, we have the GUI (if all went well)</ol><p>The same is also true for OpenBox, and many other minimal window managers.<hr><p><a href=#top>Back to top</a><hr><footer><p>Copyright (c) 2019 - 2023 Prem Phansuriyanon<p>Verbatim copying and redistribution of this entire page are permitted provided this notice is preserved</footer>

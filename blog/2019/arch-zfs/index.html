@@ -1,100 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-  <title>Artnoi.com</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="keywords" content="artnoi, Prem Phansuriyanon">
-  <meta name="author" content="@artnoi">
-  <meta charset="UTF-8">
-  <link href="/style.css" rel="stylesheet">
-</head>
-
-<body>
-  <ul class="navbar">
-    <li><a href="/"><img src="/toplogo.png" alt="Artnoi.com" class="logo">artnoi</a></li>
-    <li class="f-right"><a href="/cheat/">cheat</a></li>
-    <li class="f-right"><a href="https://notes.artnoi.com/#/all-pages">notes</a></li>
-    <li class="f-right"><a href="/blog/">blog</a></li>
-  </ul><p>Nov 18, <a href="/blog/2019/">2019</a></p>
-
-<h1 id="installing-arch-linux-on-zfs-root">Installing Arch Linux on ZFS Root</h1>
-
-<p>Last Updated: June, 2020</p>
-
-<h2 id="introduction">Introduction</h2>
-
-<p>Good day. Today I will be guiding you on how to do Arch Linux installation on the Zettabyte Filesystem.</p>
-
-<p>Please note that this article was written back in 2019 and may no longer be relevant. Also, always double check with the <a href="https://wiki.archlinux.org/index.php/Install_Arch_Linux_on_ZFS">Arch Wiki</a>.</p>
-
-<h3 id="arch-linux-https-archlinux-org"><a href="https://archlinux.org">Arch Linux</a></h3>
-
-<p>Arch Linux is a minimal Linux distribution with simplicity (think <a href="https://en.wikipedia.org/wiki/KISS_principle">KISS principles</a>) and practicality in mind. Arch is focused on binary packages, but also comes with useful build tool to compile from source (namely <code>makepkg</code>), much like the BSD ports, and the fact that the distribution ships with both Free and non-Free software makes Arch extremely technically versatile and politically neutral.</p>
-
-<blockquote>
-<p>This KISS-inspired attitude of the Arch creators, packagers, maintainers, and users implies that the Arch software catalog is rich, highly configurable, and <em>vanilla</em>.</p>
-</blockquote>
-
-<p>Arch is notorious for being hard to install and maintain, while in fact, it is the simplest one - there is clear documentation/explanation on the Arch wiki for you for every single installation/configuration step, unlike other user-friendly Linux distros that hide complexcity with abstraction - leading to more complexity and confusion to the users.</p>
-
-<blockquote>
-<p>Because of its minimalism, customizibility, and rich documentation, Arch Linux is an ideal distribution if you like to tinker around your computers. I have been using Arch for a while, but it had always been installed on <code>EXT4</code> partitions.</p>
-</blockquote>
-
-<h3 id="the-zettabyte-filesystem-zfs-https-en-wikipedia-org-wiki-zfs"><a href="https://en.wikipedia.org/wiki/ZFS">The Zettabyte Filesystem (ZFS)</a></h3>
-
-<p>ZFS is a next-generation, enterprise-grade filesystem originally developed by Sun. Unlike tradidional filesystems, ZFS integrates logical volume management, encryption, compression, RAID functionality, and other cool features all under one project. ZFS is solid, stable, and easy to use.</p>
-
-<p>ZFS design is focused on data integrity, and scalability, and the command-line interface to ZFS is pleasant to operate. ZFS has gained more mainstream interests after sysadmins discovered that <a href="https://www.youtube.com/watch?v=XimxSb00F9w">ZFS block-level snapshots could be used to revert the file-level encryption put in place by recent malicious ransomware attacks</a>.</p>
-
-<p>There&rsquo;re many flavors of ZFS, but today we&rsquo;ll be using <a href="https://zfsonlinux.org">OpenZFS on Linux</a> which on Arch Linux is provided by <code>zfs-linux</code>, <code>zfs-linux-lts</code>, or <code>zfs-dkms</code> package depending on the kernel.</p>
-
-<p>Anyone who has used ZFS (even for non-root partitions) should already now the basics of ZFS and its commands (<a href="https://linux.die.net/man/8/zpool"><code>zpool</code></a> and <a href="https://linux.die.net/man/8/zfs"><code>zfs</code></a>). Arch users who installs their own system on ZFS root should at least know what are ZFS zpool and datasets, basic properties, and how to mount ZFS datasets using either legacy mounting (<code>fstab</code> and <code>mount -t zfs</code>) or <code>zfs mount</code>.</p>
-
-<h3 id="approach-and-basic-requirement">Approach and basic requirement</h3>
-
-<p>We will be basically partitioning (<code>fdisk</code>) and preparing the ZFS filesystem for our root. After the filesystem is configured, we will then install (i.e. using <code>pacstrap -i</code>) <code>base</code>, <code>base-devel</code>, and <code>mkinicpio</code>, and some other Arch basic packages. After base install is done, we will <code>ch-root</code> to do basic configuration and prepare our <code>/boot</code> so that our <code>/boot</code> knows how to boot to our Arch ZFS root.</p>
-
-<h3 id="requirements">Requirements</h3>
-
-<ul>
-<li><p><strong>One <code>amd64</code> (<code>x86-64</code>) Linux computer</strong> with <code>pacman</code> or access to Arch Bootstrap Image (<a href="https://www.archlinux.org/download/">mirrors</a>) <strong>with a ZFS implementation installed</strong>. Alternatively, you can prepare a custom <code>archiso</code> USB stick with <a href="https://github.com/eoli3n/archiso-zfs">ZFS pre-installed</a>.</p></li>
-
-<li><p>Free disk space, preferably unmanaged GPT disk partitions (i.e. <code>/dev/sdXY</code>)</p></li>
-
-<li><p>Internet connection</p></li>
-
-<li><p><a href="https://en.wikipedia.org/wiki/Unified_Extensible_Firmware_Interface">(U)EFI</a> boot - which equates a seperate <code>FAT32</code> <strong>E</strong>FI <strong>S</strong>ystem <strong>P</strong>artition (the ESP will be mounted at <code>/boot</code>)</p></li>
-
-<li><p><code>systemd-boot</code> (UEFI only) will be used</p></li>
-</ul>
-
-<h2 id="disk-preparation">Disk preparation</h2>
-
-<h3 id="disk-partitioning">Disk partitioning</h3>
-
-<p>Before we go ahead and install Arch, let&rsquo;s first prepare our disk(s) for the installation.</p>
-
-<p>We need a FAT32 <code>/boot</code> partition and a minimum of 1 partition for our zpool I find using <code>fdisk</code> the easiest and most convenient way to partition a GPT disk:</p>
-
-<pre><code class="language-shell">fdisk /dev/sdX;
-</code></pre>
-
-<p>Replace <em>sdX</em> with your storage device name, or if you want some visualization:</p>
-
-<pre><code class="language-shell">cfdisk /dev/sdX;
-</code></pre>
-
-<p>The easiest disk layout should be a small (~250MiB) <code>VFAT</code> partition as our <code>ESP</code> (<code>/boot</code>), and a large <code>Solaris Root</code>-type partition for our zpool. This means that we will be using only one zpool for our root, and thus the system only needs to import one single pool during the boot processes - eliminating the need to enable ZFS-related <a href="https://en.wikipedia.org/wiki/Systemd">systemd</a> daemons to import extra pools (since there is none).</p>
-
-<h3 id="zfs-preparation">ZFS preparation</h3>
-
-<h3 id="create-zfs-zpool">Create ZFS zpool</h3>
-
-<p>As of June 2020, <code>zpool create -o $zpool_property -O $zfs_property</code> command can be used to create <em>master</em> dataset properties that can be automatically inherited by all children datasets (i.e. without having to use <code>zfs create -o $zfs_property</code> afterwards). For example, the command below will create a pool &ldquo;zroot&rdquo; with correct properties well suited for an Arch Linux root. Note that SSD users may want to add <code>-O autotrim=on</code>.</p>
-
-<pre><code class="language-shell">zpool create -f -o ashift=12 -o autoexpand=on -R /mnt \
+<!doctype html><html lang=en><title>Artnoi.com</title><meta name=viewport content="width=device-width,initial-scale=1"><meta name=keywords content="artnoi,Prem Phansuriyanon"><meta name=author content="@artnoi"><meta charset=UTF-8><link href=/style.css rel=stylesheet><ul class=navbar><li><a href=/><img src=/toplogo.png alt=Artnoi.com class=logo>artnoi</a><li class=f-right><a href=/cheat/>cheat</a><li class=f-right><a href=https://notes.artnoi.com/#/all-pages>notes</a><li class=f-right><a href=/blog/>blog</a></ul><p>Nov 18, <a href=/blog/2019/>2019</a><h1 id=installing-arch-linux-on-zfs-root>Installing Arch Linux on ZFS Root</h1><p>Last Updated: June, 2020<h2 id=introduction>Introduction</h2><p>Good day. Today I will be guiding you on how to do Arch Linux installation on the Zettabyte Filesystem.<p>Please note that this article was written back in 2019 and may no longer be relevant. Also, always double check with the <a href=https://wiki.archlinux.org/index.php/Install_Arch_Linux_on_ZFS>Arch Wiki</a>.<h3 id=arch-linux-https-archlinux-org><a href=https://archlinux.org>Arch Linux</a></h3><p>Arch Linux is a minimal Linux distribution with simplicity (think <a href=https://en.wikipedia.org/wiki/KISS_principle>KISS principles</a>) and practicality in mind. Arch is focused on binary packages, but also comes with useful build tool to compile from source (namely <code>makepkg</code>), much like the BSD ports, and the fact that the distribution ships with both Free and non-Free software makes Arch extremely technically versatile and politically neutral.<blockquote><p>This KISS-inspired attitude of the Arch creators, packagers, maintainers, and users implies that the Arch software catalog is rich, highly configurable, and <em>vanilla</em>.</blockquote><p>Arch is notorious for being hard to install and maintain, while in fact, it is the simplest one - there is clear documentation/explanation on the Arch wiki for you for every single installation/configuration step, unlike other user-friendly Linux distros that hide complexcity with abstraction - leading to more complexity and confusion to the users.<blockquote><p>Because of its minimalism, customizibility, and rich documentation, Arch Linux is an ideal distribution if you like to tinker around your computers. I have been using Arch for a while, but it had always been installed on <code>EXT4</code> partitions.</blockquote><h3 id=the-zettabyte-filesystem-zfs-https-en-wikipedia-org-wiki-zfs><a href=https://en.wikipedia.org/wiki/ZFS>The Zettabyte Filesystem (ZFS)</a></h3><p>ZFS is a next-generation, enterprise-grade filesystem originally developed by Sun. Unlike tradidional filesystems, ZFS integrates logical volume management, encryption, compression, RAID functionality, and other cool features all under one project. ZFS is solid, stable, and easy to use.<p>ZFS design is focused on data integrity, and scalability, and the command-line interface to ZFS is pleasant to operate. ZFS has gained more mainstream interests after sysadmins discovered that <a href="https://www.youtube.com/watch?v=XimxSb00F9w">ZFS block-level snapshots could be used to revert the file-level encryption put in place by recent malicious ransomware attacks</a>.<p>There&rsquo;re many flavors of ZFS, but today we&rsquo;ll be using <a href=https://zfsonlinux.org>OpenZFS on Linux</a> which on Arch Linux is provided by <code>zfs-linux</code>, <code>zfs-linux-lts</code>, or <code>zfs-dkms</code> package depending on the kernel.<p>Anyone who has used ZFS (even for non-root partitions) should already now the basics of ZFS and its commands (<a href=https://linux.die.net/man/8/zpool><code>zpool</code></a> and <a href=https://linux.die.net/man/8/zfs><code>zfs</code></a>). Arch users who installs their own system on ZFS root should at least know what are ZFS zpool and datasets, basic properties, and how to mount ZFS datasets using either legacy mounting (<code>fstab</code> and <code>mount -t zfs</code>) or <code>zfs mount</code>.<h3 id=approach-and-basic-requirement>Approach and basic requirement</h3><p>We will be basically partitioning (<code>fdisk</code>) and preparing the ZFS filesystem for our root. After the filesystem is configured, we will then install (i.e. using <code>pacstrap -i</code>) <code>base</code>, <code>base-devel</code>, and <code>mkinicpio</code>, and some other Arch basic packages. After base install is done, we will <code>ch-root</code> to do basic configuration and prepare our <code>/boot</code> so that our <code>/boot</code> knows how to boot to our Arch ZFS root.<h3 id=requirements>Requirements</h3><ul><li><p><strong>One <code>amd64</code> (<code>x86-64</code>) Linux computer</strong> with <code>pacman</code> or access to Arch Bootstrap Image (<a href=https://www.archlinux.org/download/>mirrors</a>) <strong>with a ZFS implementation installed</strong>. Alternatively, you can prepare a custom <code>archiso</code> USB stick with <a href=https://github.com/eoli3n/archiso-zfs>ZFS pre-installed</a>.<li><p>Free disk space, preferably unmanaged GPT disk partitions (i.e. <code>/dev/sdXY</code>)<li><p>Internet connection<li><p><a href=https://en.wikipedia.org/wiki/Unified_Extensible_Firmware_Interface>(U)EFI</a> boot - which equates a seperate <code>FAT32</code> <strong>E</strong>FI <strong>S</strong>ystem <strong>P</strong>artition (the ESP will be mounted at <code>/boot</code>)<li><p><code>systemd-boot</code> (UEFI only) will be used</ul><h2 id=disk-preparation>Disk preparation</h2><h3 id=disk-partitioning>Disk partitioning</h3><p>Before we go ahead and install Arch, let&rsquo;s first prepare our disk(s) for the installation.<p>We need a FAT32 <code>/boot</code> partition and a minimum of 1 partition for our zpool I find using <code>fdisk</code> the easiest and most convenient way to partition a GPT disk:<pre><code class=language-shell>fdisk /dev/sdX;
+</code></pre><p>Replace <em>sdX</em> with your storage device name, or if you want some visualization:<pre><code class=language-shell>cfdisk /dev/sdX;
+</code></pre><p>The easiest disk layout should be a small (~250MiB) <code>VFAT</code> partition as our <code>ESP</code> (<code>/boot</code>), and a large <code>Solaris Root</code>-type partition for our zpool. This means that we will be using only one zpool for our root, and thus the system only needs to import one single pool during the boot processes - eliminating the need to enable ZFS-related <a href=https://en.wikipedia.org/wiki/Systemd>systemd</a> daemons to import extra pools (since there is none).<h3 id=zfs-preparation>ZFS preparation</h3><h3 id=create-zfs-zpool>Create ZFS zpool</h3><p>As of June 2020, <code>zpool create -o $zpool_property -O $zfs_property</code> command can be used to create <em>master</em> dataset properties that can be automatically inherited by all children datasets (i.e. without having to use <code>zfs create -o $zfs_property</code> afterwards). For example, the command below will create a pool &ldquo;zroot&rdquo; with correct properties well suited for an Arch Linux root. Note that SSD users may want to add <code>-O autotrim=on</code>.<pre><code class=language-shell>zpool create -f -o ashift=12 -o autoexpand=on -R /mnt \
     -O acltype=posixacl \
     -O relatime=on \
     -O xattr=sa \
@@ -108,83 +14,25 @@
     -O keyformat=passphrase \
     -O keylocation=prompt \
     zroot /dev/disk/by-id/id-to-partition-partx;
-</code></pre>
-
-<blockquote>
-<p>Note: Use <code># fdisk -l</code> or <code>$ lsblk -S -o NAME,PHY-SEC</code> to determine your disk sector size and specify <code>ashift</code> value accordingly (512 byte =<code>ashift 9</code>, 4096 byte (4k) = <code>ashift 12</code>) for optimum performance, <strong>although the Arch Wiki recommends using <code>ashift=12</code> ALWAYS for compatibility with 4k sector disks in case the pools need to be moved</strong>. Also, <code>noatime</code> may be used instead of <code>relatime</code> if you really want to minimize disk reads and writes.</p>
-</blockquote>
-
-<h3 id="create-zfs-dataset-s">Create ZFS dataset(s)</h3>
-
-<pre><code class="language-shell">zfs create -o mountpoint=none zroot/ROOT;
+</code></pre><blockquote><p>Note: Use <code># fdisk -l</code> or <code>$ lsblk -S -o NAME,PHY-SEC</code> to determine your disk sector size and specify <code>ashift</code> value accordingly (512 byte =<code>ashift 9</code>, 4096 byte (4k) = <code>ashift 12</code>) for optimum performance, <strong>although the Arch Wiki recommends using <code>ashift=12</code> ALWAYS for compatibility with 4k sector disks in case the pools need to be moved</strong>. Also, <code>noatime</code> may be used instead of <code>relatime</code> if you really want to minimize disk reads and writes.</blockquote><h3 id=create-zfs-dataset-s>Create ZFS dataset(s)</h3><pre><code class=language-shell>zfs create -o mountpoint=none zroot/ROOT;
 zfs create -o mountpoint=legacy zroot/ROOT/default;
 zfs create -o mountpoint=none zroot/data;
 zfs create -o mountpoint=legacy zroot/data/home;
-</code></pre>
-
-<p>Note that if you create datasets with <code>mountpoint</code> explicitly set (as in this example), you will need to add <code>fstab</code> entries for each legacy ZFS mountpoints. Preferably, use <code>genfstab</code> to generate proper <code>fstab</code> entries. Also, for the dataset containing your <code>/var/log</code>, you will need to enable option <code>acltype=posixacl</code> otherwise you may have problem with <code>journald</code>.</p>
-
-<p>ZFS loves RAM so I think we&rsquo;re gonna need a large swap partition, so let&rsquo;s create a zvol for our swap within our master dataset:</p>
-
-<pre><code class="language-shell">zfs create -V 8G -b $(getconf PAGESIZE) \
+</code></pre><p>Note that if you create datasets with <code>mountpoint</code> explicitly set (as in this example), you will need to add <code>fstab</code> entries for each legacy ZFS mountpoints. Preferably, use <code>genfstab</code> to generate proper <code>fstab</code> entries. Also, for the dataset containing your <code>/var/log</code>, you will need to enable option <code>acltype=posixacl</code> otherwise you may have problem with <code>journald</code>.<p>ZFS loves RAM so I think we&rsquo;re gonna need a large swap partition, so let&rsquo;s create a zvol for our swap within our master dataset:<pre><code class=language-shell>zfs create -V 8G -b $(getconf PAGESIZE) \
     -o logbias=throughput \
     -o sync=always \
     -o primarycache=metadata \
     -o com.sun:auto-snapshot=false \
     zroot/enc/swap;
-</code></pre>
-
-<p>And prepare the zvol as swap partition:</p>
-
-<pre><code class="language-shell">mkswap -f /dev/zvol/{path/to/your/zvol swap dataset};
-</code></pre>
-
-<blockquote>
-<p>As of June 2020, I could not get Arch to &ldquo;resume&rdquo; on ZFS VDEVs or LUKS swap partition.</p>
-</blockquote>
-
-<p>After all root datasets are configured, set <code>bootfs</code> property for our zpool:</p>
-
-<pre><code class="language-shell">zpool set bootfs=zroot/enc/ROOT/default zroot;
-</code></pre>
-
-<p><strong>Now our zpool <code>zroot</code> is ready.</strong></p>
-
-<h4 id="export-and-import-your-pool-to-convenient-location">Export and import your pool to convenient location</h4>
-
-<p>You&rsquo;ll now have to export and re-import the pool to a convenient location like <code>/mnt</code> or <code>/install</code>:</p>
-
-<pre><code class="language-shell">zpool export zroot;
+</code></pre><p>And prepare the zvol as swap partition:<pre><code class=language-shell>mkswap -f /dev/zvol/{path/to/your/zvol swap dataset};
+</code></pre><blockquote><p>As of June 2020, I could not get Arch to &ldquo;resume&rdquo; on ZFS VDEVs or LUKS swap partition.</blockquote><p>After all root datasets are configured, set <code>bootfs</code> property for our zpool:<pre><code class=language-shell>zpool set bootfs=zroot/enc/ROOT/default zroot;
+</code></pre><p><strong>Now our zpool <code>zroot</code> is ready.</strong><h4 id=export-and-import-your-pool-to-convenient-location>Export and import your pool to convenient location</h4><p>You&rsquo;ll now have to export and re-import the pool to a convenient location like <code>/mnt</code> or <code>/install</code>:<pre><code class=language-shell>zpool export zroot;
 zpool import -d /dev/disk/by-id -R /install -l zroot;
-</code></pre>
-
-<p>This should import zpool <code>zroot</code> and its children to <code>/install</code> as root. If you set <code>mountpoint=legacy</code>, you will need to mount the dataset manually, i.e. using standard <code>mount</code> command.</p>
-
-<h2 id="arch-linux-installation">Arch Linux Installation</h2>
-
-<h3 id="mount-your-install-directory">Mount your install directory</h3>
-
-<p>Now that our ZFS layout is cool and good (and imported), let&rsquo;s first mount the other partitions/datasets such that it is final (i.e. mount your recently created <code>FAT32</code> ESP partition to <code>/install/boot</code>, <code>zroot/enc/ROOT/var</code> to <code>/var</code>, and <code>zroot/data/home</code> to <code>/home</code>). In my case, because my children datasets have <code>mountpoint</code> property set to <code>legacy</code>, I will need to mount it using legacy <code>mount</code> command:</p>
-
-<pre><code class="language-shell">mount /dev/sdxY /install/boot;
+</code></pre><p>This should import zpool <code>zroot</code> and its children to <code>/install</code> as root. If you set <code>mountpoint=legacy</code>, you will need to mount the dataset manually, i.e. using standard <code>mount</code> command.<h2 id=arch-linux-installation>Arch Linux Installation</h2><h3 id=mount-your-install-directory>Mount your install directory</h3><p>Now that our ZFS layout is cool and good (and imported), let&rsquo;s first mount the other partitions/datasets such that it is final (i.e. mount your recently created <code>FAT32</code> ESP partition to <code>/install/boot</code>, <code>zroot/enc/ROOT/var</code> to <code>/var</code>, and <code>zroot/data/home</code> to <code>/home</code>). In my case, because my children datasets have <code>mountpoint</code> property set to <code>legacy</code>, I will need to mount it using legacy <code>mount</code> command:<pre><code class=language-shell>mount /dev/sdxY /install/boot;
 mount -t zfs zroot/ROOT/var /install/var;
 mount -t zfs zroot/data/home /install/home;
-</code></pre>
-
-<h3 id="use-pacstrap-to-bootstrap-basic-packages">Use <code>pacstrap</code> to bootstrap basic packages</h3>
-
-<p>From this step on, you&rsquo;ll need a Linux computer capable of strapping Arch packages. If you don&rsquo;t have access to one, the easiest way to get yourself a proper, working Arch <code>pacman</code> without having to reboot to a live image is to <a href="https://www.archlinux.org/download/">download</a> the Arch bootstrap image and chroot into it to use the image&rsquo;s <code>pacman</code> and <code>pacstrap</code> script. Now that you can get your hand on <code>pacman</code>, issue:</p>
-
-<pre><code class="language-shell">pacstrap -i /install base base-devel mkinitcpio vim;
-</code></pre>
-
-<p>Now <code>base</code>, <code>base-devel</code>, <code>mkinitcpio</code>, and <code>vim</code> should be installed to <code>/install</code></p>
-
-<h3 id="edit-important-files">Edit important files..</h3>
-
-<p>The same boring stuff..</p>
-
-<pre><code class="language-shell">ln -sf /usr/share/zoneinfo/Asia/Bangkok /etc/localtime;
+</code></pre><h3 id=use-pacstrap-to-bootstrap-basic-packages>Use <code>pacstrap</code> to bootstrap basic packages</h3><p>From this step on, you&rsquo;ll need a Linux computer capable of strapping Arch packages. If you don&rsquo;t have access to one, the easiest way to get yourself a proper, working Arch <code>pacman</code> without having to reboot to a live image is to <a href=https://www.archlinux.org/download/>download</a> the Arch bootstrap image and chroot into it to use the image&rsquo;s <code>pacman</code> and <code>pacstrap</code> script. Now that you can get your hand on <code>pacman</code>, issue:<pre><code class=language-shell>pacstrap -i /install base base-devel mkinitcpio vim;
+</code></pre><p>Now <code>base</code>, <code>base-devel</code>, <code>mkinitcpio</code>, and <code>vim</code> should be installed to <code>/install</code><h3 id=edit-important-files>Edit important files..</h3><p>The same boring stuff..<pre><code class=language-shell>ln -sf /usr/share/zoneinfo/Asia/Bangkok /etc/localtime;
 cp /etc/resolv.conf /install/etc/;
 
 vim /install/etc/{fstab,mkinitcpio.conf};
@@ -192,77 +40,29 @@ vim /install/etc/{hostname,hosts};
 vim /install/etc/{locale.gen,locale.conf};
 vim /install/etc/systemd
 vim /install/etc/vconsole.conf;
-</code></pre>
-
-<blockquote>
-<p>Note: Now is the good time to configure <code>mkinitcpio.conf</code>, so that we don&rsquo;t have to come back when we generate
-<a href="https://en.wikipedia.org/wiki/Initial_ramdisk">initrd</a> using <code>mkinitcpio</code>. The <code>HOOKS</code> line should look like this:</p>
-</blockquote>
-
-<pre><code class="language-shell">HOOKS=(base udev autodetect modconf block keyboard zfs filesystems)
-</code></pre>
-
-<h3 id="chroot">chroot</h3>
-
-<p>After you&rsquo;re done editing some template files, now it&rsquo;s time to chroot into our new Arch installation and configure the system as root:</p>
-
-<pre><code class="language-shell">arch-chroot /install;
-</code></pre>
-
-<p>Or run the following commands to prepare the mountpoint if you don&rsquo;t have <code>arch-chroot</code>:</p>
-
-<pre><code class="language-shell">mount --bind /install /install;
+</code></pre><blockquote><p>Note: Now is the good time to configure <code>mkinitcpio.conf</code>, so that we don&rsquo;t have to come back when we generate
+<a href=https://en.wikipedia.org/wiki/Initial_ramdisk>initrd</a> using <code>mkinitcpio</code>. The <code>HOOKS</code> line should look like this:</blockquote><pre><code class=language-shell>HOOKS=(base udev autodetect modconf block keyboard zfs filesystems)
+</code></pre><h3 id=chroot>chroot</h3><p>After you&rsquo;re done editing some template files, now it&rsquo;s time to chroot into our new Arch installation and configure the system as root:<pre><code class=language-shell>arch-chroot /install;
+</code></pre><p>Or run the following commands to prepare the mountpoint if you don&rsquo;t have <code>arch-chroot</code>:<pre><code class=language-shell>mount --bind /install /install;
 mount -t proc /proc proc;
 mount --make-rslave --rbind /sys sys;
 mount --make-rslave --rbind /dev dev;
 mount --make-rslave --rbind /run run;
 chroot /install;
-</code></pre>
-
-<h3 id="re-mount-the-filesystem">Re-mount the filesystem</h3>
-
-<p>Mounted directories are often emptied/unmounted after chroot, so we can remount them by issuing <strong>(in this install jail environment)</strong>:</p>
-
-<pre><code class="language-shell">mount -a;
-</code></pre>
-
-<p>or, if you don&rsquo;t have <code>/etc/fstab</code> populated yet (you probably should btw):</p>
-
-<pre><code class="language-shell">mount -t zfs zroot/enc/default/var /var;
+</code></pre><h3 id=re-mount-the-filesystem>Re-mount the filesystem</h3><p>Mounted directories are often emptied/unmounted after chroot, so we can remount them by issuing <strong>(in this install jail environment)</strong>:<pre><code class=language-shell>mount -a;
+</code></pre><p>or, if you don&rsquo;t have <code>/etc/fstab</code> populated yet (you probably should btw):<pre><code class=language-shell>mount -t zfs zroot/enc/default/var /var;
 mount -t zfs zroot/enc/data/home /home;
 mount /dev/sdxY /boot;
-</code></pre>
-
-<h2 id="configuring-arch-linux-for-zfs-on-root">Configuring Arch Linux for ZFS-on-root</h2>
-
-<p>Now that our partitions are properly mounted to installation directory,
+</code></pre><h2 id=configuring-arch-linux-for-zfs-on-root>Configuring Arch Linux for ZFS-on-root</h2><p>Now that our partitions are properly mounted to installation directory,
 we can begin configuring Arch Linux. I usually do the following steps in
-order:</p>
-
-<h3 id="initialize-pacman-keys">Initialize <code>pacman</code> keys</h3>
-
-<pre><code class="language-shell">pacman-key --init;
+order:<h3 id=initialize-pacman-keys>Initialize <code>pacman</code> keys</h3><pre><code class=language-shell>pacman-key --init;
 pacman-key --populate archlinux;
-</code></pre>
-
-<h3 id="import-archzfs-and-archzfs-kernels-repo-s-key-s">Import <code>archzfs</code> and <code>archzfs-kernels</code> repo&rsquo;s key(s)</h3>
-
-<p>If you install Arch on ZFS, you will have to enable <code>archzfs</code> and <code>archzfs-kernels</code> repositories to avoid upgrade issues. Grab the repo&rsquo;s <code>keyid</code> from <a href="https://wiki.archlinux.org/index.php/unofficial_user_repositories">Arch Linux Unofficial User Repositories</a> (as of last edit it is <code>F75D9D76</code>), then import the key by its <code>keyid</code>, check its fingerprint, and finally locally sign the key:</p>
-
-<pre><code class="language-shell">pacman-key --recv-keys keyid;
+</code></pre><h3 id=import-archzfs-and-archzfs-kernels-repo-s-key-s>Import <code>archzfs</code> and <code>archzfs-kernels</code> repo&rsquo;s key(s)</h3><p>If you install Arch on ZFS, you will have to enable <code>archzfs</code> and <code>archzfs-kernels</code> repositories to avoid upgrade issues. Grab the repo&rsquo;s <code>keyid</code> from <a href=https://wiki.archlinux.org/index.php/unofficial_user_repositories>Arch Linux Unofficial User Repositories</a> (as of last edit it is <code>F75D9D76</code>), then import the key by its <code>keyid</code>, check its fingerprint, and finally locally sign the key:<pre><code class=language-shell>pacman-key --recv-keys keyid;
 pacman-key --finger keyid;
 pacman-key --lsign-key keyid;
-</code></pre>
-
-<h3 id="configure-pacman-and-add-archzfs-and-archzfs-kernels-to-its-repositories">Configure <code>pacman</code> and add <code>archzfs</code> and <code>archzfs-kernels</code> to its repositories</h3>
-
-<pre><code class="language-shell">vim /etc/pacman.conf;
+</code></pre><h3 id=configure-pacman-and-add-archzfs-and-archzfs-kernels-to-its-repositories>Configure <code>pacman</code> and add <code>archzfs</code> and <code>archzfs-kernels</code> to its repositories</h3><pre><code class=language-shell>vim /etc/pacman.conf;
 vim /etc/pacman.d/mirrorlist;
-</code></pre>
-
-<p>Now your repos in <code>pacman.conf</code> should look like this:</p>
-
-<pre><code>[archzfs]
+</code></pre><p>Now your repos in <code>pacman.conf</code> should look like this:<pre><code>[archzfs]
 Server = https://archzfs.com/$repo/x86_64
 [archzfs-kernels]
 Server = https://end.re/$repo/
@@ -270,150 +70,32 @@ Server = https://end.re/$repo/
 [core]
 [extra]
 ...
-</code></pre>
-
-<p>After you&rsquo;re done editing <code>pacman.conf</code> and <code>mirrorlist</code>, update and sync your local package database:</p>
-
-<pre><code class="language-shell">pacman -Syyu;
-</code></pre>
-
-<h3 id="install-kernel-firmware-and-zfs">Install kernel, firmware, and ZFS</h3>
-
-<p>Now that we have our package tree synced with <code>archzfs</code> and <code>archzfs-kernels</code> repositories, we are ready to install <a href="https://wiki.archlinux.org/index.php/Kernel">kernel</a> and <a href="https://wiki.archlinux.org/index.php/ZFS">ZFS</a> packages. Unless you choose the kernel-independent <code>zfs-dkms</code> package, you will have to match the Linux kernel with the ZFS package. I personally always install the kernel together with <code>crda</code> package and CPU microcode so that I will have them right after the next reboot. For selection, most of the time I choose less fancy kernels like the <a href="https://www.kernel.org/category/releases.html">LTS kernel</a> and pair it with <code>zfs-dkms</code>:</p>
-
-<pre><code class="language-shell">pacman -Syu crda linux-firmware linux-lts linux-headers zfs-dkms intel-ucode;
-</code></pre>
-
-<p>or if you really <em>hate</em> to build the generic <a href="https://wiki.archlinux.org/index.php/Dynamic_Kernel_Module_Support">dkms</a> modules, <strong>you can install a certain specific <code>ZFS</code> package that matches your kernel</strong>:</p>
-
-<pre><code class="language-shell">pacman -Syu crda linux-firmware linux-lts linux-headers zfs-linux-lts intel-ucode;
-</code></pre>
-
-<h3 id="configure-the-boot-partition">Configure the boot partition</h3>
-
-<h4 id="populate-boot">Populate <code>/boot</code></h4>
-
-<p>Now that the system in our <code>/</code> is configured, let&rsquo;s set up <code>/boot</code> - Re-check <code>/etc/mkinitcpio.conf</code> - <strong>To be safe, regenerate the images</strong>:</p>
-
-<pre><code class="language-shell">mkinitcpio -P;
-</code></pre>
-
-<p>This should create our init images at <code>/boot</code> with ZFS hooks. Now our &ldquo;root&rdquo; part is complete, let&rsquo;s setup the bootloader.</p>
-
-<h4 id="install-a-bootloader-systemd-boot-in-this-case">Install a bootloader - <code>systemd-boot</code> in this case</h4>
-
-<p>You can try <code>grub</code>, but it was buggy and harder to config for encrypted ZFS root so I opted for <code>systemd-boot</code> instead. Note that <strong><code>systemd-boot</code></strong> is EFI-boot only, which means it can only boot from <strong>ESP</strong> (a FAT32-formatted partition) <code>/boot</code> partition</p>
-
-<pre><code class="language-shell">bootctl --path=/boot install;
-</code></pre>
-
-<p>which will create a boot entry with default name &ldquo;Linux Boot Manager&rdquo;.</p>
-
-<p>If you want custom entry name, try:</p>
-
-<pre><code class="language-shell">efibootmgr -v; # to list detailed, numbered boot entries
+</code></pre><p>After you&rsquo;re done editing <code>pacman.conf</code> and <code>mirrorlist</code>, update and sync your local package database:<pre><code class=language-shell>pacman -Syyu;
+</code></pre><h3 id=install-kernel-firmware-and-zfs>Install kernel, firmware, and ZFS</h3><p>Now that we have our package tree synced with <code>archzfs</code> and <code>archzfs-kernels</code> repositories, we are ready to install <a href=https://wiki.archlinux.org/index.php/Kernel>kernel</a> and <a href=https://wiki.archlinux.org/index.php/ZFS>ZFS</a> packages. Unless you choose the kernel-independent <code>zfs-dkms</code> package, you will have to match the Linux kernel with the ZFS package. I personally always install the kernel together with <code>crda</code> package and CPU microcode so that I will have them right after the next reboot. For selection, most of the time I choose less fancy kernels like the <a href=https://www.kernel.org/category/releases.html>LTS kernel</a> and pair it with <code>zfs-dkms</code>:<pre><code class=language-shell>pacman -Syu crda linux-firmware linux-lts linux-headers zfs-dkms intel-ucode;
+</code></pre><p>or if you really <em>hate</em> to build the generic <a href=https://wiki.archlinux.org/index.php/Dynamic_Kernel_Module_Support>dkms</a> modules, <strong>you can install a certain specific <code>ZFS</code> package that matches your kernel</strong>:<pre><code class=language-shell>pacman -Syu crda linux-firmware linux-lts linux-headers zfs-linux-lts intel-ucode;
+</code></pre><h3 id=configure-the-boot-partition>Configure the boot partition</h3><h4 id=populate-boot>Populate <code>/boot</code></h4><p>Now that the system in our <code>/</code> is configured, let&rsquo;s set up <code>/boot</code> - Re-check <code>/etc/mkinitcpio.conf</code> - <strong>To be safe, regenerate the images</strong>:<pre><code class=language-shell>mkinitcpio -P;
+</code></pre><p>This should create our init images at <code>/boot</code> with ZFS hooks. Now our &ldquo;root&rdquo; part is complete, let&rsquo;s setup the bootloader.<h4 id=install-a-bootloader-systemd-boot-in-this-case>Install a bootloader - <code>systemd-boot</code> in this case</h4><p>You can try <code>grub</code>, but it was buggy and harder to config for encrypted ZFS root so I opted for <code>systemd-boot</code> instead. Note that <strong><code>systemd-boot</code></strong> is EFI-boot only, which means it can only boot from <strong>ESP</strong> (a FAT32-formatted partition) <code>/boot</code> partition<pre><code class=language-shell>bootctl --path=/boot install;
+</code></pre><p>which will create a boot entry with default name &ldquo;Linux Boot Manager&rdquo;.<p>If you want custom entry name, try:<pre><code class=language-shell>efibootmgr -v; # to list detailed, numbered boot entries
 efibootmgr -b $bootnum -B # remove $bootnum entry with '-B'
 efibootmgr -c \ # create new EFI boot entry
     -d /dev/sdX \ # disk X
     -p Y \ # partition Y
     -l &quot;EFI\systemd\systemd-bootx64.efi&quot; \ # EFI boot file
     -L &quot;CUSTOMNAME&quot;; # EFI entry name
-</code></pre>
-
-<p>Where X and Y corresponds to your boot partition containing our systemd-boot</p>
-
-<h4 id="configure-bootloader">Configure bootloader:</h4>
-
-<p>Create a file for <code>systemd-boot</code> in <code>/boot/loader/entries</code>. Mine (<code>zarch.conf</code>) looks something just like this (omit the line for Intel microcode if you have not installed <code>intel-ucode</code> package, and also omit the second options line if you want Bluetooth and webcam enabled):</p>
-
-<pre><code>title   Arch Linux on encrypted ZFS
+</code></pre><p>Where X and Y corresponds to your boot partition containing our systemd-boot<h4 id=configure-bootloader>Configure bootloader:</h4><p>Create a file for <code>systemd-boot</code> in <code>/boot/loader/entries</code>. Mine (<code>zarch.conf</code>) looks something just like this (omit the line for Intel microcode if you have not installed <code>intel-ucode</code> package, and also omit the second options line if you want Bluetooth and webcam enabled):<pre><code>title   Arch Linux on encrypted ZFS
 linux   /vmlinuz-linux
 initrd  /intel-ucode.img
 initrd  /initramfs-linux.img
 options zfs=zroot/ROOT/default rw
 options resume=UUID=UUIDofNORMALswap
 options module_blacklist=btusb,bluetooth,uvcvideo
-</code></pre>
-
-<blockquote>
-<p>Please note that as of June 2020, <strong>I could not get Arch (on ZFS root) to &ldquo;resume&rdquo; on ZFS VDEVs or LUKS swap partition due to <code>mkiitcpio</code> hook conflict</strong>. This may change if the <code>sd-zfs</code> is able to decrypt ZFS encryption or if <code>resume</code> works as it should (now it is triggered before the pool is decrypted). Standard swap partitions work just fine for hibernation.</p>
-
-<p><strong>Also, if you use LTS kernel (or Zen kernel), you will have to append <code>-lts</code> (or <code>-zen</code>) to <code>linux</code> and <code>initrd</code> lines accordingly</strong>. After we finished editing <code>/boot/loader/loader.conf</code>, our Arch installation should be done and ready to boot. Exit from your chroot, unmount everything, and prepare to reboot. You may also want to turn off your swap partition for smoother reboot:</p>
-</blockquote>
-
-<pre><code class="language-shell">exit;
+</code></pre><blockquote><p>Please note that as of June 2020, <strong>I could not get Arch (on ZFS root) to &ldquo;resume&rdquo; on ZFS VDEVs or LUKS swap partition due to <code>mkiitcpio</code> hook conflict</strong>. This may change if the <code>sd-zfs</code> is able to decrypt ZFS encryption or if <code>resume</code> works as it should (now it is triggered before the pool is decrypted). Standard swap partitions work just fine for hibernation.<p><strong>Also, if you use LTS kernel (or Zen kernel), you will have to append <code>-lts</code> (or <code>-zen</code>) to <code>linux</code> and <code>initrd</code> lines accordingly</strong>. After we finished editing <code>/boot/loader/loader.conf</code>, our Arch installation should be done and ready to boot. Exit from your chroot, unmount everything, and prepare to reboot. You may also want to turn off your swap partition for smoother reboot:</blockquote><pre><code class=language-shell>exit;
 swapoff -a;
 umount -lf /install;
 zfs unmount -a;
 zfs export zroot;
-</code></pre>
-
-<h3 id="now-triple-check-everything-reboot-and-have-fun">Now triple check everything. Reboot, and have fun.</h3>
-
-<p>When you successfully reboot, and Arch Linux is succesfully initialized, you should be prompted to provide encryption key for <code>zroot</code> which will be used for unlocking the encrypted datasets. If all is good, you should next be greeted by a login screen. After successful login and some standard sanity checks, your Arch installation is successful. Note that if you want to have other non-root (i.e. data) zpools imported at boot, you will need to set <code>cachefile</code> property of your data pools to <code>cachefile=/etc/zfs/zpool.cache</code> and use <code>systemctl</code> to enable relevant <code>systemd</code> units:</p>
-
-<pre><code class="language-shell">zpool set cachefile=/etc/zfs/zpool.cache &lt;pool name&gt;;
+</code></pre><h3 id=now-triple-check-everything-reboot-and-have-fun>Now triple check everything. Reboot, and have fun.</h3><p>When you successfully reboot, and Arch Linux is succesfully initialized, you should be prompted to provide encryption key for <code>zroot</code> which will be used for unlocking the encrypted datasets. If all is good, you should next be greeted by a login screen. After successful login and some standard sanity checks, your Arch installation is successful. Note that if you want to have other non-root (i.e. data) zpools imported at boot, you will need to set <code>cachefile</code> property of your data pools to <code>cachefile=/etc/zfs/zpool.cache</code> and use <code>systemctl</code> to enable relevant <code>systemd</code> units:<pre><code class=language-shell>zpool set cachefile=/etc/zfs/zpool.cache &lt;pool name&gt;;
 systemctl enable zfs-import-cache.service zfs-import.target zfs-mount.service zfs.target;
-</code></pre>
-
-<h3 id="importing-non-root-pool-at-boot-with-zfs-root">Importing non-root pool at boot with ZFS root</h3>
-
-<blockquote>
-<p><strong>My root pool has <code>cachefile</code> property EXPLICITLY DISABLED</strong> for now. Otherwise, I can&rsquo;t get ZFS systemd services to import and mount other zpools.</p>
-</blockquote>
-
-<p>If you need your system to import other zpool (say, an encrypted data pool <em>datapool</em>) at boot, you will need disable your root pool <code>cachefile</code> property, and prepare a systemd unit to do <code>zfs load-key</code> for our data pool <em>datapool</em>. My solution to an encrypted root pool + an encrypted data pool is to let initramfs import and mount the root pool (<code>cachefile=none</code>), while the encrypted data pool is to be imported by <code>zfs-import-cache.service</code> (<code>cachefile=/etc/zfs/zpool.cache</code>) and decrypted+mounted by the custom systemd <code>zfs-load-key@.service</code>. My setp-by-step guide to make this to work is:</p>
-
-<ul>
-<li>Remove old <code>/etc/zfs/zpool.cache</code>:</li>
-</ul>
-
-<pre><code class="language-shell">rm /etc/zfs/zpool.cache;
-</code></pre>
-
-<ul>
-<li>And let <code>zpool set</code> command recreate the cache file: # zpool set cachefile=/etc/zfs/zpool.cache datapool;</li>
-</ul>
-
-<p>Now we should see the new cache file if we do:</p>
-
-<pre><code class="language-shell">ls /etc/zfs;
-</code></pre>
-
-<ul>
-<li><p>I usually disable and re-enable the 4 ZFS-related services at this point.</p></li>
-
-<li><p>Edit and enable <code>ZFS-load-key@datapool.service</code>. Note that you should hard-code the pool name within the service - it won&rsquo;t work if you use something like <code>zfs load-key -a</code> or <code>zfs mount -a</code> in the service. You can copy my template for custom systemd unit <a href="https://gitlab.com/artnoi-staple/dotfiles/-/blob/master/linux/arch/systemd/zfs-load-key@.service">zfs-load-key@datapool.service</a></p></li>
-</ul>
-
-<h3 id="caveats">Caveats</h3>
-
-<ul>
-<li><p><strong>DO NOT forget <code>rw</code> kernel parameter for our zroot</strong> in <code>/boot/loader/entries/*.conf</code>, otherwise you won&rsquo;t be able to login.</p></li>
-
-<li><p><strong>ONLY put ZFS datasets with <code>mountpoint</code> set to legacy in <code>fstab</code></strong>.</p></li>
-</ul>
-
-<h3 id="notes">Notes</h3>
-
-<ul>
-<li><p>As a well-meaning Arch user, <strong>I encourage you to read and follow the steps from the <a href="https://wiki.archlinux.org/index.php/Installing_Arch_Linux_on_ZFS">latest Arch wiki pages on ZFS on root</a></strong>. Most of my guides below are based from the Arch wiki, but with my own configuration added. (Because I followed it)</p></li>
-
-<li><p><strong>ZFS is heavy on RAM</strong>, so it is not ideal for older computers.</p></li>
-
-<li><p>The commands used in this tutorial are prepared for most consumer SSDs, and some of the settings (disk or non-disk) are my own preferences</p></li>
-
-<li><p>You can setup Arch Linux on ZFS differently of course. For example my friend favors the method of first installing Arch Linux on an EXT4 root and then configuring ZFS and migrating to the new root - eliminating the need to do most of the work in <code>ch-root</code> environment, but my method minimizes writes to my SSDs by only write once, compressed and encrypted.</p></li>
-</ul>
-
-<p>That&rsquo;s it.</p>
-<hr>
-<p><a href="#top">Back to top</a></p>
-<hr>
-<footer>
-	<p>Copyright (c) 2019 - 2023 Prem Phansuriyanon</p>
-	<p>Verbatim copying and redistribution of this entire page are permitted provided this notice is preserved</p>
-</footer>
-</body>
-
-</html>
+</code></pre><h3 id=importing-non-root-pool-at-boot-with-zfs-root>Importing non-root pool at boot with ZFS root</h3><blockquote><p><strong>My root pool has <code>cachefile</code> property EXPLICITLY DISABLED</strong> for now. Otherwise, I can&rsquo;t get ZFS systemd services to import and mount other zpools.</blockquote><p>If you need your system to import other zpool (say, an encrypted data pool <em>datapool</em>) at boot, you will need disable your root pool <code>cachefile</code> property, and prepare a systemd unit to do <code>zfs load-key</code> for our data pool <em>datapool</em>. My solution to an encrypted root pool + an encrypted data pool is to let initramfs import and mount the root pool (<code>cachefile=none</code>), while the encrypted data pool is to be imported by <code>zfs-import-cache.service</code> (<code>cachefile=/etc/zfs/zpool.cache</code>) and decrypted+mounted by the custom systemd <code>zfs-load-key@.service</code>. My setp-by-step guide to make this to work is:<ul><li>Remove old <code>/etc/zfs/zpool.cache</code>:</ul><pre><code class=language-shell>rm /etc/zfs/zpool.cache;
+</code></pre><ul><li>And let <code>zpool set</code> command recreate the cache file: # zpool set cachefile=/etc/zfs/zpool.cache datapool;</ul><p>Now we should see the new cache file if we do:<pre><code class=language-shell>ls /etc/zfs;
+</code></pre><ul><li><p>I usually disable and re-enable the 4 ZFS-related services at this point.<li><p>Edit and enable <code>ZFS-load-key@datapool.service</code>. Note that you should hard-code the pool name within the service - it won&rsquo;t work if you use something like <code>zfs load-key -a</code> or <code>zfs mount -a</code> in the service. You can copy my template for custom systemd unit <a href=https://gitlab.com/artnoi-staple/dotfiles/-/blob/master/linux/arch/systemd/zfs-load-key@.service>zfs-load-key@datapool.service</a></ul><h3 id=caveats>Caveats</h3><ul><li><p><strong>DO NOT forget <code>rw</code> kernel parameter for our zroot</strong> in <code>/boot/loader/entries/*.conf</code>, otherwise you won&rsquo;t be able to login.<li><p><strong>ONLY put ZFS datasets with <code>mountpoint</code> set to legacy in <code>fstab</code></strong>.</ul><h3 id=notes>Notes</h3><ul><li><p>As a well-meaning Arch user, <strong>I encourage you to read and follow the steps from the <a href=https://wiki.archlinux.org/index.php/Installing_Arch_Linux_on_ZFS>latest Arch wiki pages on ZFS on root</a></strong>. Most of my guides below are based from the Arch wiki, but with my own configuration added. (Because I followed it)<li><p><strong>ZFS is heavy on RAM</strong>, so it is not ideal for older computers.<li><p>The commands used in this tutorial are prepared for most consumer SSDs, and some of the settings (disk or non-disk) are my own preferences<li><p>You can setup Arch Linux on ZFS differently of course. For example my friend favors the method of first installing Arch Linux on an EXT4 root and then configuring ZFS and migrating to the new root - eliminating the need to do most of the work in <code>ch-root</code> environment, but my method minimizes writes to my SSDs by only write once, compressed and encrypted.</ul><p>That&rsquo;s it.<hr><p><a href=#top>Back to top</a><hr><footer><p>Copyright (c) 2019 - 2023 Prem Phansuriyanon<p>Verbatim copying and redistribution of this entire page are permitted provided this notice is preserved</footer>

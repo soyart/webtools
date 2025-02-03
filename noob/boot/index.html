@@ -1,208 +1,24 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-  <title>Artnoi.com</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="keywords" content="artnoi, Prem Phansuriyanon">
-  <meta name="author" content="@artnoi">
-  <meta charset="UTF-8">
-  <link href="/style.css" rel="stylesheet">
-</head>
-
-<body>
-  <ul class="navbar">
-    <li><a href="/"><img src="/toplogo.png" alt="Artnoi.com" class="logo">artnoi</a></li>
-    <li class="f-right"><a href="/cheat/">cheat</a></li>
-    <li class="f-right"><a href="https://notes.artnoi.com/#/all-pages">notes</a></li>
-    <li class="f-right"><a href="/blog/">blog</a></li>
-  </ul><h1 id="low-level-booting">Low-level booting</h1>
-
-<p>The moment you turn you machine on, the CPU doesn&rsquo;t just jump right into the operating system code. The processing of starting the operating system after powered on is called <em>bootstraping</em> the computer, or just <em>booting</em>.</p>
-
-<h2 id="legacy-systems">Legacy systems</h2>
-
-<p>Legacy systems rely on the <a href="https://en.wikipedia.org/wiki/Master_boot_record">MBR (Master Boot Record)</a> partition scheme to boot the operating system. The MBR is usually 512 (or more) bytes in the drive&rsquo;s first sector. The information in the MBR includes the bootstrap code (boot loader), and the partition table.</p>
-
-<p>Because the MBR also stores partition information and thus it limits the maximum number of partitions a medium can hold (limited to 4 <em>primary</em> partitions), as well as the maximum amount of data adressable (2TB).</p>
-
-<blockquote>
-<p>The boot code is, in simplest terms, a special small program that helps transferring control of the machine from the BIOS to the OS.</p>
-</blockquote>
-
-<p>Because the boot code is already stored <em>raw</em> on the disk&rsquo;s first sector, legacy systems don&rsquo;t actually require a boot partition or filesystem to store the boot code file, although it is still recommended to do so.</p>
-
-<h2 id="u-efi-systems">(U)EFI systems</h2>
-
-<p>UEFI systems relies on EFI interface, which is a standardized communication standards between the firmware and the operating systems. To boot in this mode, you will need EFI support in both hardware and software (the EFI bootloader).</p>
-
-<h3 id="efi-boot-entries">EFI boot entries</h3>
-
-<p>The EFI boot entries can be manipulated on Linux with <code>efibootmgr</code>. For example, show the entries with:</p>
-
-<pre><code class="language-shell">efibootmgr -v;
-</code></pre>
-
-<p>To make next boot <code>0001</code>, do:</p>
-
-<pre><code class="language-shell">efibootmgr -n 0001;
-</code></pre>
-
-<p>To set new boot order, in this case &lsquo;<code>0002,0003,0001,0000</code>&rsquo;, do:</p>
-
-<pre><code class="language-shell">efibootmgr -o 0002,0003,0001,0000;
-</code></pre>
-
-<p>Removing an entry (<code>-B</code>), in this case entry number 0001 (<code>-b 001</code>):</p>
-
-<pre><code class="language-shell">efibootmgr -b 001 -B;
-</code></pre>
-
-<p>Adding custom entry (<code>-c</code> create, <code>-d</code> disk, <code>-l</code> location, <code>-L</code> label) for <code>/boot/loader/EFI/systemd/systemd-bootx64.efi</code>:</p>
-
-<pre><code class="language-shell">efibootmgr -c -d /dev/sdX -p Y -l &quot;EFI\systemd\systemd-bootx64.efi&quot; -L &quot;CUSTOMNAME&quot;;
-</code></pre>
-
-<h2 id="uefi-vs-legacy">UEFI vs legacy</h2>
-
-<p>Booting using EFI has some technical advantages over legacy boots, for example, the EFI boot disks can be formatted with a GPT partition table, which is much more modern and suitable for today&rsquo;s large drives.</p>
-
-<h1 id="starting-the-kernel">Starting the kernel</h1>
-
-<p>Once the computer finished initializing its components, it then accesses the disk, looking for a higher-level bootloader to continue booting to the operating systems. Different boot modes (legacy vs UEFI) will require different type of bootloaders.</p>
-
-<h2 id="linux-bootloaders">Linux bootloaders</h2>
-
-<p>The kernel cannot load itself, even after the hardware has finished initial boot processes. Instead, a special program (bootloader) helps boot the kernel by executing the kernels with the correct parameters for target system.</p>
-
-<p>There are biliions of bootloaders for the Linux kernel, but in this article I&rsquo;m only going to focus on EFI-only <code>systemd-boot</code> (Arch&rsquo;s default) and the more popular swiss army knife <code>grub</code>.</p>
-
-<h3 id="systemd-boot"><code>systemd-boot</code></h3>
-
-<p><code>systemd-boot</code> is a great utility, but it&rsquo;s EFI-only, which is fine on modern machines. Arch Linux ships with <code>systemd-boot</code>, so it&rsquo;s convenient to install it to the <code>/boot</code> partition on Arch with:</p>
-
-<pre><code class="language-shell">bootctl --path=/boot install;
-</code></pre>
-
-<p>This should install the EFI bootloader program to <code>/boot</code>, or the EFI system partition.</p>
-
-<p>To configure <code>systemd-boot</code>, edit <code>/boot/loader/loader.conf</code>.</p>
-
-<h3 id="grub"><code>grub</code></h3>
-
-<p>Installing <code>grub</code> legacy boot code on an MBR disk:</p>
-
-<pre><code class="language-shell">grub-install --target=i386-pc /dev/sdX;
-</code></pre>
-
-<p>Installing <code>grub</code> on an EFI system partition (ESP, in this example mounted on <code>/boot</code>):</p>
-
-<pre><code class="language-shell">grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB;
-</code></pre>
-
-<p>Configuring <code>grub</code> is done mostly on the <code>/etc/default/grub</code> template file, which will later be used to produce <code>grub.cfg</code> in our <code>/boot</code>. After editing <code>grub</code> config in <code>/etc/default</code>, update the <code>grub</code> config in <code>/boot</code> with:</p>
-
-<pre><code class="language-shell">grub-mkconfig -o /boot/grub/grub.cfg;
-</code></pre>
-
-<h2 id="initramfs-and-initrd">Initramfs and initrd</h2>
-
-<blockquote>
-<p>To boot the operating system, the computer first boots into BIOS, and executes a bootloader program (an EFI program for EFI systems, or platform-specific bootloader for legacy systems). Then, that bootloader starts initial kernel, by literally copying <em>initramfs</em> into RAM (and thus the name initial <em>ramdisk</em>, or initrd).</p>
-</blockquote>
-
-<p>The initramfs is a compressed <code>cpio(1)</code> image of a small filesystem containing the kernel and other essential utilities essential to boot into the actual root filesystem.</p>
-
-<p>Because each root filesystem is configured differently, so it is crucial that the initramfs is properly configured and contain all the utilities to <em>prepare to mount</em> the actual root filesystem.</p>
-
-<h2 id="mkinitcpio-8"><code>mkinitcpio(8)</code></h2>
-
-<p>On Arch Linux, <code>mkinitcpio(8)</code> is a shell (more like bash) utility used to create initramfs. If your root filesystem is not on special block device, the default settings in <code>/etc/mkinitcpio.conf</code> will work most of the times.</p>
-
-<p>There might be some exception: you may need to embed <code>/usr/bin/btrfs</code> binaries to the image if Btrfs is used as root filesystem (because <code>fsck(8)</code> doesn&rsquo;t work on Btrfs), even though that Btrfs root is sitting on raw partition (not <a href="/cheat/device-mapper/"><code>dm</code> device</a>), or embedding the modules <code>amdgpu</code> and <code>radeon</code> when using AMD GPU.</p>
-
-<h2 id="mkinitcpio-8-for-non-standard-root-filesystem"><code>mkinitcpio(8)</code> for non-standard root filesystem</h2>
-
-<p>If your root filesystem is on a special block device, you will need to edit the <code>mkinitcpio(8)</code> settings so that the resulting image is able to mount the actual root filesystem.</p>
-
-<p>Hooks in <code>mkinicpio(8)</code> are <code>bash(1)</code> scripts which are sourced in the order specified in <code>mkinitcpio.conf</code>&rsquo;s <code>HOOKS</code> variable.</p>
-
-<p>Below are some of my staple, frequently used <code>mkinitcpio(8) HOOKS</code> for encrypted root filesystems.</p>
-
-<p>LUKS-on-LVM, and LVM-on-LUKS</p>
-
-<pre><code class="language-shell">HOOKS=(base systemd autodetect keyboard sd-vconsole modconf block sd-encrypt lvm2 filesystems resume fsck);
-</code></pre>
-
-<p>Encrypted ZFS</p>
-
-<pre><code class="language-shell">    HOOKS=(base udev autodetect modconf block keyboard zfs filesystems);
-</code></pre>
-
-<p>You should recheck with the Arch Wiki if your machine fails to boot.</p>
-
-<h2 id="linux-kernel-parameters-boot-parameters">Linux Kernel parameters (boot parameters)</h2>
-
-<p>The kernel is like any other programs - it can have parameters (arguments). The boot parameter is passed to the kernel by the higher-level bootloader, usually dictating the kernel behaviors and limitations.</p>
-
-<p>Sysadmins edit the boot parameters to match their kernel/booting needs. Kernel boot parameters are usually configured with bootloaders, e.g. <code>systemd-boot</code> and <code>grub</code>.</p>
-
-<h3 id="systemd-boot-1"><code>systemd-boot</code></h3>
-
-<blockquote>
-<p>The guide below is an example for <a href="/cheat/device-mapper/">booting into encrypted root filesystem</a></p>
-</blockquote>
-
-<p>Edit <code>options</code> field in <code>/boot/loader/entries/*.conf</code> for your desired parameters. Examples include</p>
-
-<pre><code>options	loglevel=3
+<!doctype html><html lang=en><title>Artnoi.com</title><meta name=viewport content="width=device-width,initial-scale=1"><meta name=keywords content="artnoi,Prem Phansuriyanon"><meta name=author content="@artnoi"><meta charset=UTF-8><link href=/style.css rel=stylesheet><ul class=navbar><li><a href=/><img src=/toplogo.png alt=Artnoi.com class=logo>artnoi</a><li class=f-right><a href=/cheat/>cheat</a><li class=f-right><a href=https://notes.artnoi.com/#/all-pages>notes</a><li class=f-right><a href=/blog/>blog</a></ul><h1 id=low-level-booting>Low-level booting</h1><p>The moment you turn you machine on, the CPU doesn&rsquo;t just jump right into the operating system code. The processing of starting the operating system after powered on is called <em>bootstraping</em> the computer, or just <em>booting</em>.<h2 id=legacy-systems>Legacy systems</h2><p>Legacy systems rely on the <a href=https://en.wikipedia.org/wiki/Master_boot_record>MBR (Master Boot Record)</a> partition scheme to boot the operating system. The MBR is usually 512 (or more) bytes in the drive&rsquo;s first sector. The information in the MBR includes the bootstrap code (boot loader), and the partition table.<p>Because the MBR also stores partition information and thus it limits the maximum number of partitions a medium can hold (limited to 4 <em>primary</em> partitions), as well as the maximum amount of data adressable (2TB).<blockquote><p>The boot code is, in simplest terms, a special small program that helps transferring control of the machine from the BIOS to the OS.</blockquote><p>Because the boot code is already stored <em>raw</em> on the disk&rsquo;s first sector, legacy systems don&rsquo;t actually require a boot partition or filesystem to store the boot code file, although it is still recommended to do so.<h2 id=u-efi-systems>(U)EFI systems</h2><p>UEFI systems relies on EFI interface, which is a standardized communication standards between the firmware and the operating systems. To boot in this mode, you will need EFI support in both hardware and software (the EFI bootloader).<h3 id=efi-boot-entries>EFI boot entries</h3><p>The EFI boot entries can be manipulated on Linux with <code>efibootmgr</code>. For example, show the entries with:<pre><code class=language-shell>efibootmgr -v;
+</code></pre><p>To make next boot <code>0001</code>, do:<pre><code class=language-shell>efibootmgr -n 0001;
+</code></pre><p>To set new boot order, in this case &lsquo;<code>0002,0003,0001,0000</code>&rsquo;, do:<pre><code class=language-shell>efibootmgr -o 0002,0003,0001,0000;
+</code></pre><p>Removing an entry (<code>-B</code>), in this case entry number 0001 (<code>-b 001</code>):<pre><code class=language-shell>efibootmgr -b 001 -B;
+</code></pre><p>Adding custom entry (<code>-c</code> create, <code>-d</code> disk, <code>-l</code> location, <code>-L</code> label) for <code>/boot/loader/EFI/systemd/systemd-bootx64.efi</code>:<pre><code class=language-shell>efibootmgr -c -d /dev/sdX -p Y -l &quot;EFI\systemd\systemd-bootx64.efi&quot; -L &quot;CUSTOMNAME&quot;;
+</code></pre><h2 id=uefi-vs-legacy>UEFI vs legacy</h2><p>Booting using EFI has some technical advantages over legacy boots, for example, the EFI boot disks can be formatted with a GPT partition table, which is much more modern and suitable for today&rsquo;s large drives.<h1 id=starting-the-kernel>Starting the kernel</h1><p>Once the computer finished initializing its components, it then accesses the disk, looking for a higher-level bootloader to continue booting to the operating systems. Different boot modes (legacy vs UEFI) will require different type of bootloaders.<h2 id=linux-bootloaders>Linux bootloaders</h2><p>The kernel cannot load itself, even after the hardware has finished initial boot processes. Instead, a special program (bootloader) helps boot the kernel by executing the kernels with the correct parameters for target system.<p>There are biliions of bootloaders for the Linux kernel, but in this article I&rsquo;m only going to focus on EFI-only <code>systemd-boot</code> (Arch&rsquo;s default) and the more popular swiss army knife <code>grub</code>.<h3 id=systemd-boot><code>systemd-boot</code></h3><p><code>systemd-boot</code> is a great utility, but it&rsquo;s EFI-only, which is fine on modern machines. Arch Linux ships with <code>systemd-boot</code>, so it&rsquo;s convenient to install it to the <code>/boot</code> partition on Arch with:<pre><code class=language-shell>bootctl --path=/boot install;
+</code></pre><p>This should install the EFI bootloader program to <code>/boot</code>, or the EFI system partition.<p>To configure <code>systemd-boot</code>, edit <code>/boot/loader/loader.conf</code>.<h3 id=grub><code>grub</code></h3><p>Installing <code>grub</code> legacy boot code on an MBR disk:<pre><code class=language-shell>grub-install --target=i386-pc /dev/sdX;
+</code></pre><p>Installing <code>grub</code> on an EFI system partition (ESP, in this example mounted on <code>/boot</code>):<pre><code class=language-shell>grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB;
+</code></pre><p>Configuring <code>grub</code> is done mostly on the <code>/etc/default/grub</code> template file, which will later be used to produce <code>grub.cfg</code> in our <code>/boot</code>. After editing <code>grub</code> config in <code>/etc/default</code>, update the <code>grub</code> config in <code>/boot</code> with:<pre><code class=language-shell>grub-mkconfig -o /boot/grub/grub.cfg;
+</code></pre><h2 id=initramfs-and-initrd>Initramfs and initrd</h2><blockquote><p>To boot the operating system, the computer first boots into BIOS, and executes a bootloader program (an EFI program for EFI systems, or platform-specific bootloader for legacy systems). Then, that bootloader starts initial kernel, by literally copying <em>initramfs</em> into RAM (and thus the name initial <em>ramdisk</em>, or initrd).</blockquote><p>The initramfs is a compressed <code>cpio(1)</code> image of a small filesystem containing the kernel and other essential utilities essential to boot into the actual root filesystem.<p>Because each root filesystem is configured differently, so it is crucial that the initramfs is properly configured and contain all the utilities to <em>prepare to mount</em> the actual root filesystem.<h2 id=mkinitcpio-8><code>mkinitcpio(8)</code></h2><p>On Arch Linux, <code>mkinitcpio(8)</code> is a shell (more like bash) utility used to create initramfs. If your root filesystem is not on special block device, the default settings in <code>/etc/mkinitcpio.conf</code> will work most of the times.<p>There might be some exception: you may need to embed <code>/usr/bin/btrfs</code> binaries to the image if Btrfs is used as root filesystem (because <code>fsck(8)</code> doesn&rsquo;t work on Btrfs), even though that Btrfs root is sitting on raw partition (not <a href=/cheat/device-mapper/><code>dm</code> device</a>), or embedding the modules <code>amdgpu</code> and <code>radeon</code> when using AMD GPU.<h2 id=mkinitcpio-8-for-non-standard-root-filesystem><code>mkinitcpio(8)</code> for non-standard root filesystem</h2><p>If your root filesystem is on a special block device, you will need to edit the <code>mkinitcpio(8)</code> settings so that the resulting image is able to mount the actual root filesystem.<p>Hooks in <code>mkinicpio(8)</code> are <code>bash(1)</code> scripts which are sourced in the order specified in <code>mkinitcpio.conf</code>&rsquo;s <code>HOOKS</code> variable.<p>Below are some of my staple, frequently used <code>mkinitcpio(8) HOOKS</code> for encrypted root filesystems.<p>LUKS-on-LVM, and LVM-on-LUKS<pre><code class=language-shell>HOOKS=(base systemd autodetect keyboard sd-vconsole modconf block sd-encrypt lvm2 filesystems resume fsck);
+</code></pre><p>Encrypted ZFS<pre><code class=language-shell>    HOOKS=(base udev autodetect modconf block keyboard zfs filesystems);
+</code></pre><p>You should recheck with the Arch Wiki if your machine fails to boot.<h2 id=linux-kernel-parameters-boot-parameters>Linux Kernel parameters (boot parameters)</h2><p>The kernel is like any other programs - it can have parameters (arguments). The boot parameter is passed to the kernel by the higher-level bootloader, usually dictating the kernel behaviors and limitations.<p>Sysadmins edit the boot parameters to match their kernel/booting needs. Kernel boot parameters are usually configured with bootloaders, e.g. <code>systemd-boot</code> and <code>grub</code>.<h3 id=systemd-boot-1><code>systemd-boot</code></h3><blockquote><p>The guide below is an example for <a href=/cheat/device-mapper/>booting into encrypted root filesystem</a></blockquote><p>Edit <code>options</code> field in <code>/boot/loader/entries/*.conf</code> for your desired parameters. Examples include<pre><code>options	loglevel=3
 options	rd.luks.options=discard
 options	rd.luks.name=UUID0=cryptlvm
 options	root=/dev/mapper/my-root
 options	resume=/dev/mapper/my-swap&quot;
-</code></pre>
-
-<h3 id="grub-1"><code>grub</code></h3>
-
-<p><code>grub</code> is usually used as the bootloader, and so sysadmins usually edit <code>grub</code> config file <code>/etc/default/grub</code> to change kernel parameters. An example below would set the same kernel parameter as the example for <code>systemd-boot</code>:</p>
-
-<pre><code>GRUB_CMDLINE_LINUX_DEFAULT=&quot;\
+</code></pre><h3 id=grub-1><code>grub</code></h3><p><code>grub</code> is usually used as the bootloader, and so sysadmins usually edit <code>grub</code> config file <code>/etc/default/grub</code> to change kernel parameters. An example below would set the same kernel parameter as the example for <code>systemd-boot</code>:<pre><code>GRUB_CMDLINE_LINUX_DEFAULT=&quot;\
     loglevel=3\
     rd.luks.options=discard\
     rd.luks.name=UUID0=cryptlvm\
     root=/dev/mapper/my-root\
     resume=/dev/mapper/my-swap\
 &quot;
-</code></pre>
-
-<h2 id="linux-boot-and-initramfs">Linux boot and initramfs</h2>
-
-<blockquote>
-<p>Both UEFI and legacy systems will use initramfs after the initial boot processes.</p>
-</blockquote>
-
-<p>The initramfs is a <code>cpio</code> image (usually compressed) in <code>/boot</code> partition of the Linux system. The booting kernel will mount this initial root image as RAM disk, and will use this root filesystem during initialization processes, e.g. when probing for the real root.</p>
-
-<p>This is why if your real root is customized, i.e. installed on an encrypted volume, you will usually need to modify the initramfs to accommodate unlocking and mounting the real root.</p>
-
-<h3 id="why-use-initramfs">Why use initramfs?</h3>
-
-<p>The initramfs can be used to customize boot processes, i.e. by editting config files in <code>/etc</code> of the initramfs image, or by embedding custom application in the initramfs.</p>
-
-<h2 id="kernel-file-size">Kernel file size</h2>
-
-<p>The Linux kernel source code is so large that having all of the parts built-in to one running kernel would be a huge waste of RAM space.</p>
-
-<p>The developers then came up with the ideas of loadable kernel modules - for dummies, it is a system that allows loading needed modules (from <code>/usr/lib/modules</code>) to memory <strong>as you need them</strong>, leaving only the essential modules in the actual kernel.</p>
-
-<p>Lately, I have seen people trying to optimize boot time by not using loadable kernel modules. If you build the modules right into the kernel (not as loadable), then the built-in modules will be embedded in your kernel, increasing both RAM and <code>/boot</code> storage usage.</p>
-<hr>
-<p><a href="#top">Back to top</a></p>
-<hr>
-<footer>
-	<p>Copyright (c) 2019 - 2023 Prem Phansuriyanon</p>
-	<p>Verbatim copying and redistribution of this entire page are permitted provided this notice is preserved</p>
-</footer>
-</body>
-
-</html>
+</code></pre><h2 id=linux-boot-and-initramfs>Linux boot and initramfs</h2><blockquote><p>Both UEFI and legacy systems will use initramfs after the initial boot processes.</blockquote><p>The initramfs is a <code>cpio</code> image (usually compressed) in <code>/boot</code> partition of the Linux system. The booting kernel will mount this initial root image as RAM disk, and will use this root filesystem during initialization processes, e.g. when probing for the real root.<p>This is why if your real root is customized, i.e. installed on an encrypted volume, you will usually need to modify the initramfs to accommodate unlocking and mounting the real root.<h3 id=why-use-initramfs>Why use initramfs?</h3><p>The initramfs can be used to customize boot processes, i.e. by editting config files in <code>/etc</code> of the initramfs image, or by embedding custom application in the initramfs.<h2 id=kernel-file-size>Kernel file size</h2><p>The Linux kernel source code is so large that having all of the parts built-in to one running kernel would be a huge waste of RAM space.<p>The developers then came up with the ideas of loadable kernel modules - for dummies, it is a system that allows loading needed modules (from <code>/usr/lib/modules</code>) to memory <strong>as you need them</strong>, leaving only the essential modules in the actual kernel.<p>Lately, I have seen people trying to optimize boot time by not using loadable kernel modules. If you build the modules right into the kernel (not as loadable), then the built-in modules will be embedded in your kernel, increasing both RAM and <code>/boot</code> storage usage.<hr><p><a href=#top>Back to top</a><hr><footer><p>Copyright (c) 2019 - 2023 Prem Phansuriyanon<p>Verbatim copying and redistribution of this entire page are permitted provided this notice is preserved</footer>

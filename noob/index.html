@@ -1,306 +1,48 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-  <title>Artnoi.com</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="keywords" content="artnoi, Prem Phansuriyanon">
-  <meta name="author" content="@artnoi">
-  <meta charset="UTF-8">
-  <link href="/style.css" rel="stylesheet">
-</head>
-
-<body>
-  <ul class="navbar">
-    <li><a href="/"><img src="/toplogo.png" alt="Artnoi.com" class="logo">artnoi</a></li>
-    <li class="f-right"><a href="/cheat/">cheat</a></li>
-    <li class="f-right"><a href="https://notes.artnoi.com/#/all-pages">notes</a></li>
-    <li class="f-right"><a href="/blog/">blog</a></li>
-  </ul><h1 id="cheat-sheet-for-n00bs">Cheat sheet for n00bs</h1>
-
-<p><a href="#others">Other cheat sheets</a> are also available</p>
-
-<h2 id="unix-manual-pages-man-1-pages">UNIX manual pages (<code>man(1)</code> pages)</h2>
-
-<p>It is best to first read the manual with <code>man(1)</code>. See also: <a href="https://en.wikipedia.org/wiki/Man_page#Command_usage">usage</a>.</p>
-
-<h4 id="arch-linux-man-1-pages">Arch Linux <code>man(1)</code> pages</h4>
-
-<p>Arch Linux&rsquo;s <code>base</code> metapackage by default does not ship with <code>man(1)</code>,
-although the package manual pages are already packaged and installed on the system by <code>pacman</code>.</p>
-
-<p>To use <code>man(1)</code>, install <code>man-db</code> packages:</p>
-
-<pre><code class="language-shell">pacman -S man-db;
+<!doctype html><html lang=en><title>Artnoi.com</title><meta name=viewport content="width=device-width,initial-scale=1"><meta name=keywords content="artnoi,Prem Phansuriyanon"><meta name=author content="@artnoi"><meta charset=UTF-8><link href=/style.css rel=stylesheet><ul class=navbar><li><a href=/><img src=/toplogo.png alt=Artnoi.com class=logo>artnoi</a><li class=f-right><a href=/cheat/>cheat</a><li class=f-right><a href=https://notes.artnoi.com/#/all-pages>notes</a><li class=f-right><a href=/blog/>blog</a></ul><h1 id=cheat-sheet-for-n00bs>Cheat sheet for n00bs</h1><p><a href=#others>Other cheat sheets</a> are also available<h2 id=unix-manual-pages-man-1-pages>UNIX manual pages (<code>man(1)</code> pages)</h2><p>It is best to first read the manual with <code>man(1)</code>. See also: <a href=https://en.wikipedia.org/wiki/Man_page#Command_usage>usage</a>.<h4 id=arch-linux-man-1-pages>Arch Linux <code>man(1)</code> pages</h4><p>Arch Linux&rsquo;s <code>base</code> metapackage by default does not ship with <code>man(1)</code>,
+although the package manual pages are already packaged and installed on the system by <code>pacman</code>.<p>To use <code>man(1)</code>, install <code>man-db</code> packages:<pre><code class=language-shell>pacman -S man-db;
 man ls; # see manual pages for ls(1)
-</code></pre>
-
-<h2 id="users-and-groups">Users and groups</h2>
-
-<h3 id="changing-one-s-own-password">Changing one&rsquo;s own password</h3>
-
-<pre><code class="language-shell">passwd &lt;USERNAME&gt;;
-</code></pre>
-
-<p>You can put your own <code>username</code> or you can just omit it.</p>
-
-<h3 id="changing-other-user-s-password">Changing other user&rsquo;s password</h3>
-
-<pre><code class="language-shell">passwd &lt;USERNAME&gt;;
-</code></pre>
-
-<h3 id="switching-user-with-new-user-s-password">Switching user (with new user&rsquo;s password)</h3>
-
-<pre><code class="language-shell">su &lt;USERNAME&gt;;
-</code></pre>
-
-<p><code>su</code> defaults to root user and will ask for the root password, i.e. if <code>&lt;USERNAME&gt;</code> is not specified.</p>
-
-<h3 id="switching-to-root-using-sudo-8-using-sudo-requires-the-admin-user-s-password-not-root-password">Switching to root using <code>sudo(8)</code> (using <code>sudo</code> requires the admin user&rsquo;s password, not root password)</h3>
-
-<pre><code class="language-shell">sudo -i;
-</code></pre>
-
-<h2 id="files-and-permissions">Files and permissions</h2>
-
-<h3 id="using-ls-1-to-print-a-long-detailed-output">Using <code>ls(1)</code> to print a &lsquo;long&rsquo; (detailed) output</h3>
-
-<pre><code class="language-shell">ls -l;
-</code></pre>
-
-<h3 id="changing-permissions-or-modes-with-chmod-1">Changing permissions (or &lsquo;modes&rsquo;) with <code>chmod(1)</code></h3>
-
-<pre><code class="language-shell">chown &lt;OWNER&gt;:&lt;GROUP&gt; &lt;PATH&gt;;
-</code></pre>
-
-<h3 id="changing-file-permissions">Changing file permissions</h3>
-
-<pre><code class="language-shell">chmod &lt;MODE&gt; &lt;PATH&gt;;
-</code></pre>
-
-<blockquote>
-<p>Hint: Use <code>-R</code> option to use <code>chmod(1)</code> or <code>chown(1)</code> recursively: <code># chown -R artnoi:artnoi /home/artnoi/Downloads</code></p>
-</blockquote>
-
-<p>Note that the modes can be either</p>
-
-<ol>
-<li><a href="https://www.cyberciti.biz/faq/unix-linux-bsd-chmod-numeric-permissions-notation-command">Numerical</a> which can be <a href="https://chmod-calculator.com">calculated</a> or memorized easily (e.g. <code>600</code> for private files, <code>755</code> for normal files)</li>
-<li><code>drwxrwxrwx</code> = directory(<code>d</code>) + user(<code>rwx</code>) + group(<code>rwx</code>) + others(<code>rwx</code>)</li>
-</ol>
-
-<h3 id="examples-changing-file-permission-with-chmod-1">Examples: changing file permission with <code>chmod(1)</code></h3>
-
-<p>Adding <em>execute</em> permission to file <code>foo</code></p>
-
-<pre><code class="language-shell">chmod +x foo;
-</code></pre>
-
-<p>Removing <em>write</em> permission to file <code>foo</code></p>
-
-<pre><code class="language-shell">chmod -w foo;
-</code></pre>
-
-<p>Adding <em>write</em> permission to all files in directory <code>bar</code></p>
-
-<pre><code class="language-shell">chmod -R +w bar;
-</code></pre>
-
-<p>Adding <em>read and wite</em> permission to all files in directory <code>bar</code> <strong>for owner&rsquo;s &lsquo;group&rsquo; members</strong></p>
-
-<pre><code class="language-shell">chmod -R g+rw bar;
-</code></pre>
-
-<p>Removing <em>write, read, and execute</em> permission to all files in directory <code>bar</code> <strong>for &lsquo;others&rsquo; (world)</strong></p>
-
-<pre><code class="language-shell">chmod -R o-rwx bar;
-</code></pre>
-
-<h2 id="arch-linux-package-management">Arch Linux package management</h2>
-
-<blockquote>
-<p>See also: <a href="https://man.archlinux.org/man/pacman.8">manual for <code>pacman(8)</code></a></p>
-</blockquote>
-
-<p>Arch Linux official package manager is <code>pacman(8)</code>.
+</code></pre><h2 id=users-and-groups>Users and groups</h2><h3 id=changing-one-s-own-password>Changing one&rsquo;s own password</h3><pre><code class=language-shell>passwd &lt;USERNAME&gt;;
+</code></pre><p>You can put your own <code>username</code> or you can just omit it.<h3 id=changing-other-user-s-password>Changing other user&rsquo;s password</h3><pre><code class=language-shell>passwd &lt;USERNAME&gt;;
+</code></pre><h3 id=switching-user-with-new-user-s-password>Switching user (with new user&rsquo;s password)</h3><pre><code class=language-shell>su &lt;USERNAME&gt;;
+</code></pre><p><code>su</code> defaults to root user and will ask for the root password, i.e. if <code>&lt;USERNAME></code> is not specified.<h3 id=switching-to-root-using-sudo-8-using-sudo-requires-the-admin-user-s-password-not-root-password>Switching to root using <code>sudo(8)</code> (using <code>sudo</code> requires the admin user&rsquo;s password, not root password)</h3><pre><code class=language-shell>sudo -i;
+</code></pre><h2 id=files-and-permissions>Files and permissions</h2><h3 id=using-ls-1-to-print-a-long-detailed-output>Using <code>ls(1)</code> to print a &lsquo;long&rsquo; (detailed) output</h3><pre><code class=language-shell>ls -l;
+</code></pre><h3 id=changing-permissions-or-modes-with-chmod-1>Changing permissions (or &lsquo;modes&rsquo;) with <code>chmod(1)</code></h3><pre><code class=language-shell>chown &lt;OWNER&gt;:&lt;GROUP&gt; &lt;PATH&gt;;
+</code></pre><h3 id=changing-file-permissions>Changing file permissions</h3><pre><code class=language-shell>chmod &lt;MODE&gt; &lt;PATH&gt;;
+</code></pre><blockquote><p>Hint: Use <code>-R</code> option to use <code>chmod(1)</code> or <code>chown(1)</code> recursively: <code># chown -R artnoi:artnoi /home/artnoi/Downloads</code></blockquote><p>Note that the modes can be either<ol><li><a href=https://www.cyberciti.biz/faq/unix-linux-bsd-chmod-numeric-permissions-notation-command>Numerical</a> which can be <a href=https://chmod-calculator.com>calculated</a> or memorized easily (e.g. <code>600</code> for private files, <code>755</code> for normal files)<li><code>drwxrwxrwx</code> = directory(<code>d</code>) + user(<code>rwx</code>) + group(<code>rwx</code>) + others(<code>rwx</code>)</ol><h3 id=examples-changing-file-permission-with-chmod-1>Examples: changing file permission with <code>chmod(1)</code></h3><p>Adding <em>execute</em> permission to file <code>foo</code><pre><code class=language-shell>chmod +x foo;
+</code></pre><p>Removing <em>write</em> permission to file <code>foo</code><pre><code class=language-shell>chmod -w foo;
+</code></pre><p>Adding <em>write</em> permission to all files in directory <code>bar</code><pre><code class=language-shell>chmod -R +w bar;
+</code></pre><p>Adding <em>read and wite</em> permission to all files in directory <code>bar</code> <strong>for owner&rsquo;s &lsquo;group&rsquo; members</strong><pre><code class=language-shell>chmod -R g+rw bar;
+</code></pre><p>Removing <em>write, read, and execute</em> permission to all files in directory <code>bar</code> <strong>for &lsquo;others&rsquo; (world)</strong><pre><code class=language-shell>chmod -R o-rwx bar;
+</code></pre><h2 id=arch-linux-package-management>Arch Linux package management</h2><blockquote><p>See also: <a href=https://man.archlinux.org/man/pacman.8>manual for <code>pacman(8)</code></a></blockquote><p>Arch Linux official package manager is <code>pacman(8)</code>.
 The program has a few majors operations, namely <code>-S</code> (<code>--sync</code>) for syncing from the repos,
 <code>-Q</code> for querying the local database, <code>-R</code> (<code>--remove</code>) for removing packages,
-and <code>-D</code> (<code>--database</code>) for database operation.</p>
-
-<p>These major operations, when used in shortened forms, are in uppercase.</p>
-
-<h3 id="searching-and-querying-package-info">Searching and querying package info</h3>
-
-<h4 id="searching-for-packages-using-regexp-s-or-search">Searching for packages using regexp (<code>-s</code>, or <code>--search</code>)</h4>
-
-<p>Search option will use the <a href="https://en.wikipedia.org/wiki/Regular_expression">regular expression</a> to search for packages. <code>-S</code> means that <code>pacman</code> will search on the repos, while <code>-Q</code> will make it search the local database.</p>
-
-<pre><code class="language-shell">pacman -Ss tmux; # search mirrors
+and <code>-D</code> (<code>--database</code>) for database operation.<p>These major operations, when used in shortened forms, are in uppercase.<h3 id=searching-and-querying-package-info>Searching and querying package info</h3><h4 id=searching-for-packages-using-regexp-s-or-search>Searching for packages using regexp (<code>-s</code>, or <code>--search</code>)</h4><p>Search option will use the <a href=https://en.wikipedia.org/wiki/Regular_expression>regular expression</a> to search for packages. <code>-S</code> means that <code>pacman</code> will search on the repos, while <code>-Q</code> will make it search the local database.<pre><code class=language-shell>pacman -Ss tmux; # search mirrors
 pacman -Qs tmux; # search local db
-</code></pre>
-
-<h4 id="getting-package-information-i-or-info">Getting package information (<code>-i</code>, or <code>--info</code>)</h4>
-
-<p>Note that <code>-i</code> option will use <strong>exact match</strong> (not regexp) to find the package information.</p>
-
-<pre><code class="language-shell">pacman -Si tmux;
+</code></pre><h4 id=getting-package-information-i-or-info>Getting package information (<code>-i</code>, or <code>--info</code>)</h4><p>Note that <code>-i</code> option will use <strong>exact match</strong> (not regexp) to find the package information.<pre><code class=language-shell>pacman -Si tmux;
 pacman -Qi tmux;
-</code></pre>
-
-<h4 id="listing-all-files-from-packages">Listing all files from packages</h4>
-
-<pre><code class="language-shell">pacman -Ql tmux;
-</code></pre>
-
-<h3 id="completely-removing-a-package">Completely removing a package</h3>
-
-<pre><code class="language-shell">pacman -Rns &lt;PACKAGE&gt;;
-</code></pre>
-
-<h3 id="syncing-package-database-and-upgrade">Syncing package database and upgrade</h3>
-
-<pre><code class="language-shell">pacman -Syyu;
-</code></pre>
-
-<p>(Note the double &lsquo;y&rsquo;) This may be done after switching repos, i.e. from Thai servers to Korean ones.</p>
-
-<h3 id="configuring-pacman-conf-5">Configuring <code>pacman.conf(5)</code></h3>
-
-<p><code>pacman</code>&rsquo;s main configuration file is stored in <code>/etc/pacman.conf</code>, with additional configuration files in <code>/etc/pacman.d</code> directory. One file that we may want to edit a little bit often is <code>/etc/pacman.d/mirrorlist</code> which stores information about repo servers.</p>
-
-<h3 id="getting-block-device-information">Getting block device information</h3>
-
-<p>The commands below can be used to view block device information. <code>blkid</code> needs root privilege though.</p>
-
-<pre><code class="language-shell">lsblk &lt;DEVICE&gt;;    # Standard lsblk output
+</code></pre><h4 id=listing-all-files-from-packages>Listing all files from packages</h4><pre><code class=language-shell>pacman -Ql tmux;
+</code></pre><h3 id=completely-removing-a-package>Completely removing a package</h3><pre><code class=language-shell>pacman -Rns &lt;PACKAGE&gt;;
+</code></pre><h3 id=syncing-package-database-and-upgrade>Syncing package database and upgrade</h3><pre><code class=language-shell>pacman -Syyu;
+</code></pre><p>(Note the double &lsquo;y&rsquo;) This may be done after switching repos, i.e. from Thai servers to Korean ones.<h3 id=configuring-pacman-conf-5>Configuring <code>pacman.conf(5)</code></h3><p><code>pacman</code>&rsquo;s main configuration file is stored in <code>/etc/pacman.conf</code>, with additional configuration files in <code>/etc/pacman.d</code> directory. One file that we may want to edit a little bit often is <code>/etc/pacman.d/mirrorlist</code> which stores information about repo servers.<h3 id=getting-block-device-information>Getting block device information</h3><p>The commands below can be used to view block device information. <code>blkid</code> needs root privilege though.<pre><code class=language-shell>lsblk &lt;DEVICE&gt;;    # Standard lsblk output
 lsblk -f &lt;DEVICE&gt;; # More detailed output
 blkid &lt;DEVICE&gt;;    # Equivalent to lsblk -f, but needs privilege
-</code></pre>
-
-<p>Note that if you specify <code>&lt;DEVICE&gt;</code>, <code>lsblk(8)</code> and <code>blkid(8)</code> will only display information related to the specified device. In other words, omit <code>&lt;DEVICE&gt;</code> to get information from all block devices. Another note is that block devices can be both:</p>
-
-<ol>
-<li>Normal block devices - which can be found in <code>/dev/</code>, and usually in <em>sda, sdb2, vda, vdb1, mmcblk0, mmcblk0p3</em> formats</li>
-<li>Device mapper - which can be found in <code>/dev/mapper</code></li>
-</ol>
-
-<h3 id="editting-normal-block-device-partitions">Editting normal block device partitions</h3>
-
-<pre><code class="language-shell">fdisk &lt;DEVICE&gt;;
+</code></pre><p>Note that if you specify <code>&lt;DEVICE></code>, <code>lsblk(8)</code> and <code>blkid(8)</code> will only display information related to the specified device. In other words, omit <code>&lt;DEVICE></code> to get information from all block devices. Another note is that block devices can be both:<ol><li>Normal block devices - which can be found in <code>/dev/</code>, and usually in <em>sda, sdb2, vda, vdb1, mmcblk0, mmcblk0p3</em> formats<li>Device mapper - which can be found in <code>/dev/mapper</code></ol><h3 id=editting-normal-block-device-partitions>Editting normal block device partitions</h3><pre><code class=language-shell>fdisk &lt;DEVICE&gt;;
 cfdisk &lt;DEVICE&gt;;
-</code></pre>
-
-<p>For logical volume, please see <code>lvm(8)</code> man pages.</p>
-
-<h3 id="mounting-unmounting-filesystem">Mounting/unmounting filesystem</h3>
-
-<p>Mounting is done with <code>mount(1)</code>:</p>
-
-<pre><code class="language-shell">mount &lt;DEVICE&gt; &lt;MOUNTPOINT&gt;;
-</code></pre>
-
-<p>Unmounting is done with <code>umount(1)</code>, and only the source device or mountpoint is needed:</p>
-
-<pre><code class="language-shell">umount &lt;DEVICE&gt;;
+</code></pre><p>For logical volume, please see <code>lvm(8)</code> man pages.<h3 id=mounting-unmounting-filesystem>Mounting/unmounting filesystem</h3><p>Mounting is done with <code>mount(1)</code>:<pre><code class=language-shell>mount &lt;DEVICE&gt; &lt;MOUNTPOINT&gt;;
+</code></pre><p>Unmounting is done with <code>umount(1)</code>, and only the source device or mountpoint is needed:<pre><code class=language-shell>umount &lt;DEVICE&gt;;
 umount &lt;MOUNTPOINT&gt;;
-</code></pre>
-
-<h3 id="creating-formatting-luks-device">Creating (formatting) LUKS device</h3>
-
-<pre><code class="language-shell">cryptsetup luksFormat &lt;DEVICE&gt;;
-</code></pre>
-
-<h3 id="openning-unlocking-luks-device">Openning (unlocking) LUKS device</h3>
-
-<pre><code class="language-shell">cryptsetup luksOpen &lt;DEVICE&gt; &lt;NAME&gt;;
+</code></pre><h3 id=creating-formatting-luks-device>Creating (formatting) LUKS device</h3><pre><code class=language-shell>cryptsetup luksFormat &lt;DEVICE&gt;;
+</code></pre><h3 id=openning-unlocking-luks-device>Openning (unlocking) LUKS device</h3><pre><code class=language-shell>cryptsetup luksOpen &lt;DEVICE&gt; &lt;NAME&gt;;
 cryptsetup luksOpen &lt;DEVICE&gt; &lt;NAME&gt; --key-file &lt;PATH&gt;;
-</code></pre>
-
-<p>Now, your dm-crypt device should be available at <code>/dev/mapper/&lt;NAME&gt;</code></p>
-
-<h3 id="creating-filesystem-with-mkfs-8">Creating filesystem with mkfs(8)</h3>
-
-<p>A coresponding <code>mkfs</code>.<em>type</em> utility is used to create a filesystem on Linux.</p>
-
-<p><strong>EXT4</strong></p>
-
-<pre><code class="language-shell">mkfs.ext4 &lt;DEVICE&gt;;
-</code></pre>
-
-<p><strong>EXT4 with no journal (lighter on systems)</strong></p>
-
-<pre><code class="language-shell">mkfs.ext4 -O &quot;^has_journal&quot; &lt;DEVICE&gt;;
-</code></pre>
-
-<p><strong>FAT32 (using FAT)</strong></p>
-
-<pre><code class="language-shell">mkfs.fat -F32 &lt;DEVICE&gt;;
-</code></pre>
-
-<p><strong>FAT32 (using VFAT)</strong></p>
-
-<pre><code class="language-shell">mkfs.vfat -F32 &lt;DEVICE&gt;;
-</code></pre>
-
-<p>Example - Creating and mounting a LUKS-encrypted EXT4 filesystem on partition <code>/dev/vda3</code>:</p>
-
-<pre><code class="language-shell">cryptsetup luksFormat /dev/vda3;
+</code></pre><p>Now, your dm-crypt device should be available at <code>/dev/mapper/&lt;NAME></code><h3 id=creating-filesystem-with-mkfs-8>Creating filesystem with mkfs(8)</h3><p>A coresponding <code>mkfs</code>.<em>type</em> utility is used to create a filesystem on Linux.<p><strong>EXT4</strong><pre><code class=language-shell>mkfs.ext4 &lt;DEVICE&gt;;
+</code></pre><p><strong>EXT4 with no journal (lighter on systems)</strong><pre><code class=language-shell>mkfs.ext4 -O &quot;^has_journal&quot; &lt;DEVICE&gt;;
+</code></pre><p><strong>FAT32 (using FAT)</strong><pre><code class=language-shell>mkfs.fat -F32 &lt;DEVICE&gt;;
+</code></pre><p><strong>FAT32 (using VFAT)</strong><pre><code class=language-shell>mkfs.vfat -F32 &lt;DEVICE&gt;;
+</code></pre><p>Example - Creating and mounting a LUKS-encrypted EXT4 filesystem on partition <code>/dev/vda3</code>:<pre><code class=language-shell>cryptsetup luksFormat /dev/vda3;
 cryptsetup luksOpen /dev/vda3 foo;
 mkfs.ext4 /dev/mapper/foo;
 mount /dev/mapper/foo /mnt;
-</code></pre>
-
-<h3 id="ext4-defrag-hdd">EXT4 defrag (HDD)</h3>
-
-<p>Use <code>e4defrag(8)</code> to defrag an <em>EXT4 filesystem on a hard disk drive</em> on-line. Note that You need root privileges to defrag system files</p>
-
-<h3 id="disk-tuning">Disk tuning</h3>
-
-<h4 id="ssd-trim">SSD TRIM</h4>
-
-<p><code>fstrim(8)</code> can be used to <em>trim</em> (i.e. discard) unused blocks on solid-state storage. The discard potentially has some benefits as it may prolong SSD lifespan and increases performance on disks that are almost full. Only SSDs should be trimmed.</p>
-
-<h4 id="ext2-ext3-ext4-filesystem-setting">EXT2, EXT3, EXT4 filesystem setting</h4>
-
-<blockquote>
-<p>The EXT2-4 family of filesystems has been a staple in the Linux kernel for decades. Its most recent member, EXT4, is still very prevalent in desktop Linux users who usually like the fact that it made specifically for their kernels. EXT4 is stable, reliable, and well supported, although its lack of other modern features like compression, encryption, etc has led me to skip using it on my computers for some years now.</p>
-</blockquote>
-
-<p>Use <code>tune2fs(8)</code> to configure EXT2, EXT3, and EXT4 filesystems. For example, <code># tune2fs -O &quot;^has_journal&quot; /dev/mapper/crypt-home</code> will disable journaling on a EXT4 filesystem residing on block device <code>/dev/mapper/crypt-home</code>.</p>
-
-<h4 id="zfs">ZFS</h4>
-
-<blockquote>
-<p>ZFS is the <em>last word</em> in filesystems. It was originally developed by Sun (Oracle), and is one of the most incredible filesystem in many ways. It can do <strong>Copy-on-Write</strong>, <strong>snapshots</strong>, <strong>compression</strong>, <strong>encryption</strong>, <strong>volume management (i.e. software RAID)</strong>, and many other amazing things to ensure your data is safe.</p>
-</blockquote>
-
-<p>Due to its incompatible license, ZFS was not included in the Linux kernel. Instead, a separate ZFS Linux kernel module is usually used to provide ZFS on Linux computers.</p>
-
-<h4 id="using-zfs-8-and-zpool-8">Using zfs(8) and zpool(8).</h4>
-
-<p>Use <code>zfs set</code> and <code>zpool set</code> to configure ZFS storage. Also, see <a href="/cheat/zfs/">this cheat sheet</a>.</p>
-
-<h3 id="btrfs">Btrfs</h3>
-
-<blockquote>
-<p>Btrfs is yet another featureful filesystem, featuring <strong>Copy-on-Write (CoW)</strong>, <strong>snapshots</strong>, <strong>compression</strong>, <strong>volume management</strong>, and many other features. Btfs currently has no encryption support, but we can always use Linux <code>dm-crypt</code> to enable encryption on block storage.</p>
-</blockquote>
-
-<p>See this <a href="/blog/2021/btrfs/">blog post for Btrfs</a></p>
-
-<h3 id="fstab-5">fstab(5)</h3>
-
-<p>In simplest terms, <code>fstab(5)</code> is a text file containing each <em>entry</em> of filesystem mounts in a line. Each line has 7 fields, and all 7 fields must be specified otherwise the mount fails. <a href="https://wiki.archlinux.org/index.php/Fstab">Here is what I think is a good guide</a> to (Arch) Linux <code>fstab</code>. I always recommend using UUID for <a href="https://wiki.archlinux.org/index.php/Persistent_block_device_naming">persistent block device naming</a>.</p>
-
-<blockquote>
-<p>For partitions that are not required to boot, adding <code>nofail</code> and <code>noauto</code> in the mount options is sometimes recommended to avoid boot failure if such partitions are not available at boot time.</p>
-</blockquote>
-
-<h3 id="basic-sql">Basic SQL</h3>
-
-<p>Below is an SQL snippet for beginners</p>
-
-<pre><code class="language-sql">DROP TABLE orders;
+</code></pre><h3 id=ext4-defrag-hdd>EXT4 defrag (HDD)</h3><p>Use <code>e4defrag(8)</code> to defrag an <em>EXT4 filesystem on a hard disk drive</em> on-line. Note that You need root privileges to defrag system files<h3 id=disk-tuning>Disk tuning</h3><h4 id=ssd-trim>SSD TRIM</h4><p><code>fstrim(8)</code> can be used to <em>trim</em> (i.e. discard) unused blocks on solid-state storage. The discard potentially has some benefits as it may prolong SSD lifespan and increases performance on disks that are almost full. Only SSDs should be trimmed.<h4 id=ext2-ext3-ext4-filesystem-setting>EXT2, EXT3, EXT4 filesystem setting</h4><blockquote><p>The EXT2-4 family of filesystems has been a staple in the Linux kernel for decades. Its most recent member, EXT4, is still very prevalent in desktop Linux users who usually like the fact that it made specifically for their kernels. EXT4 is stable, reliable, and well supported, although its lack of other modern features like compression, encryption, etc has led me to skip using it on my computers for some years now.</blockquote><p>Use <code>tune2fs(8)</code> to configure EXT2, EXT3, and EXT4 filesystems. For example, <code># tune2fs -O "^has_journal" /dev/mapper/crypt-home</code> will disable journaling on a EXT4 filesystem residing on block device <code>/dev/mapper/crypt-home</code>.<h4 id=zfs>ZFS</h4><blockquote><p>ZFS is the <em>last word</em> in filesystems. It was originally developed by Sun (Oracle), and is one of the most incredible filesystem in many ways. It can do <strong>Copy-on-Write</strong>, <strong>snapshots</strong>, <strong>compression</strong>, <strong>encryption</strong>, <strong>volume management (i.e. software RAID)</strong>, and many other amazing things to ensure your data is safe.</blockquote><p>Due to its incompatible license, ZFS was not included in the Linux kernel. Instead, a separate ZFS Linux kernel module is usually used to provide ZFS on Linux computers.<h4 id=using-zfs-8-and-zpool-8>Using zfs(8) and zpool(8).</h4><p>Use <code>zfs set</code> and <code>zpool set</code> to configure ZFS storage. Also, see <a href=/cheat/zfs/>this cheat sheet</a>.<h3 id=btrfs>Btrfs</h3><blockquote><p>Btrfs is yet another featureful filesystem, featuring <strong>Copy-on-Write (CoW)</strong>, <strong>snapshots</strong>, <strong>compression</strong>, <strong>volume management</strong>, and many other features. Btfs currently has no encryption support, but we can always use Linux <code>dm-crypt</code> to enable encryption on block storage.</blockquote><p>See this <a href=/blog/2021/btrfs/>blog post for Btrfs</a><h3 id=fstab-5>fstab(5)</h3><p>In simplest terms, <code>fstab(5)</code> is a text file containing each <em>entry</em> of filesystem mounts in a line. Each line has 7 fields, and all 7 fields must be specified otherwise the mount fails. <a href=https://wiki.archlinux.org/index.php/Fstab>Here is what I think is a good guide</a> to (Arch) Linux <code>fstab</code>. I always recommend using UUID for <a href=https://wiki.archlinux.org/index.php/Persistent_block_device_naming>persistent block device naming</a>.<blockquote><p>For partitions that are not required to boot, adding <code>nofail</code> and <code>noauto</code> in the mount options is sometimes recommended to avoid boot failure if such partitions are not available at boot time.</blockquote><h3 id=basic-sql>Basic SQL</h3><p>Below is an SQL snippet for beginners<pre><code class=language-sql>DROP TABLE orders;
 DROP TABLE products;
 DROP TABLE customers;
 
@@ -354,27 +96,4 @@ AND C.id IN
 (SELECT DISTINCT C.id FROM customers C RIGHT JOIN orders O on C.id = O.cust_id LEFT JOIN products P ON O.prod_id = P.id WHERE P.id = 2)
 AND C.id IN
 (SELECT DISTINCT C.id FROM customers C RIGHT JOIN orders O on C.id = O.cust_id LEFT JOIN products P ON O.prod_id = P.id WHERE P.id = 3);
-</code></pre>
-
-<h2 id="a-name-others-a"><a name="others"></a></h2>
-
-<p><a href="/cheat/arch/">Arch Linux cheat sheet</a><br>
-<a href="/blog/2019/arch-zfs.html">Arch Linux ZFS root</a><br>
-<a href="/cheat/zfs/">ZFS cheat sheet</a><br>
-<a href="/cheat/device-mapper/">Device Mapper - LUKS and LVM</a><br>
-<a href="/cheat/git/">Git cheat sheet</a></p>
-
-<p><a href="/noob/block/">Storage (disks, etc.)</a><br>
-<a href="/noob/boot/">Booting the computer</a><br>
-<a href="/noob/desktop/">Minimal UNIX desktop</a><br>
-<a href="/noob/vim/">Vim for noobs</a></p>
-<hr>
-<p><a href="#top">Back to top</a></p>
-<hr>
-<footer>
-	<p>Copyright (c) 2019 - 2023 Prem Phansuriyanon</p>
-	<p>Verbatim copying and redistribution of this entire page are permitted provided this notice is preserved</p>
-</footer>
-</body>
-
-</html>
+</code></pre><h2 id=a-name-others-a><a name=others></a></h2><p><a href=/cheat/arch/>Arch Linux cheat sheet</a><br><a href=/blog/2019/arch-zfs.html>Arch Linux ZFS root</a><br><a href=/cheat/zfs/>ZFS cheat sheet</a><br><a href=/cheat/device-mapper/>Device Mapper - LUKS and LVM</a><br><a href=/cheat/git/>Git cheat sheet</a><p><a href=/noob/block/>Storage (disks, etc.)</a><br><a href=/noob/boot/>Booting the computer</a><br><a href=/noob/desktop/>Minimal UNIX desktop</a><br><a href=/noob/vim/>Vim for noobs</a><hr><p><a href=#top>Back to top</a><hr><footer><p>Copyright (c) 2019 - 2023 Prem Phansuriyanon<p>Verbatim copying and redistribution of this entire page are permitted provided this notice is preserved</footer>
