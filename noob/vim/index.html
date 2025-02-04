@@ -1,36 +1,36 @@
-<!DOCTYPE html><html lang=en> <head><title>Artnoi.com</title><meta name=viewport content="width=device-width, initial-scale=1.0"><meta name=keywords content="artnoi, Prem Phansuriyanon"><meta name=author content=@artnoi><meta charset=UTF-8><link href=/style.css rel=stylesheet></head> <body> <ul class=navbar> <li><a href=/ ><img src=/toplogo.png alt=Artnoi.com class=logo>artnoi</a></li> <li class=f-right><a href=/cheat/ >cheat</a></li> <li class=f-right><a href=https://notes.artnoi.com/#/all-pages>notes</a></li> <li class=f-right><a href=/blog/ >blog</a></li> </ul> <h1 id=vim-cheat-sheet-for-noobs>Vim cheat sheet for noobs</h1> <blockquote> <p>Note: I have since 2022 migrated from Vim and NeoVim to <a href=https://helix-editor.com>Helix</a></p> </blockquote> <p>This useless article will show you noobs how to use Normal mode and Insert mode in Vim so that you can get going. Note that this article is for Vim only and not <code>vi(1)</code>.</p> <h2 id=normal-mode>Normal mode</h2> <p>When you launch Vim, you are usually in Normal mode, which we usually use for <strong>navigating and entering editor commands</strong>, but NOT really for writing.</p> <blockquote> <p>For actual writing, we use Insert mode, which will be discussed later.</p> </blockquote> <p>To enter a command in Normal mode, press colon <code>:</code>, which will bring up the editor command prompt, and then enter the command.</p> <p>For example, to write out (save) a file after you&#8217;re done:</p> <pre><code class=language-vim>:write
-</code></pre> <p>or in its short form:</p> <pre><code class=language-vim>:w
-</code></pre> <p>Some of the more frequently used Vim commands are <code>w</code> for writing, <code>q</code> for quiting, <code>&#47;</code> to search for pattern, <code>s</code> and <code>%s</code> to substitute pattern, and <code>set</code> to set configuration, etc. You can try to set Vim to show line number with:</p> <pre><code class=language-vim>set number
+<!doctype html><html lang=en><head><title>Artnoi.com</title><meta name=viewport content="width=device-width,initial-scale=1"><meta name=keywords content="artnoi,Prem Phansuriyanon"><meta name=author content="@artnoi"><meta charset=UTF-8><link href=/style.css rel=stylesheet></head><body><ul class=navbar><li><a href=/><img src=/toplogo.png alt=Artnoi.com class=logo>artnoi</a></li><li class=f-right><a href=/cheat/>cheat</a></li><li class=f-right><a href=https://notes.artnoi.com/#/all-pages>notes</a></li><li class=f-right><a href=/blog/>blog</a></li></ul><h1 id=vim-cheat-sheet-for-noobs>Vim cheat sheet for noobs</h1><blockquote><p>Note: I have since 2022 migrated from Vim and NeoVim to <a href=https://helix-editor.com>Helix</a></p></blockquote><p>This useless article will show you noobs how to use Normal mode and Insert mode in Vim so that you can get going. Note that this article is for Vim only and not <code>vi(1)</code>.</p><h2 id=normal-mode>Normal mode</h2><p>When you launch Vim, you are usually in Normal mode, which we usually use for <strong>navigating and entering editor commands</strong>, but NOT really for writing.</p><blockquote><p>For actual writing, we use Insert mode, which will be discussed later.</p></blockquote><p>To enter a command in Normal mode, press colon <code>:</code>, which will bring up the editor command prompt, and then enter the command.</p><p>For example, to write out (save) a file after you&rsquo;re done:</p><pre><code class=language-vim>:write
+</code></pre><p>or in its short form:</p><pre><code class=language-vim>:w
+</code></pre><p>Some of the more frequently used Vim commands are <code>w</code> for writing, <code>q</code> for quiting, <code>/</code> to search for pattern, <code>s</code> and <code>%s</code> to substitute pattern, and <code>set</code> to set configuration, etc. You can try to set Vim to show line number with:</p><pre><code class=language-vim>set number
 set relativenumber
 set invnumber
-</code></pre> <h3 id=normal-mode-navigation-and-keybindings>Normal mode navigation, and keybindings</h3> <p>In Normal mode, you can navigate through your text with <strong>arrow keys</strong>, or what is dubbed <em>the Vim keys</em>: <strong>h, j, k, l keys</strong>.</p> <p>After some time, you&#8217;ll learn to love the Vim keys, because they are actually more comfortable to use and are actually more reliable if you work with different keyboards.</p> <p>Keybinding <code>G</code> will go to end of file, while <code>gg</code> will go to the beginning. <code>0</code> will go to the beginning of line, while <code>$</code> is for end of line. You can always navigate by word with <code>w</code>, or go backward by word with <code>b</code>. And the most frequently one for me is the dot <code>.</code> to execute previous command.</p> <h3 id=some-command-examples>Some command examples</h3> <p>These directional keys can also be used in combination with other commands. For example, key <code>d</code> (binded to <code>:delete</code> command):</p> <pre><code>d0  = delete from cursor til beginning of line
+</code></pre><h3 id=normal-mode-navigation-and-keybindings>Normal mode navigation, and keybindings</h3><p>In Normal mode, you can navigate through your text with <strong>arrow keys</strong>, or what is dubbed <em>the Vim keys</em>: <strong>h, j, k, l keys</strong>.</p><p>After some time, you&rsquo;ll learn to love the Vim keys, because they are actually more comfortable to use and are actually more reliable if you work with different keyboards.</p><p>Keybinding <code>G</code> will go to end of file, while <code>gg</code> will go to the beginning. <code>0</code> will go to the beginning of line, while <code>$</code> is for end of line. You can always navigate by word with <code>w</code>, or go backward by word with <code>b</code>. And the most frequently one for me is the dot <code>.</code> to execute previous command.</p><h3 id=some-command-examples>Some command examples</h3><p>These directional keys can also be used in combination with other commands. For example, key <code>d</code> (binded to <code>:delete</code> command):</p><pre><code>d0	= delete from cursor til beginning of line
 
-d$  = delete from cursor til end of line
+d$	= delete from cursor til end of line
 
-dgg = delete from cursor til beginning of file
+dgg	= delete from cursor til beginning of file
 
-dG  = delete from cursor til end of file
+dG	= delete from cursor til end of file
 
-5dd = delete 5 lines from cursor
+5dd	= delete 5 lines from cursor
 
-d&#47;text = delete up to pattern `text`
-</code></pre> <p>I learned a lot from <a href="https://www.youtube.com/watch?v=wlR5gYd6um0">this YouTube video</a> about how to expressively use these editor commands in a more efficient and intuitive manner.</p> <p>It is this combination of commands, bindings, regexp, etc. that makes Vim so loved by those who write a lot of text files.</p> <h2 id=insert-mode>Insert mode</h2> <p>To enter Insert mode, either use <code>:insert</code> command or press <em>i</em> key to insert text into Vim memory buffer. Note that This buffer will not be written to file until user gives the <code>:write</code> command.</p> <blockquote> <p>To exit the Insert mode (i.e. go back to Normal mode), press Esc.</p> </blockquote> <p>You can also press <em>A</em> (uppercase) to append the line (i.e. insert at the end of line).</p> <p>After you are done editting, use <code>write</code> (<code>w</code>) command to write the buffer to file:</p> <pre><code>:w
-</code></pre> <p>Or save to another file;</p> <pre><code>:w &#60;FILENAME&#62;
-</code></pre> <p>And quit Vim with <code>quit</code> (<code>q</code>) command:</p> <pre><code>:q
-</code></pre> <p>Most people just combine these:</p> <pre><code>:wq
-</code></pre> <p>Sometimes, you just want to quit. To force anything in Vim, append <code>!</code> to the command. If you want to discard the text you&#8217;ve been editing in Vim, then you can <em>force</em> quit without saving with:</p> <pre><code>:q!
-</code></pre> <h2 id=some-newbie-tricks>Some newbie tricks</h2> <p>Use <code>:tabedit</code> command to edit files in new Vim tab:</p> <pre><code>:tabedit &#60;FILENAME&#62;
-</code></pre> <p>To enable mouse support, add this line to your <code>.vimrc</code> file (Vim configuration) in your home directory:</p> <pre><code class=language-vim>set mouse=a
-</code></pre> <p>Or if you are using the same <code>.vimrc</code> on servers and desktops like I do:</p> <pre><code class=language-vim>    if has(&#39;mouse&#39;)
-        set mouse=a
+d/text = delete up to pattern `text`
+</code></pre><p>I learned a lot from <a href="https://www.youtube.com/watch?v=wlR5gYd6um0">this YouTube video</a> about how to expressively use these editor commands in a more efficient and intuitive manner.</p><p>It is this combination of commands, bindings, regexp, etc. that makes Vim so loved by those who write a lot of text files.</p><h2 id=insert-mode>Insert mode</h2><p>To enter Insert mode, either use <code>:insert</code> command or press <em>i</em> key to insert text into Vim memory buffer. Note that This buffer will not be written to file until user gives the <code>:write</code> command.</p><blockquote><p>To exit the Insert mode (i.e. go back to Normal mode), press Esc.</p></blockquote><p>You can also press <em>A</em> (uppercase) to append the line (i.e. insert at the end of line).</p><p>After you are done editting, use <code>write</code> (<code>w</code>) command to write the buffer to file:</p><pre><code>:w
+</code></pre><p>Or save to another file;</p><pre><code>:w &lt;FILENAME&gt;
+</code></pre><p>And quit Vim with <code>quit</code> (<code>q</code>) command:</p><pre><code>:q
+</code></pre><p>Most people just combine these:</p><pre><code>:wq
+</code></pre><p>Sometimes, you just want to quit. To force anything in Vim, append <code>!</code> to the command. If you want to discard the text you&rsquo;ve been editing in Vim, then you can <em>force</em> quit without saving with:</p><pre><code>:q!
+</code></pre><h2 id=some-newbie-tricks>Some newbie tricks</h2><p>Use <code>:tabedit</code> command to edit files in new Vim tab:</p><pre><code>:tabedit &lt;FILENAME&gt;
+</code></pre><p>To enable mouse support, add this line to your <code>.vimrc</code> file (Vim configuration) in your home directory:</p><pre><code class=language-vim>set mouse=a
+</code></pre><p>Or if you are using the same <code>.vimrc</code> on servers and desktops like I do:</p><pre><code class=language-vim>    if has('mouse')
+    	set mouse=a
     endif
-</code></pre> <p>Vim mouse support also works over SSH on many terminal emulators.</p> <h3 id=.vimrc>.vimrc</h3> <p><code>.vimrc</code> is where we store Vim &#8220;<em>run command</em>&#8221; configuration, apart from the <code>.vim</code> directory. My basic <code>.vimrc</code> looks like this:</p> <pre><code class=language-vim>" vim files
+</code></pre><p>Vim mouse support also works over SSH on many terminal emulators.</p><h3 id=vimrc>.vimrc</h3><p><code>.vimrc</code> is where we store Vim &ldquo;<em>run command</em>&rdquo; configuration, apart from the <code>.vim</code> directory. My basic <code>.vimrc</code> looks like this:</p><pre><code class=language-vim>&quot; vim files
 set viminfo=
 set noswapfile
 set nobackup
-set undodir=$HOME&#47;.vim&#47;
+set undodir=$HOME/.vim/
 
-" Editor settings
+&quot; Editor settings
 syntax on
 set incsearch
 set invnumber
@@ -41,19 +41,19 @@ set shiftwidth=4
 set cursorline
 color iceberg
 
-" Enable mouse in all modes if possible
-if has(&#39;mouse&#39;)
+&quot; Enable mouse in all modes if possible
+if has('mouse')
     set mouse=a
 endif
 
-" Fixes backspace not working
+&quot; Fixes backspace not working
 set backspace=indent,eol,start
-" Show the cursor position
+&quot; Show the cursor position
 set ruler
-" Show the current mode
+&quot; Show the current mode
 set showmode
-" Show the filename in the window titlebar
+&quot; Show the filename in the window titlebar
 set title
-" Show the (partial) command as it’s being typed
+&quot; Show the (partial) command as it’s being typed
 set showcmd
-</code></pre> <p>Also, <a href="https://www.youtube.com/watch?v=wlR5gYd6um0">watch this YouTube video</a> for yanking (<em>copy</em> text), pasting, and other cool <em>Vim language</em>.</p> <p>If you made it, congrats! You have just learned to master a very expressive, efficient text editor that doesn&#8217;t require graphic interface at all!</p> <p>I myself use Vim for almost everything, including this website. Even when programming, I find it much easier to use Vim with a tiling window manager than most other IDEs. Vim is the only software I install to my OpenBSD webserver.</p> <p>With Vim, you can artfully edit text anywhere from just a console.</p> <hr> <p><a href=#top>Back to top</a></p> <hr> <footer> <p>Copyright (c) 2019 - 2023 Prem Phansuriyanon</p> <p>Verbatim copying and redistribution of this entire page are permitted provided this notice is preserved</p> </footer> </body> </html> 
+</code></pre><p>Also, <a href="https://www.youtube.com/watch?v=wlR5gYd6um0">watch this YouTube video</a> for yanking (<em>copy</em> text), pasting, and other cool <em>Vim language</em>.</p><p>If you made it, congrats! You have just learned to master a very expressive, efficient text editor that doesn&rsquo;t require graphic interface at all!</p><p>I myself use Vim for almost everything, including this website. Even when programming, I find it much easier to use Vim with a tiling window manager than most other IDEs. Vim is the only software I install to my OpenBSD webserver.</p><p>With Vim, you can artfully edit text anywhere from just a console.</p><hr><p><a href=#top>Back to top</a></p><hr><footer><p>Copyright (c) 2019 - 2023 Prem Phansuriyanon</p><p>Verbatim copying and redistribution of this entire page are permitted provided this notice is preserved</p></footer></body></html>

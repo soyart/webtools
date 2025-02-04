@@ -1,227 +1,227 @@
-<!DOCTYPE html><html lang=en> <head><title>Artnoi.com</title><meta name=viewport content="width=device-width, initial-scale=1.0"><meta name=keywords content="artnoi, Prem Phansuriyanon"><meta name=author content=@artnoi><meta charset=UTF-8><link href=/style.css rel=stylesheet></head> <body> <ul class=navbar> <li><a href=/ ><img src=/toplogo.png alt=Artnoi.com class=logo>artnoi</a></li> <li class=f-right><a href=/cheat/ >cheat</a></li> <li class=f-right><a href=https://notes.artnoi.com/#/all-pages>notes</a></li> <li class=f-right><a href=/blog/ >blog</a></li> </ul> <p>Feb 26, <a href=/blog/2021/ >2021</a></p> <p>I have some spare time, so I decided to write how I put this website together with all the proxies.</p> <h1 id=building-https-relays-and-reverse-proxies-for-artnoi.com>Building HTTPS relays and reverse proxies for artnoi.com</h1> <p>I have been using <a href=/blog/2020/openbsd-server/ >my OpenBSD box</a> to serve this website since last year, and it has been running strong. However, using only <code>httpd(8)</code> to serve this website also has one downside - <em>downtime</em>, which is quite annoying when you have to do some maintenance tasks.</p> <p>I thought about adding another webserver, but then I realized if I was going to make my web stack more complex than needed, why <em>not</em> build a load-balancer or reverse proxies too this time, so that I don&#8217;t have to worry about downtime when one of the webservers is taken down.</p> <p>The addition of <a href=/searx>searx.artnoi.com (artnoi.com&#47;searx)</a> neccessitates the need for a result proxy <code>filtron</code> and image proxy <code>morty</code>, which is exactly what NGINX is typically used as reverse proxies for.</p> <blockquote> <p><a href=https://searx.github.io/searx/admin/installation-nginx.html#nginx-searx-site>Searx documentation about <code>filtron</code> and <code>morty</code></a></p> </blockquote> <h2 id=overview>Overview</h2> <p>The diagram of what I had in mind looks something like this:</p> <pre><code># Redirect to HTTPS
-HTTPS clients: http:&#47;&#47;artnoi.com
-&#62; HTTPS proxy   :80 HTTP 301 https:&#47;&#47;artnoi.com
+<!doctype html><html lang=en><head><title>Artnoi.com</title><meta name=viewport content="width=device-width,initial-scale=1"><meta name=keywords content="artnoi,Prem Phansuriyanon"><meta name=author content="@artnoi"><meta charset=UTF-8><link href=/style.css rel=stylesheet></head><body><ul class=navbar><li><a href=/><img src=/toplogo.png alt=Artnoi.com class=logo>artnoi</a></li><li class=f-right><a href=/cheat/>cheat</a></li><li class=f-right><a href=https://notes.artnoi.com/#/all-pages>notes</a></li><li class=f-right><a href=/blog/>blog</a></li></ul><p>Feb 26, <a href=/blog/2021/>2021</a></p><p>I have some spare time, so I decided to write how I put this website together with all the proxies.</p><h1 id=building-https-relays-and-reverse-proxies-for-artnoi-com>Building HTTPS relays and reverse proxies for artnoi.com</h1><p>I have been using <a href=/blog/2020/openbsd-server/>my OpenBSD box</a> to serve this website since last year, and it has been running strong. However, using only <code>httpd(8)</code> to serve this website also has one downside - <em>downtime</em>, which is quite annoying when you have to do some maintenance tasks.</p><p>I thought about adding another webserver, but then I realized if I was going to make my web stack more complex than needed, why <em>not</em> build a load-balancer or reverse proxies too this time, so that I don&rsquo;t have to worry about downtime when one of the webservers is taken down.</p><p>The addition of <a href=/searx>searx.artnoi.com (artnoi.com/searx)</a> neccessitates the need for a result proxy <code>filtron</code> and image proxy <code>morty</code>, which is exactly what NGINX is typically used as reverse proxies for.</p><blockquote><p><a href=https://searx.github.io/searx/admin/installation-nginx.html#nginx-searx-site>Searx documentation about <code>filtron</code> and <code>morty</code></a></p></blockquote><h2 id=overview>Overview</h2><p>The diagram of what I had in mind looks something like this:</p><pre><code># Redirect to HTTPS
+HTTPS clients: http://artnoi.com
+&gt; HTTPS proxy	:80 HTTP 301 https://artnoi.com
 
 # Relays and reverse proxies
-HTTPS clients: https:&#47;&#47;artnoi.com
-&#62; HTTPS proxy   :443
-&#62; Load balancer :8082
-&#62; Webservers    :8080 HTTP 200 OK
-</code></pre> <p>Non-Searx part can be configured with the design above very easily, and one OpenBSD machine can do this. I knew OpenBSD ships with its own <code>relayd(8)</code>, but that would mean my entire webstack would rely solely on OpenBSD utilities (which is a good thing).</p> <p><em>But</em> I cannot do the Searx part on OpenBSD unless I installed Python and other crazy $h!t packages on my OpenBSD to run Searx.</p> <p>Because I want to not install any extra software at all on OpenBSD, and the fact that I may be even too noob to patch this to run on OpenBSD, <em>I will do the Searx part on Arch Linux</em>.</p> <p>OpenBSD will be the main webserver, and <code>relayd(8)</code> will also be used <strong>to make it seem more complicated than it should be</strong>, because why not? The web is bloat, bruh!</p> <h2 id=openbsd-relayd8>OpenBSD relayd(8)</h2> <p><a href=https://openbsd.org>OpenBSD</a> ships with <code>relayd(8)</code>, a simple relay daemon that can dynamically redirect incoming connections to target hosts. It can be configured with <code>relayd.conf(5)</code> pretty easily, and the manual page contains many useful examples for relaying and redirecting different connections.</p> <p>But when I tried <code>relayd(8)</code>, although it could do the relays and redirections just fine, I had some minor problems with TLS, and this escalated further when I tried adding new webservers (e.g. the one doing <a href=/searx>searx.artnoi.com</a> on different hosts to the relays.</p> <p>Obtaining a certificate was a headache, and more so when serving it, e.g. renaming or linking the certificate to the actual IP address of the interface is tiring.</p> <p>So I had to find something else, but could not found anything satisfying except for NGINX</p> <blockquote> <p>TL;DR - For now, <code>relayd</code> is not used as HTTPS proxy, but HTTP and other TCP&#47;UDP connections (e.g. <a href=/blog/2020/endlessh/ >SSH</a>).</p> </blockquote> <h2 id=nginx><a href=https://nginx.com>NGINX</a></h2> <p>OpenBSD also provides binary package for <a href=https://nginx.com>NGINX</a>, a widely-used webserver and proxy software. NGINX has advantages in that it is cross-platform and thus configuration can be copied over from one system to another without much efforts.</p> <p>So I use my Arch Linux VPS (let&#8217;s call it host 0) as NGINX HTTPS proxy, since I don&#8217;t want to install extra packages on my OpenBSD VPS (let&#8217;s call it host 1). So now, the diagram looks something like this</p> <blockquote> <p>Domain artnoi.com resolves to Host 0&#8217;s public IP address</p> </blockquote> <pre><code>HTTPS client: https:&#47;&#47;artnoi.com
-&#62; NGINX HTTPS proxy (Host0):443
-&#62; relayd proxy      (Host1):8082
-&#62; Webservers  (Host1,Host2):8080 HTTP 200 OK
+HTTPS clients: https://artnoi.com
+&gt; HTTPS proxy	:443
+&gt; Load balancer :8082
+&gt; Webservers	:8080 HTTP 200 OK
+</code></pre><p>Non-Searx part can be configured with the design above very easily, and one OpenBSD machine can do this. I knew OpenBSD ships with its own <code>relayd(8)</code>, but that would mean my entire webstack would rely solely on OpenBSD utilities (which is a good thing).</p><p><em>But</em> I cannot do the Searx part on OpenBSD unless I installed Python and other crazy $h!t packages on my OpenBSD to run Searx.</p><p>Because I want to not install any extra software at all on OpenBSD, and the fact that I may be even too noob to patch this to run on OpenBSD, <em>I will do the Searx part on Arch Linux</em>.</p><p>OpenBSD will be the main webserver, and <code>relayd(8)</code> will also be used <strong>to make it seem more complicated than it should be</strong>, because why not? The web is bloat, bruh!</p><h2 id=openbsd-relayd-8>OpenBSD relayd(8)</h2><p><a href=https://openbsd.org>OpenBSD</a> ships with <code>relayd(8)</code>, a simple relay daemon that can dynamically redirect incoming connections to target hosts. It can be configured with <code>relayd.conf(5)</code> pretty easily, and the manual page contains many useful examples for relaying and redirecting different connections.</p><p>But when I tried <code>relayd(8)</code>, although it could do the relays and redirections just fine, I had some minor problems with TLS, and this escalated further when I tried adding new webservers (e.g. the one doing <a href=/searx>searx.artnoi.com</a> on different hosts to the relays.</p><p>Obtaining a certificate was a headache, and more so when serving it, e.g. renaming or linking the certificate to the actual IP address of the interface is tiring.</p><p>So I had to find something else, but could not found anything satisfying except for NGINX</p><blockquote><p>TL;DR - For now, <code>relayd</code> is not used as HTTPS proxy, but HTTP and other TCP/UDP connections (e.g. <a href=/blog/2020/endlessh/>SSH</a>).</p></blockquote><h2 id=nginx-https-nginx-com><a href=https://nginx.com>NGINX</a></h2><p>OpenBSD also provides binary package for <a href=https://nginx.com>NGINX</a>, a widely-used webserver and proxy software. NGINX has advantages in that it is cross-platform and thus configuration can be copied over from one system to another without much efforts.</p><p>So I use my Arch Linux VPS (let&rsquo;s call it host 0) as NGINX HTTPS proxy, since I don&rsquo;t want to install extra packages on my OpenBSD VPS (let&rsquo;s call it host 1). So now, the diagram looks something like this</p><blockquote><p>Domain artnoi.com resolves to Host 0&rsquo;s public IP address</p></blockquote><pre><code>HTTPS client: https://artnoi.com
+&gt; NGINX HTTPS proxy	(Host0):443
+&gt; relayd proxy		(Host1):8082
+&gt; Webservers  (Host1,Host2):8080 HTTP 200 OK
 
-HTTPS client: https:&#47;&#47;artnoi.com&#47;searx
-&#62; NGINX HTTPS proxy (Host 0):443
-&#62; filtron           (Host 0):4004
-&#62; Searx instance    (Host 0):8888 HTTP 200 OK
-</code></pre> <p>Many ACME client software has support for NGINX, so I can quickly obtained certficates using any means comfortable to me.</p> <h3 id=nginx---obtaining-lets-encrypt-certificate-with-certbot>NGINX - obtaining Let&#8217;s Encrypt certificate with certbot</h3> <p>I used bloated <code>certbot</code> as ACME client. And I configured a <code>webroot</code> for ACME, and use NGINX as HTTPS frontend on my NGINX configuration. I chose to have one certificate for all of my domains.</p> <p>The result is one server block that would establish HTTPS connections for all of my domains - artnoi.com, www.artnoi.com, artnoi.com&#47;cheat, noob.artnoi.com, searx.artnoi.com, artnoi.xyz, searx.artnoi.xyz.</p> <p>You can write a dummy configuration just for ACME challenges, or use webroot method to avoid downtime. I write a separate ACME webroot configuration for NGINX which will later be included by production configuration:</p> <pre><code># &#47;etc&#47;nginx&#47;production&#47;letsencrypt&#47;webroot
+HTTPS client: https://artnoi.com/searx
+&gt; NGINX HTTPS proxy (Host 0):443
+&gt; filtron 			(Host 0):4004
+&gt; Searx instance	(Host 0):8888 HTTP 200 OK
+</code></pre><p>Many ACME client software has support for NGINX, so I can quickly obtained certficates using any means comfortable to me.</p><h3 id=nginx-obtaining-let-s-encrypt-certificate-with-certbot>NGINX - obtaining Let&rsquo;s Encrypt certificate with certbot</h3><p>I used bloated <code>certbot</code> as ACME client. And I configured a <code>webroot</code> for ACME, and use NGINX as HTTPS frontend on my NGINX configuration. I chose to have one certificate for all of my domains.</p><p>The result is one server block that would establish HTTPS connections for all of my domains - artnoi.com, www.artnoi.com, artnoi.com/cheat, noob.artnoi.com, searx.artnoi.com, artnoi.xyz, searx.artnoi.xyz.</p><p>You can write a dummy configuration just for ACME challenges, or use webroot method to avoid downtime. I write a separate ACME webroot configuration for NGINX which will later be included by production configuration:</p><pre><code># /etc/nginx/production/letsencrypt/webroot
 
-# webroot is &#47;var&#47;lib&#47;letsencrypt
-location ^~ &#47;.well-known&#47;acme-challenge&#47; {
+# webroot is /var/lib/letsencrypt
+location ^~ /.well-known/acme-challenge/ {
   allow all;
-  root &#47;var&#47;lib&#47;letsencrypt&#47;;
-  default_type "text&#47;plain";
+  root /var/lib/letsencrypt/;
+  default_type &quot;text/plain&quot;;
   try_files $uri =404;
 }
-</code></pre> <p>Also, make sure that <code>&#47;var&#47;lib&#47;letsencrypt</code> is ready as webroot:</p> <pre><code class=language-shell>WEBROOT=&#39;&#47;var&#47;lib&#47;letsencrypt&#39;;
+</code></pre><p>Also, make sure that <code>/var/lib/letsencrypt</code> is ready as webroot:</p><pre><code class=language-shell>WEBROOT='/var/lib/letsencrypt';
 
-mkdir -p "${WEBROOT}&#47;.well-known";
-chgrp http "$WEBROOT";
-chmod g+s "$WEBROOT";
-</code></pre> <h3 id=nginx-as-https-reverse-proxies>NGINX as HTTPS reverse proxies</h3> <p>After NGINX reverse proxy establishes HTTPS connections with the certificates, it then proxies the HTTP connection <em>in plain text</em> but under WireGuard VPN to <code>relayd(8)</code> on port 8082, whose load-balancing configuration is much simpler.</p> <p>My website is static HTML pages, which is served mainly by OpenBSD httpd(8), and a backup Arch Linux webserver at home. But there&#8217;s also Searx instance running on <a href=/searx>&#47;searx</a>, which needs <code>filtron</code> and <code>morty</code> for search sanitation. The Searx instance, <code>filtron</code>, and <code>morty</code>, all three are on the same Linux host.</p> <p>My final configuration has 2 server blocks, one listening on 80 for HTTP requests and ACME challenges, and the other on port 443 for HTTPS.</p> <p>I wrote a separate file for serving HTTPS, and it will be included by the server block listening on port 443:</p> <pre><code class=language-shell>ssl_certificate &#47;etc&#47;letsencrypt&#47;live&#47;artnoi.com&#47;fullchain.pem;
-ssl_certificate_key &#47;etc&#47;letsencrypt&#47;live&#47;artnoi.com&#47;privkey.pem;
-include &#47;etc&#47;letsencrypt&#47;options-ssl-nginx.conf;
-ssl_dhparam &#47;etc&#47;letsencrypt&#47;ssl-dhparams.pem;
-</code></pre> <p>And this is my 2 <code>server</code> blocks:</p> <pre><code>server {
+mkdir -p &quot;${WEBROOT}/.well-known&quot;;
+chgrp http &quot;$WEBROOT&quot;;
+chmod g+s &quot;$WEBROOT&quot;;
+</code></pre><h3 id=nginx-as-https-reverse-proxies>NGINX as HTTPS reverse proxies</h3><p>After NGINX reverse proxy establishes HTTPS connections with the certificates, it then proxies the HTTP connection <em>in plain text</em> but under WireGuard VPN to <code>relayd(8)</code> on port 8082, whose load-balancing configuration is much simpler.</p><p>My website is static HTML pages, which is served mainly by OpenBSD httpd(8), and a backup Arch Linux webserver at home. But there&rsquo;s also Searx instance running on <a href=/searx>/searx</a>, which needs <code>filtron</code> and <code>morty</code> for search sanitation. The Searx instance, <code>filtron</code>, and <code>morty</code>, all three are on the same Linux host.</p><p>My final configuration has 2 server blocks, one listening on 80 for HTTP requests and ACME challenges, and the other on port 443 for HTTPS.</p><p>I wrote a separate file for serving HTTPS, and it will be included by the server block listening on port 443:</p><pre><code class=language-shell>ssl_certificate /etc/letsencrypt/live/artnoi.com/fullchain.pem;
+ssl_certificate_key /etc/letsencrypt/live/artnoi.com/privkey.pem;
+include /etc/letsencrypt/options-ssl-nginx.conf;
+ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+</code></pre><p>And this is my 2 <code>server</code> blocks:</p><pre><code>server {
 
   # Reverse proxies for artnoi.com and its subdomains
-  set $servername &#39;&#39;;
-  set $servername &#39;${servername} artnoi.com www.artnoi.com artnoi.xyz&#39;;
-  set $servername &#39;${servername} artnoi.com&#47;cheat zv.artnoi.com noob.artnoi.com&#39;;
-  set $servername &#39;${servername} searx.artnoi.com searx.artnoi.xyz&#39;;
+  set $servername '';
+  set $servername '${servername} artnoi.com www.artnoi.com artnoi.xyz';
+  set $servername '${servername} artnoi.com/cheat zv.artnoi.com noob.artnoi.com';
+  set $servername '${servername} searx.artnoi.com searx.artnoi.xyz';
   server_name $servername;
 
   # Redirects subdomain to location
 
   if ($host = artnoi.xyz) {
-    return 301 https:&#47;&#47;artnoi.com;
+    return 301 https://artnoi.com;
   }
 
   if ($host = zv.artnoi.com) {
-    return 301 https:&#47;&#47;artnoi.com&#47;noob;
+    return 301 https://artnoi.com/noob;
   }
 
   if ($host = noob.artnoi.com) {
-    return 301 https:&#47;&#47;artnoi.com&#47;noob;
+    return 301 https://artnoi.com/noob;
   }
 
-  if ($host = artnoi.com&#47;cheat) {
-    return 301 https:&#47;&#47;artnoi.com&#47;cheat;
+  if ($host = artnoi.com/cheat) {
+    return 301 https://artnoi.com/cheat;
   }
 
   if ($host = searx.artnoi.com) {
-    return 301 https:&#47;&#47;artnoi.com&#47;searx;
+    return 301 https://artnoi.com/searx;
   }
 
   if ($host = searx.artnoi.xyz) {
-    return 301 https:&#47;&#47;artnoi.com&#47;searx;
+    return 301 https://artnoi.com/searx;
   }
 
-  location &#47;robot.txt {
+  location /robot.txt {
     return 444;
   }
 
-  location &#47; {
-    proxy_pass http:&#47;&#47;10.7.0.10:8082;
+  location / {
+    proxy_pass http://10.7.0.10:8082;
   }
 
-  # artnoi.com&#47;searx - Filtron and Searx
-  location &#47;searx {
+  # artnoi.com/searx - Filtron and Searx
+  location /searx {
 
     # filtron listens on 4004 and forward to 8888
-    proxy_pass         http:&#47;&#47;127.0.0.1:4004&#47;;
+    proxy_pass         http://127.0.0.1:4004/;
 
     proxy_set_header   Host             $http_host;
     proxy_set_header   Connection       $http_connection;
     proxy_set_header   X-Real-IP        $remote_addr;
     proxy_set_header   X-Forwarded-For  $proxy_add_x_forwarded_for;
     proxy_set_header   X-Scheme         $scheme;
-    proxy_set_header   X-Script-Name    &#47;searx;
+    proxy_set_header   X-Script-Name    /searx;
   }
 
   # For Searx
-  location &#47;searx&#47;static {
-    alias &#47;usr&#47;lib&#47;python3.9&#47;site-packages&#47;searx&#47;static;
+  location /searx/static {
+    alias /usr/lib/python3.9/site-packages/searx/static;
   }
 
   # Result proxy for Searx
-  location &#47;morty {
+  location /morty {
     # morty listens on 3000
-    proxy_pass         http:&#47;&#47;127.0.0.1:3000&#47;;
+    proxy_pass         http://127.0.0.1:3000/;
 
-      proxy_set_header   Host             $http_host;
-      proxy_set_header   Connection       $http_connection;
-      proxy_set_header   X-Real-IP        $remote_addr;
-      proxy_set_header   X-Forwarded-For  $proxy_add_x_forwarded_for;
-      proxy_set_header   X-Scheme         $scheme;
+	  proxy_set_header   Host             $http_host;
+	  proxy_set_header   Connection       $http_connection;
+	  proxy_set_header   X-Real-IP        $remote_addr;
+	  proxy_set_header   X-Forwarded-For  $proxy_add_x_forwarded_for;
+	  proxy_set_header   X-Scheme         $scheme;
   }
 
   listen 443 ssl http2;
-  include production&#47;https&#47;artnoi.com.conf;
+  include production/https/artnoi.com.conf;
 }
 
 server {
 
   # For webroot certbot (.well-known)
-  include production&#47;letsencrypt&#47;webroot.conf;
+  include production/letsencrypt/webroot.conf;
 
   # HTTP-to-HTTPS redirects
   if ($host = artnoi.com) {
-    return 301 https:&#47;&#47;$host$request_uri;
+    return 301 https://$host$request_uri;
   }
 
   if ($host = www.artnoi.com) {
-    return 301 https:&#47;&#47;$host$request_uri;
+    return 301 https://$host$request_uri;
   }
 
   if ($host = noob.artnoi.com) {
-    return 301 https:&#47;&#47;$host$request_uri;
+    return 301 https://$host$request_uri;
   }
 
   if ($host = zv.artnoi.com) {
-    return 301 https:&#47;&#47;$host$request_uri;
+    return 301 https://$host$request_uri;
   }
 
-  if ($host = artnoi.com&#47;cheat) {
-    return 301 https:&#47;&#47;$host$request_uri;
+  if ($host = artnoi.com/cheat) {
+    return 301 https://$host$request_uri;
   }
 
   if ($host = artnoi.xyz) {
-    return 301 https:&#47;&#47;artnoi.com;
+    return 301 https://artnoi.com;
   }
 
   if ($host = searx.artnoi.com) {
-      return 301 https:&#47;&#47;$host$request_uri;
+	  return 301 https://$host$request_uri;
   }
 
   if ($host = searx.artnoi.xyz) {
-      return 301 https:&#47;&#47;artnoi.com&#47;searx;
+	  return 301 https://artnoi.com/searx;
   }
 
   listen 45.76.190.176:80;
   return 404;
 }
-</code></pre> <h3 id=relayd8-as-load-balancer>relayd(8) as load-balancer</h3> <p>First, let&#8217;s define our relay protocols. Both NGINX and relayd can do TCP relays (<code>stream</code> in NGINX configuration), but here we will be using plain-text HTTP as intended. I wrote my <code>httpfilter</code> protocol (relay rules) in a separate file <code>&#47;etc&#47;relayd.httpfilter.conf</code>:</p> <blockquote> <p>Don&#8217;t just copy and paste. The HTTP <a href=https://securityheaders.com>security headers</a> can break your website if not done properly.</p> </blockquote> <pre><code>http protocol "httpfilter" {
+</code></pre><h3 id=relayd-8-as-load-balancer>relayd(8) as load-balancer</h3><p>First, let&rsquo;s define our relay protocols. Both NGINX and relayd can do TCP relays (<code>stream</code> in NGINX configuration), but here we will be using plain-text HTTP as intended. I wrote my <code>httpfilter</code> protocol (relay rules) in a separate file <code>/etc/relayd.httpfilter.conf</code>:</p><blockquote><p>Don&rsquo;t just copy and paste. The HTTP <a href=https://securityheaders.com>security headers</a> can break your website if not done properly.</p></blockquote><pre><code>http protocol &quot;httpfilter&quot; {
 
-  ## https:&#47;&#47;securityheaders.com
+  ## https://securityheaders.com
   ## Client HTTP request header
-  match request header set "Connection"\
-    value "close"
-  match request header set "X-Forwarded-For"\
-    value "$REMOTE_ADDR"
-  match request header set "X-Forwarded-By"\
-    value "$SERVER_ADDR:$SERVER_PORT"
-  match header set "Keep-Alive"\
-    value "$TIMEOUT"
+  match request header set &quot;Connection&quot;\
+    value &quot;close&quot;
+  match request header set &quot;X-Forwarded-For&quot;\
+    value &quot;$REMOTE_ADDR&quot;
+  match request header set &quot;X-Forwarded-By&quot;\
+    value &quot;$SERVER_ADDR:$SERVER_PORT&quot;
+  match header set &quot;Keep-Alive&quot;\
+    value &quot;$TIMEOUT&quot;
 
-  match query hash "sessid"
+  match query hash &quot;sessid&quot;
 
-  #match hash "sessid"
+  #match hash &quot;sessid&quot;
 
-  ## https:&#47;&#47;securityheaders.com
+  ## https://securityheaders.com
   ## Server HTTP response header
   # NGINX already handles that
-  #match response header set "Strict-Transport-Security"\
-  #  value "max-age=31536000; includeSubDomains; always"
+  #match response header set &quot;Strict-Transport-Security&quot;\
+  #  value &quot;max-age=31536000; includeSubDomains; always&quot;
 
   match response header\
-    remove "Server"
-  match response header set "X-Frame-Options"\
-      value "SAMEORIGIN"
-  match response header set "X-XSS-Protection"\
-      value "1; mode=block"
-  match response header set "X-Content-Type-Options"\
-      value "nosniff"
-  match response header set "Referrer-Policy"\
-      value "strict-origin"
-  match response header set "Content-Security-Policy"\
-      value "default-src &#39;self&#39;; font-src &#39;self&#39;; style-src &#39;self&#39;; base-uri &#39;none&#39;; form-action &#39;self&#39;; frame-ancestors &#39;none&#39;"
-  match response header set "Feature-Policy"\
-      value "accelerometer &#39;none&#39;; camera &#39;none&#39;; geolocation &#39;none&#39;; gyroscope &#39;none&#39;; magnetometer &#39;none&#39;; microphone &#39;none&#39;; payment &#39;none&#39;; usb &#39;none&#39;"
-  match response header set "Permissions-Policy"\
-    value "accelerometer=(); camera=(); geolocation=(); gyroscope=(); magnetometer=(); microphone=(); payment=(); usb=()"
+    remove &quot;Server&quot;
+  match response header set &quot;X-Frame-Options&quot;\
+	  value &quot;SAMEORIGIN&quot;
+  match response header set &quot;X-XSS-Protection&quot;\
+	  value &quot;1; mode=block&quot;
+  match response header set &quot;X-Content-Type-Options&quot;\
+	  value &quot;nosniff&quot;
+  match response header set &quot;Referrer-Policy&quot;\
+	  value &quot;strict-origin&quot;
+  match response header set &quot;Content-Security-Policy&quot;\
+	  value &quot;default-src 'self'; font-src 'self'; style-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'&quot;
+  match response header set &quot;Feature-Policy&quot;\
+	  value &quot;accelerometer 'none'; camera 'none'; geolocation 'none'; gyroscope 'none'; magnetometer 'none'; microphone 'none'; payment 'none'; usb 'none'&quot;
+  match response header set &quot;Permissions-Policy&quot;\
+    value &quot;accelerometer=(); camera=(); geolocation=(); gyroscope=(); magnetometer=(); microphone=(); payment=(); usb=()&quot;
 
   pass
-  block path "&#47;cgi-bin&#47;index.cgi" value "*command=*"
+  block path &quot;/cgi-bin/index.cgi&quot; value &quot;*command=*&quot;
 
   # set recommended tcp options
   tcp { nodelay, sack, socket buffer 65536, backlog 100 }
 }
-</code></pre> <p>The following relayd(8) configuration listens on WireGuard IP 10.7.0.10 port 8082 and forward the connections to <code>&#60;web_hosts&#62;</code> table in HTTP:</p> <pre><code>## Macros
-lo_addr="127.0.0.1"
-wg_addr="10.7.0.10"
+</code></pre><p>The following relayd(8) configuration listens on WireGuard IP 10.7.0.10 port 8082 and forward the connections to <code>&lt;web_hosts></code> table in HTTP:</p><pre><code>## Macros
+lo_addr=&quot;127.0.0.1&quot;
+wg_addr=&quot;10.7.0.10&quot;
 
 ## Tables
-table &#60;web_hosts&#62; { $lo_addr $wg_tcenter }
+table &lt;web_hosts&gt; { $lo_addr $wg_tcenter }
 
 ## Global options
 interval 6
 log state changes
 
 # get httpfilter from file
-include "&#47;etc&#47;relayd.httpfilter.conf"
+include &quot;/etc/relayd.httpfilter.conf&quot;
 
-relay "www4" {
+relay &quot;www4&quot; {
   listen on $wg_addr port 8082
-  protocol "httpfilter"
-  forward to &#60;web_hosts&#62; port 8080\
-    mode loadbalance check http "&#47;" code 200
+  protocol &quot;httpfilter&quot;
+  forward to &lt;web_hosts&gt; port 8080\
+    mode loadbalance check http &quot;/&quot; code 200
 }
-</code></pre> <h2 id=httpd8-configuration>httpd(8) configuration</h2> <p>Now we can use a simple non-HTTPS configuration for <code>httpd(8)</code> in the <code>server</code> section:</p> <pre><code>server "artnoi.com" {
-  alias "www.artnoi.com"
+</code></pre><h2 id=httpd-8-configuration>httpd(8) configuration</h2><p>Now we can use a simple non-HTTPS configuration for <code>httpd(8)</code> in the <code>server</code> section:</p><pre><code>server &quot;artnoi.com&quot; {
+  alias &quot;www.artnoi.com&quot;
   listen on $httpd_ip port 80
-  root "&#47;htdocs&#47;html-artnoi.com"
+  root &quot;/htdocs/html-artnoi.com&quot;
 }
-</code></pre> <p>That&#8217;s it guys!</p> <hr> <p><a href=#top>Back to top</a></p> <hr> <footer> <p>Copyright (c) 2019 - 2023 Prem Phansuriyanon</p> <p>Verbatim copying and redistribution of this entire page are permitted provided this notice is preserved</p> </footer> </body> </html> 
+</code></pre><p>That&rsquo;s it guys!</p><hr><p><a href=#top>Back to top</a></p><hr><footer><p>Copyright (c) 2019 - 2023 Prem Phansuriyanon</p><p>Verbatim copying and redistribution of this entire page are permitted provided this notice is preserved</p></footer></body></html>
