@@ -1,38 +1,38 @@
-<!doctype html><html lang=en><title>Artnoi.com</title><meta name=viewport content="width=device-width,initial-scale=1"><meta name=keywords content="artnoi,Prem Phansuriyanon"><meta name=author content="@artnoi"><meta charset=UTF-8><link href=/style.css rel=stylesheet><ul class=navbar><li><a href=/><img src=/toplogo.png alt=Artnoi.com class=logo>artnoi</a><li class=f-right><a href=/cheat/>cheat</a><li class=f-right><a href=https://notes.artnoi.com/#/all-pages>notes</a><li class=f-right><a href=/blog/>blog</a></ul><p>Nov 20, <a href=/blog/2023/>2023</a><h1 id=introducing-ali-and-ali-rs>Introducing ALI and ali-rs</h1><p><a href=https://github.com/soyart/ali>ALI</a> is my latest big project,
+<!doctype html><html lang=en><head><title>Artnoi.com</title><meta name=viewport content="width=device-width,initial-scale=1"><meta name=keywords content="artnoi,Prem Phansuriyanon"><meta name=author content="@artnoi"><meta charset=UTF-8><link href=/style.css rel=stylesheet></head><body><ul class=navbar><li><a href=/><img src=/toplogo.png alt=Artnoi.com class=logo>artnoi</a></li><li class=f-right><a href=/cheat/>cheat</a></li><li class=f-right><a href=https://notes.artnoi.com/#/all-pages>notes</a></li><li class=f-right><a href=/blog/>blog</a></li></ul><p>Nov 20, <a href=/blog/2023/>2023</a></p><h1 id=introducing-ali-and-ali-rs>Introducing ALI and ali-rs</h1><p><a href=https://github.com/soyart/ali>ALI</a> is my latest big project,
 arising from my itch to create something like cloud-init but
-with very focused goals in mind.<p>The result is a somewhat small but very simple mechanism
+with very focused goals in mind.</p><p>The result is a somewhat small but very simple mechanism
 for preparing a new Arch Linux system. ALI was first meant
 to be a big web of shell scripts, but later evolved into just
-a declarative YAML specification.<p>It is designed based on my own experience of maintaining
-Arch Linux systems as hobby and at my previous job.<p><a href=https://github.com/soyart/ali-rs>ali-rs</a> is the reference
+a declarative YAML specification.</p><p>It is designed based on my own experience of maintaining
+Arch Linux systems as hobby and at my previous job.</p><p><a href=https://github.com/soyart/ali-rs>ali-rs</a> is the reference
 implementation for ALI, with manifest validation and other
-features aimed at simplifying and standardizing Arch Linux installations.<p>Users can use ALI and ali-rs to create somewhat reproducible
-Arch Linux systems.<h2 id=ali-vs-cloud-init-or-autoinstall>ALI vs cloud-init or autoinstall</h2><p><strong>The most clear difference between ALI and <a href=https://cloud-init.io>cloud-init</a>
+features aimed at simplifying and standardizing Arch Linux installations.</p><p>Users can use ALI and ali-rs to create somewhat reproducible
+Arch Linux systems.</p><h2 id=ali-vs-cloud-init-or-autoinstall>ALI vs cloud-init or autoinstall</h2><p><strong>The most clear difference between ALI and <a href=https://cloud-init.io>cloud-init</a>
 is that ALI is just a YAML specification</strong>, while cloud-init is
 a full-fledged platform for configuring Linux machines
-for the cloud, and comes with its own set of mostly Python tools.<p>Unlike cloud-init and autoinstall, ALI does not aim to
+for the cloud, and comes with its own set of mostly Python tools.</p><p>Unlike cloud-init and autoinstall, ALI does not aim to
 always create a full, bootable system. Parts of the declaration
 can be omitted, and ALI can be used to just bootstrap a new
-chroot environment.<p>This allows ALI users to use ALI to create an Arch Linux system
+chroot environment.</p><p>This allows ALI users to use ALI to create an Arch Linux system
 anywhere; users can use ALI for creating a new Arch environment
-on a real disk with a bootloader, or as chroot mountpoints.<p>While cloud-init is more fully-featured, it can be an overkill
+on a real disk with a bootloader, or as chroot mountpoints.</p><p>While cloud-init is more fully-featured, it can be an overkill
 for (my) personal use, and the feedback users get from applying
 the cloud-init manifests is not instant - you&rsquo;d need
-to reboot to re-apply cloud-init manifests.<p>Users can even just use ALI to partition their disks for them,
-while the users perform the actual installation.<p>Or users can manually partition the disks before using ALI to
-populate/configure the systems.<p>Another difference is that cloud-init is run at boot time,
+to reboot to re-apply cloud-init manifests.</p><p>Users can even just use ALI to partition their disks for them,
+while the users perform the actual installation.</p><p>Or users can manually partition the disks before using ALI to
+populate/configure the systems.</p><p>Another difference is that cloud-init is run at boot time,
 right before the system fully boots, while ALI, as a standard,
-does not have this limitation.<h2 id=ali-rs>ali-rs</h2><p>After the spec is published, I began working on a reference implementation.<p><a href=https://github.com/soyart/ali-rs>ali-rs</a> is that implementation,
-written in Rust because <a href=/blog/2023/try-rust/>I wanted to learn the language</a>.<p>This implementation is a single binary Rust program,
+does not have this limitation.</p><h2 id=ali-rs>ali-rs</h2><p>After the spec is published, I began working on a reference implementation.</p><p><a href=https://github.com/soyart/ali-rs>ali-rs</a> is that implementation,
+written in Rust because <a href=/blog/2023/try-rust/>I wanted to learn the language</a>.</p><p>This implementation is a single binary Rust program,
 and it fully supports all of ALI features, with its own
-extra features not found in ALI, like manifest validation.<p>ali-rs is currently 70-80% done, with all of ALI features implemented
+extra features not found in ALI, like manifest validation.</p><p>ali-rs is currently 70-80% done, with all of ALI features implemented
 but not yet completely tested. I occasionally use it to install
-Arch Linux to new Vultr VPS.<p>ali-rs has manifest validation built-in and enabled by default,
+Arch Linux to new Vultr VPS.</p><p>ali-rs has manifest validation built-in and enabled by default,
 which means that, if there&rsquo;s no bug (ahem), ali-rs would never
 wipe your data on existing block devices. This makes ali-rs
-safe to use on non-clean slate scenarios.<p>In addition to arbitary shell commands, ali-rs also features its own
+safe to use on non-clean slate scenarios.</p><p>In addition to arbitary shell commands, ali-rs also features its own
 sub-language called <a href=https://github.com/soyart/ali-rs/blob/master/HOOKS.md>hooks</a>,
 which are just simple text interface for configuring Arch Linux systems
-in an opinionated way.<p>This means that even though ALI does not have boot features,
+in an opinionated way.</p><p>This means that even though ALI does not have boot features,
 users still have the means to provide bootloader configuration programmatically
-via shell scripts or ali-rs hooks.<hr><p><a href=#top>Back to top</a><hr><footer><p>Copyright (c) 2019 - 2023 Prem Phansuriyanon<p>Verbatim copying and redistribution of this entire page are permitted provided this notice is preserved</footer>
+via shell scripts or ali-rs hooks.</p><hr><p><a href=#top>Back to top</a></p><hr><footer><p>Copyright (c) 2019 - 2023 Prem Phansuriyanon</p><p>Verbatim copying and redistribution of this entire page are permitted provided this notice is preserved</p></footer></body></html>
