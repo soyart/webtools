@@ -37,5 +37,5 @@ which is my desktop and terminal font face, with blue-ish color scheme from
 
 <s>artnoi.com is [served using OpenBSD `httpd(8)` and `relayd(8)`](/blog/2022/openbsd-https).</s>
 
-As of Nov 2023, artnoi.com is served using [GitHub Pages](https://docs.github.com/en/pages),
-and built from Markdown using [ssg](https://github.com/soyart/ssg).
+artnoi.com is built from Markdown using [ssg](https://github.com/soyart/ssg)
+and deployed to GitHub Pages via [webtools](https://github.com/soyart/webtools).
