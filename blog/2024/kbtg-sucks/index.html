@@ -65,7 +65,7 @@ Most of them have &ldquo;advanced&rdquo; or senior titles, but none of them woul
 fit my personal standard for senior devs.</p><h4 id=no-ownership-among-the-devs>No ownership among the devs</h4><blockquote><p>Of all the devs I work with here, only 3 were considered competent</p></blockquote><p>All of them had no interest in having ownership of their code.
 They only focused on delivering their buggy, barely-working code
 at the end of the sprints.</p><p>They never mentioned the word &ldquo;tech debt&rdquo; too, so it&rsquo;s
-only normal that the sprint demos usually had more failures than success.</p><h4 id=lack-of-intelligence>Lack of intelligence</h4><p>All of them that I worked with are what we call &ldquo;cargo-cult developer&rdquo; -
+only normal that the sprint demos usually had more failures than success.</p><h4 id=lack-or-very-low-level-of-intelligence>Lack or very low level of intelligence</h4><p>All of them that I worked with are what we call &ldquo;cargo-cult developer&rdquo; -
 a grouping of SWEs who only do something because someone told them
 it&rsquo;s good, without any small critical thinking efforts.</p><p>This is why they couldn&rsquo;t tell that their code is shit and not &ldquo;clean
 architecture&rdquo; at all. They never thought about it - some of their senior
@@ -85,22 +85,23 @@ that operates without foreign key constraints, proper row ID,
 and another version for production databases.</p><p>Some of them did not even bother to notice that code written to work
 on development environment is very likely to be broken on production.</p><p>And, you guess it, they ALWAYS had database constraint-related bugs when testing
 in SIT-like environments. This used to happen every week.</p><p>This SQL constraint issue, coupled with their low intellect, kept the outsourced
-company from timely delivery of the product.</p><h4 id=stupid-code-reviews>Stupid code reviews</h4><p>They are hell-bent on making every code review a D-grade drama,
+company from timely delivery of the product.</p><h4 id=stupid-code-reviews>Stupid code reviews</h4><p>They are hell-bent on making every code review a Netflix drama,
 where stupid shit like naming, alphabet order, and other cliche, cargo-cult stuff
-gets mentioned all the time, but the obvious shit like <em>not</em> handling errors,
-transactions, and mutexes are not considered.</p><p>They don&rsquo;t follow any style guides, instead, they made up their own rules
+gets mentioned all the time, but the obvious problems like <em>not</em> handling errors,
+database transactions, and mutexes are not being mentioned or cared about at all.</p><p>They don&rsquo;t follow any style guides, instead, they made up their own rules
 based on their (possibly) JavaScript and Java backgrounds.</p><p>They always wanted to force their stupid, useless convention on me,
 pointing to their style guide reference every time I signaled my unwillingness
-to comply. If their style was any good or logical, I&rsquo;d not complain one bit.</p><p>Even worse is when they reject mys PR citing their stupid
+to comply. If their style was any good or logical, I&rsquo;d not complain one bit.</p><p>Even worse is when they reject my PRs citing their stupid
 rules like interfaces should be defined in alphabetical order,
 while their recently merged PRs also clearly violated this rule.
 They ignored my comment pointing out they themselves just pushed changes
-violating their rules.</p><p>When I told them that some of their rules outright violates Go convention,
+violating their rules.</p><p>When I told them that some if not most of their rules outright violate Go convention,
 they ignored it, citing extra efforts.</p><p>They used to reject my code that follows Google and Uber Go style guide,
-which is the one they said they followed. When I told them that this is
-not right according to Google, or Uber style guides, they simply said
-&ldquo;oh, we have our own rules&rdquo; and continue to name files like JavaScript,
-which led to buggy GitLab runner from case-insensitive filesystem on the server.</p><p>These people had no idea that they are bad devs, despite having worked
+which is the one they said they followed. When I corrected them saying
+none of the style guides mention or encourage their convention of camelCase filenames,
+they will just say &ldquo;oh, we have our own rules&rdquo;, and proceeding to continue to name files
+like JavaScript, which led to buggy GitLab runner from case-insensitive filesystem
+on the server.</p><p>These people had no idea that they are bad devs, despite having worked
 in software for more than a decade. If you go to their LinkedIn profile
 you&rsquo;ll see that they brag about how they know &ldquo;CRUD&rdquo;, &ldquo;PostgreSQL&rdquo;, &ldquo;REST API&rdquo;.
 One of them even spells Go (Golang) differently 5 times in their resume.
