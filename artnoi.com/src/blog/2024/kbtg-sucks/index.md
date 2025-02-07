@@ -161,7 +161,7 @@ at the end of the sprints.
 They never mentioned the word "tech debt" too, so it's
 only normal that the sprint demos usually had more failures than success.
 
-#### Lack of intelligence
+#### Lack or very low level of intelligence
 
 All of them that I worked with are what we call "cargo-cult developer" -
 a grouping of SWEs who only do something because someone told them
@@ -203,10 +203,10 @@ company from timely delivery of the product.
 
 #### Stupid code reviews
 
-They are hell-bent on making every code review a D-grade drama,
+They are hell-bent on making every code review a Netflix drama,
 where stupid shit like naming, alphabet order, and other cliche, cargo-cult stuff
-gets mentioned all the time, but the obvious shit like *not* handling errors,
-transactions, and mutexes are not considered.
+gets mentioned all the time, but the obvious problems like *not* handling errors,
+database transactions, and mutexes are not being mentioned or cared about at all.
 
 They don't follow any style guides, instead, they made up their own rules
 based on their (possibly) JavaScript and Java backgrounds.
@@ -215,20 +215,21 @@ They always wanted to force their stupid, useless convention on me,
 pointing to their style guide reference every time I signaled my unwillingness
 to comply. If their style was any good or logical, I'd not complain one bit.
 
-Even worse is when they reject mys PR citing their stupid
+Even worse is when they reject my PRs citing their stupid
 rules like interfaces should be defined in alphabetical order,
 while their recently merged PRs also clearly violated this rule.
 They ignored my comment pointing out they themselves just pushed changes
 violating their rules.
 
-When I told them that some of their rules outright violates Go convention,
+When I told them that some if not most of their rules outright violate Go convention,
 they ignored it, citing extra efforts.
 
 They used to reject my code that follows Google and Uber Go style guide,
-which is the one they said they followed. When I told them that this is
-not right according to Google, or Uber style guides, they simply said
-"oh, we have our own rules" and continue to name files like JavaScript,
-which led to buggy GitLab runner from case-insensitive filesystem on the server.
+which is the one they said they followed. When I corrected them saying
+none of the style guides mention or encourage their convention of camelCase filenames,
+they will just say "oh, we have our own rules", and proceeding to continue to name files
+like JavaScript, which led to buggy GitLab runner from case-insensitive filesystem
+on the server.
 
 These people had no idea that they are bad devs, despite having worked
 in software for more than a decade. If you go to their LinkedIn profile
