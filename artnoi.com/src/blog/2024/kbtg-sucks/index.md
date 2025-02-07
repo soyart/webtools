@@ -29,19 +29,22 @@ experience with the company, and why I had to leave there in a hurry.
 
 I joined KBTG in Oct 2023 as a full-time software engineer.
 My hunch during the interview with other KBTG employees raised
-a lot of red flags for me (I thought the interviewers seemed dumb technically).
+a lot of red flags. For me personally, I thought the interviewers
+seemed and sounded dumb.
 
 But I accepted the offer any way.
 
-The first day was the orientation, and one of senior executives welcomed us
-with some narcissistic theme that went something like:
+During the orientation which is the 1st day of employment,
+one of senior executives welcomed us with some what weird
+perspective that went something like:
 
-> ".. we're one of the best tech companies in the SEA region.
+> "At KBTG .... we're one of the best tech companies in the SEA region.
 > We now have 1.5k employees (or something), but we aim to recruit
-> more people and pushed that count to 2500, so that we can be
-> **the best** in SEA"..
+> more and more people and push that count to 2500, so that we can be
+> **the best** in SEA" ....
 >
-> A 65 year old senior executive at, ahem, SEA's best tech companies
+> A 65 year old senior executive at a self-proclaimed member of SEA's
+> best tech companies, whatever that means.
 
 I kid you not, so they think they are "the best" because they have
 so many people working for them.
@@ -51,10 +54,6 @@ in the world, simply because they employ up to 2 million people,
 or NK's Korean People's Army has the most fearsome combat poweress
 simply because their towering number of personnel.
 
-(Coming back to think about it,
-I'd say this kind of thinking matches the speaker's level of overall
-intelligence, experience, and awareness).
-
 The fact that they thought adding people will get them closer to
 their goal of being at the top also sounds very weird. Sure,
 if they only acquired competent business people and engineers,
@@ -62,49 +61,49 @@ and not some nepo kid bankers, bozo engineers, or incompetent
 mid-level managers.
 
 During the orientation they kept telling us new joiners that
-they only have "the best of the best" people working for them,
-that everyone here is incredibly talented.
+they only have "the best of the best" people in tech working for them,
+and that everyone here is incredibly talented.
 
-### Team
+### Team and engineering levels
 
 I was assigned to an all-new-joiner squad, working on the backend of
 a upcoming mobile app product.
 
-And then I learned that there are 3 tiers of SWEs at KBTG - a normal one
-(e.g. me), "advanced", and senior. I was the only normal engineer
-(not advanced, not senior) in the entire squad.
-
 The app is incredibly simple - more like a front-end for SQL databases
 and bank's legacy core banking software running in their mainframes.
 
+Then I learned that there are 3 tiers of SWEs at KBTG - a normal one
+(e.g. me), "advanced", and senior. I was the only normal engineer
+(not advanced, not senior) in the entire squad.
+
 I also learned that the project we're working had been developed
-by an outsourcers for 2 years already. In late 2023, around
-25-30 SWEs were working on the product, which was still in beta.
+by an outsourced company for 2 years already. In late 2023, a total of
+25-30 SWEs were working on the product, which was still in beta and
+nowhere near being ready for production.
 
-So, an outsourced company had been working on KBTG products for 2
-years, and in 2023 KBTG hired more people, including me,
-to ship this product within their release timeline because the
-outsourced teams couldn't.
+It seems like KBTG just hired us to help with the delivery of the app
+after incompetent contractors failed to ship it after 2 years.
 
-> Other squad members had joined together and worked together before.
-> They all came from the same place (another Thai bank), and they all
-> came here because their followed their manager. I later heard from
-> a friend that their previous workplace was purging old, incompetent
-> engineers, replacing them with younger, more competent new joiners.
+> Other team members had joined together and worked together before.
+> They all came from the another Thai bank, and they all
+> came here because their followed their manager who led the exodus.
+> I later heard from > a friend that their previous workplace was purging old,
+> incompetent *senile* engineers, replacing them with younger and more
+> competent new hires.
 
 ### Worst possible code
-
-The first time I took a look at it, I was cursing whoever
-wrote that piece of shit, antichrist software.
-
-I'm not gonna say that my code is any good, but it sure was better
-than theirs.
 
 Their code is super bad - it follows a very stupid interpretation
 of "Clean Architecture", where they focused on the wrong part
 about the pattern (they did not even read the book).
 
-One of them cared so much about keeping the function body short,
+The first time I took a look at it, I was cursing whoever
+wrote that piece of shit, antichrist software.
+
+I'm not gonna say that my code is any good, but it sure was better
+than theirs by all metrics.
+
+One of them cared so much about keeping the function body super short,
 so he splited a complex function into 5, all of which were not reused
 at all and resulted in fragmented code that I have to move up and down
 the files to understand.
