@@ -36,7 +36,7 @@ mkswap -U clear &quot;$SWAPFILE&quot;;
 swapon &quot;$SWAPFILE&quot;;
 
 echo &quot;$SWAPFILE none swap defaults 0 0&quot; &gt;&gt; /etc/fstab;
-</code></pre><p>Now we have a good swapfile, now let&rsquo;s tell our bootloader to pass the new <code>resume</code> and <code>resume_offset</code>.</p><p>This time, <code>resume</code> is the UUID of the device on which the filesystem with the swapfile is. In my case, <code>swapfile</code> is in Btrfs subvolume <code>/swapvolume</code>, which, being a logical volume, shares the same UUID as its parent <code>/</code>. So <code>resume</code> for me is going to be the UUID of my Btrfs filesystem.</p><p><code>resume_offset</code> is offset of the swapfile.</p><p>Getting file offset on a filesystems <strong>other than Btrfs</strong> can use this command to find the value for <code>resume_offset</code> of file <code>/swapfile</code>:</p><pre><code class=language-shell>    filefrag -v '/swapfile';
+</code></pre><p>Now we have a good swapfile, now let&rsquo;s tell our bootloader to pass the new <code>resume</code> and <code>resume_offset</code>.</p><p>This time, <code>resume</code> is the UUID of the device on which the filesystem with the swapfile is. In my case, <code>swapfile</code> is in Btrfs subvolume <code>/swapvolume</code>, which, being a logical volume, shares the same UUID as its parent <code>/</code>. So <code>resume</code> for me is going to be the UUID of my Btrfs filesystem.</p><p><code>resume_offset</code> is offset of the swapfile.</p><p>Getting file offset on a filesystems <strong>other than Btrfs</strong> can use this command to find the value for <code>resume_offset</code> of file <code>/swapfile</code>:</p><pre><code class=language-shell>filefrag -v '/swapfile';
 </code></pre><p>And this is the output of the above command:</p><pre><code>Filesystem type is: fb69
 File size of /swapfile is 4294967296 (1048576 blocks of 4096 bytes)
 ext:     logical_offset:        physical_offset: length:   expected: flags:
@@ -44,16 +44,16 @@ ext:     logical_offset:        physical_offset: length:   expected: flags:
 1:        1..   22527:      38913..     61439:  22527:             unwritten
 2:    22528..   53247:     899072..    929791:  30720:      61440: unwritten
 </code></pre><p>In this case, the <code>resume_offset</code> is 38912.
-With Btrfs, the whole thing is a mess, and <code>filefrag</code> won&rsquo;t help you. Instead, you&rsquo;ll need to grab a small C program source code off GitHub, and use it to determine your <code>resume_offset</code>:</p><pre><code class=language-shell>    ## You should review the source code before proceeding :)
-    URL=&quot;https://github.com/osandov/osandov-linux/blob/master/scripts/btrfs_map_physical.c&quot;;
-    #
-    PROGNAME='btrfs_map_physical';
-    cd /tmp;
-    curl $URL &gt; $PROGNAME;
-    gcc -O2 -o &quot;$PROGNAME&quot; &quot;${PROGNAME}.c&quot;;
-    chmod +x $PROGNAME
-    mv $PROGNAME /usr/local/sbin/;
-    &quot;$PROGNAME&quot; /swapvolume/swapfile
+With Btrfs, the whole thing is a mess, and <code>filefrag</code> won&rsquo;t help you. Instead, you&rsquo;ll need to grab a small C program source code off GitHub, and use it to determine your <code>resume_offset</code>:</p><pre><code class=language-shell>## You should review the source code before proceeding :)
+URL=&quot;https://github.com/osandov/osandov-linux/blob/master/scripts/btrfs_map_physical.c&quot;;
+#
+PROGNAME='btrfs_map_physical';
+cd /tmp;
+curl $URL &gt; $PROGNAME;
+gcc -O2 -o &quot;$PROGNAME&quot; &quot;${PROGNAME}.c&quot;;
+chmod +x $PROGNAME
+mv $PROGNAME /usr/local/sbin/;
+&quot;$PROGNAME&quot; /swapvolume/swapfile
 </code></pre><p>The last command should produce the following output:</p><pre><code>FILE OFFSET EXTENT TYPE LOGICAL SIZE LOGICAL OFFSET PHYSICAL SIZE DEVID PHYSICAL OFFSET
 0          regular  4096      2927632384 268435456 1 4009762816
 4096       prealloc 268431360 2927636480 268431360 1 4009766912
@@ -63,7 +63,7 @@ With Btrfs, the whole thing is a mess, and <code>filefrag</code> won&rsquo;t hel
 1073741824 prealloc 268435456 4056940544 268435456 1 5139070976
 1342177280 prealloc 268435456 4325376000 268435456 1 5407506432
 1610612736 prealloc 268435456 4593811456 268435456 1 5675941888
-</code></pre><p>This time, <code>resume_offset</code> boot parameter is the <code>PHYSICAL_OFFSET</code> of <code>FILE OFFSET 0</code>, which is 4009762816. After you put both kernel parameters in your bootloader entry, you&rsquo;re done. That should be it for resuming to swapfile.</p><h3 id=resume-to-zfs>Resume to ZFS</h3><p>I have both dm-crypt and encrpyted ZFS root filesystems, but I can only got the dm-crypt root to resume properly, because the <code>resume</code> initramfs hook would just skip ZFS swap ZVOL and complained that it could not find the resume device when actually the ZPOOL had not been unlocked. I could not use a separate dm-crypt swap partition either, because I want TRIM support for my filesystems, and that requires <code>systemd</code> and <code>sd-encrypt</code> hook which in turn breaks ZFS encryption (as of June 21, 2020).</p><h3 id=suspend-hibernate-on-lid-close>Suspend/hibernate on lid-close</h3><p>For Arch to suspend/hibernate on laptop lid-close event, I had to do the following:</p><ul><li><p>System-wide/console<br>First, start by configuring <code>logind.conf</code> and see if it works.</p></li><li><p>GUI: basic suspend<br>If suspense on console works, now it should also work on X by issuing <code># systemctl suspend</code> on an X terminal.</p></li><li><p>GUI: suspend and lock GUI (X/Wayland) screen (<code>slock</code>, <code>swaylock</code>)</p></li></ul><h3 id=using-systemd-service-to-activate-screen-lock-on-sleep>Using systemd service to activate screen lock on sleep</h3><p>We can use a basic systemd service to execute a screen locker before <code>suspend.target</code>.</p><p>Below is an example I copied from the Arch Wiki <a href=https://wiki.archlinux.org/index.php/Slock>slock page</a> and my <code>swaylock@.service</code> for Sway (a Wayland window manager):</p><pre><code>#/etc/systemd/system/slock@.service
+</code></pre><p>This time, <code>resume_offset</code> boot parameter is the <code>PHYSICAL_OFFSET</code> of <code>FILE OFFSET 0</code>, which is 4009762816. After you put both kernel parameters in your bootloader entry, you&rsquo;re done. That should be it for resuming to swapfile.</p><h3 id=resume-to-zfs>Resume to ZFS</h3><p>I have both dm-crypt and encrpyted ZFS root filesystems, but I can only got the dm-crypt root to resume properly, because the <code>resume</code> initramfs hook would just skip ZFS swap ZVOL and complained that it could not find the resume device when actually the ZPOOL had not been unlocked. I could not use a separate dm-crypt swap partition either, because I want TRIM support for my filesystems, and that requires <code>systemd</code> and <code>sd-encrypt</code> hook which in turn breaks ZFS encryption (as of June 21, 2020).</p><h3 id=suspend-hibernate-on-lid-close>Suspend/hibernate on lid-close</h3><p>For Arch to suspend/hibernate on laptop lid-close event, I had to do the following:</p><ul><li><p>System-wide/console</p><p>First, start by configuring <code>logind.conf</code> and see if it works.</p></li><li><p>GUI: basic suspend</p><p>If suspense on console works, now it should also work on X by issuing <code># systemctl suspend</code> on an X terminal.</p></li><li><p>GUI: suspend and lock GUI (X/Wayland) screen (<code>slock</code>, <code>swaylock</code>)</p></li></ul><h3 id=using-systemd-service-to-activate-screen-lock-on-sleep>Using systemd service to activate screen lock on sleep</h3><p>We can use a basic systemd service to execute a screen locker before <code>suspend.target</code>.</p><p>Below is an example I copied from the Arch Wiki <a href=https://wiki.archlinux.org/index.php/Slock>slock page</a> and my <code>swaylock@.service</code> for Sway (a Wayland window manager):</p><pre><code>#/etc/systemd/system/slock@.service
 [Unit]
 Description=Lock X session using slock for user %i
 Before=sleep.target

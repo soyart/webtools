@@ -57,11 +57,11 @@ seasoned and new-to-the-language programmers, enabling better velocity when onbo
 controls. We can even write separate builders for each DBMS if our queries
 are super complex.</p><blockquote><p>An example of custom query builders <a href=https://github.com/soyart/gsl/tree/master/sqlquery>is gsl/sqlquery</a>.</p><p>It was paired with <a href=https://github.com/Masterminds/squirrel>squirrel</a>
 query builder library, and only used when the squirrel does not support
-what I&rsquo;m doing, or when hacking squirrel seems unintuitive.</p></blockquote><h2 id=conclusion>Conclusion</h2><ul><li>ORM is okay for quick prototyping</li></ul><p>ORM allows us to just use <code>findOne</code>, <code>findMany</code>, and other convenient APIs
-to give us an idea of how data repositories should be implemented.</p><ul><li>ORM is okay for small apps</li></ul><p>ORM can be used in small projects, to avoid reinventing the wheel.</p><ul><li>ORM is bad for real production code</li></ul><p>If your company is developing its own applications, then ORM could
+what I&rsquo;m doing, or when hacking squirrel seems unintuitive.</p></blockquote><h2 id=conclusion>Conclusion</h2><ul><li><p>ORM is okay for quick prototyping</p><p>ORM allows us to just use <code>findOne</code>, <code>findMany</code>, and other convenient APIs
+to give us an idea of how data repositories should be implemented.</p></li><li><p>ORM is okay for small apps</p><p>ORM can be used in small projects, to avoid reinventing the wheel.</p></li><li><p>ORM is bad for real production code</p><p>If your company is developing its own applications, then ORM could
 be hindering velocity and introduces unintentional expensive operations.</p><p>ORM&rsquo;s also hides SQL queries (which we&rsquo;re supposed to know) from us,
 adding another layer of complexity.</p><p>And if you solely relied on ORM without knowing SQL,
 you&rsquo;ll be screwed once future changes need to involve some complex,
-performant queries with dialect clauses.</p><ul><li>Force yourself to know, <em>and use</em>, vanilla SQL enough such that you don&rsquo;t need ORM</li></ul><p>Knowing SQL is a must - there&rsquo;s no excuse for that. And we can
-then use that knowledge to write code using query builder libraries.</p><p>If the builder libraries do not cover what you&rsquo;re doing, you can
+performant queries with dialect clauses.</p></li><li><p>Force yourself to know, <em>and use</em>, vanilla SQL enough such that you don&rsquo;t need ORM</p><p>Knowing SQL is a must - there&rsquo;s no excuse for that. And we can
+then use that knowledge to write code using query builder libraries.</p></li></ul><p>If the builder libraries do not cover what you&rsquo;re doing, you can
 just write a custom one to handle that part.</p><hr><p><a href=#top>Back to top</a></p><hr><footer><p>Copyright (c) 2019 - 2023 Prem Phansuriyanon</p><p>Verbatim copying and redistribution of this entire page are permitted provided this notice is preserved</p></footer></body></html>
