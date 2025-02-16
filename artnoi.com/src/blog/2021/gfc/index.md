@@ -75,25 +75,25 @@ gfc will _not_ hash keyfiles, because I expect user's keyfile to be more random 
 
 - `gfc.go`
 
-The only file for `main` package is `gfc.go` and is responsible for controlling flows. Other code (e.g. I/O and AES) is in `gfc/crypt` directory.
+    The only file for `main` package is `gfc.go` and is responsible for controlling flows. Other code (e.g. I/O and AES) is in `gfc/crypt` directory.
 
-This main file defines type `flags` that holds command-line flags information. The `flags` struct also has crypt.GfcFile embedded.
+    This main file defines type `flags` that holds command-line flags information. The `flags` struct also has crypt.GfcFile embedded.
 
 - `crypt/file.go`
 
-I/O and file operation methods are defined in `aesgfc/file.go`. This file also defines a struct; `aesgfc.GfcFile` for files used by gfc.
+    I/O and file operation methods are defined in `aesgfc/file.go`. This file also defines a struct; `aesgfc.GfcFile` for files used by gfc.
 
-Currently, this struct and its methods wraps basic `os.File` methods like `Open()`, `Create()`, `Read()` and `Write()`. Other functions and methods include those that deal with hex encoding and decoding.
+    Currently, this struct and its methods wraps basic `os.File` methods like `Open()`, `Create()`, `Read()` and `Write()`. Other functions and methods include those that deal with hex encoding and decoding.
 
-If gfc is given `-H` (hexadecimal), then (1) for encryption, the encrypted output buffer is encoded to hex with `EncodeBuf()` before being written to outfile, or (2) for decryption, the infile is read into a buffer, and that read buffer is decoded from hex to bytes with `DecodeFile()`.
+    If gfc is given `-H` (hexadecimal), then (1) for encryption, the encrypted output buffer is encoded to hex with `EncodeBuf()` before being written to outfile, or (2) for decryption, the infile is read into a buffer, and that read buffer is decoded from hex to bytes with `DecodeFile()`.
 
 - `crypt/key.go`
 
-This file contains code related to encryption key, e.g. reading passphrase from console, hashing passphrase, and reading keyfile. It also holds constants for gfc cryptography, e.g. the length of certain objects.
+    This file contains code related to encryption key, e.g. reading passphrase from console, hashing passphrase, and reading keyfile. It also holds constants for gfc cryptography, e.g. the length of certain objects.
 
-`crypt/ctr.go` and `crypt/gcm.go`
+- `crypt/ctr.go` and `crypt/gcm.go`
 
-gfc supports 2 AES stream cipher modes; GCM (default) and CTR (optional). GCM mode enables message authentication, which should prevent the encrypted files from being tampered. Both modes are stream ciphers based on counter mode of block mode of operation.
+    gfc supports 2 AES stream cipher modes; GCM (default) and CTR (optional). GCM mode enables message authentication, which should prevent the encrypted files from being tampered. Both modes are stream ciphers based on counter mode of block mode of operation.
 
 ## GCM (default mode)
 

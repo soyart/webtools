@@ -149,29 +149,29 @@ are super complex.
 
 - ORM is okay for quick prototyping
 
-  ORM allows us to just use `findOne`, `findMany`, and other convenient APIs
-  to give us an idea of how data repositories should be implemented.
+    ORM allows us to just use `findOne`, `findMany`, and other convenient APIs
+    to give us an idea of how data repositories should be implemented.
 
 - ORM is okay for small apps
 
-  ORM can be used in small projects, to avoid reinventing the wheel.
+    ORM can be used in small projects, to avoid reinventing the wheel.
 
 - ORM is bad for real production code
 
-  If your company is developing its own applications, then ORM could
-  be hindering velocity and introduces unintentional expensive operations.
+    If your company is developing its own applications, then ORM could
+    be hindering velocity and introduces unintentional expensive operations.
 
-  ORM's also hides SQL queries (which we're supposed to know) from us,
-  adding another layer of complexity.
+    ORM's also hides SQL queries (which we're supposed to know) from us,
+    adding another layer of complexity.
 
-  And if you solely relied on ORM without knowing SQL,
-  you'll be screwed once future changes need to involve some complex,
-  performant queries with dialect clauses.
+    And if you solely relied on ORM without knowing SQL,
+    you'll be screwed once future changes need to involve some complex,
+    performant queries with dialect clauses.
 
 - Force yourself to know, *and use*, vanilla SQL enough such that you don't need ORM
 
-  Knowing SQL is a must - there's no excuse for that. And we can
-  then use that knowledge to write code using query builder libraries.
+    Knowing SQL is a must - there's no excuse for that. And we can
+    then use that knowledge to write code using query builder libraries.
 
-  If the builder libraries do not cover what you're doing, you can
-  just write a custom one to handle that part.
+If the builder libraries do not cover what you're doing, you can
+just write a custom one to handle that part.
