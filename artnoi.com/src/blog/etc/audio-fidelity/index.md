@@ -35,23 +35,23 @@ In turn, only four parameters are needed to assess everything that affects audio
 
 - **Noise**
 
-  Anything not present in the source material
+    Anything not present in the source material
 
 - **Frequency response**
 
-  Ideally is a flat line across audible range
+    Ideally is a flat line across audible range
 
 - **Distortion**
 
-  How audio signal may distort, i.e. incorrectly manifest
+    How audio signal may distort, i.e. incorrectly manifest
 
 - **Time-based errors**
 
-  Since sound is naturally a longitudinal wave with time as one of its axis,
-  large time-based errors _will_ affect other parameters.
+    Since sound is naturally a longitudinal wave with time as one of its axis,
+    large time-based errors _will_ affect other parameters.
 
-  An example would be analog audio's _wow_ (cassete tape standard ~ 0.08%)
-  or digital audio's jitter.
+    An example would be analog audio's _wow_ (cassete tape standard ~ 0.08%)
+    or digital audio's jitter.
 
 > "These four basic parameters define everything that affects audio fidelity.
 > As powerful as it is, there's no secret "magic" to sound, no unknown parameters

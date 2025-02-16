@@ -97,7 +97,7 @@ This time, `resume` is the UUID of the device on which the filesystem with the s
 Getting file offset on a filesystems **other than Btrfs** can use this command to find the value for `resume_offset` of file `/swapfile`:
 
 ```shell
-    filefrag -v '/swapfile';
+filefrag -v '/swapfile';
 ```
 
 And this is the output of the above command:
@@ -115,16 +115,16 @@ In this case, the `resume_offset` is 38912.
 With Btrfs, the whole thing is a mess, and `filefrag` won't help you. Instead, you'll need to grab a small C program source code off GitHub, and use it to determine your `resume_offset`:
 
 ```shell
-    ## You should review the source code before proceeding :)
-    URL="https://github.com/osandov/osandov-linux/blob/master/scripts/btrfs_map_physical.c";
-    #
-    PROGNAME='btrfs_map_physical';
-    cd /tmp;
-    curl $URL > $PROGNAME;
-    gcc -O2 -o "$PROGNAME" "${PROGNAME}.c";
-    chmod +x $PROGNAME
-    mv $PROGNAME /usr/local/sbin/;
-    "$PROGNAME" /swapvolume/swapfile
+## You should review the source code before proceeding :)
+URL="https://github.com/osandov/osandov-linux/blob/master/scripts/btrfs_map_physical.c";
+#
+PROGNAME='btrfs_map_physical';
+cd /tmp;
+curl $URL > $PROGNAME;
+gcc -O2 -o "$PROGNAME" "${PROGNAME}.c";
+chmod +x $PROGNAME
+mv $PROGNAME /usr/local/sbin/;
+"$PROGNAME" /swapvolume/swapfile
 ```
 
 The last command should produce the following output:
@@ -151,11 +151,13 @@ I have both dm-crypt and encrpyted ZFS root filesystems, but I can only got the 
 
 For Arch to suspend/hibernate on laptop lid-close event, I had to do the following:
 
-- System-wide/console  
-  First, start by configuring `logind.conf` and see if it works.
+- System-wide/console
 
-- GUI: basic suspend  
-  If suspense on console works, now it should also work on X by issuing `# systemctl suspend` on an X terminal.
+    First, start by configuring `logind.conf` and see if it works.
+
+- GUI: basic suspend
+
+    If suspense on console works, now it should also work on X by issuing `# systemctl suspend` on an X terminal.
 
 - GUI: suspend and lock GUI (X/Wayland) screen (`slock`, `swaylock`)
 

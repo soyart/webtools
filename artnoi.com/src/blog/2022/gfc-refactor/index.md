@@ -53,19 +53,19 @@ To do this, I divide gfc logic into [4 different stages](https://github.com/soya
 
 - Read infile
 
-If user doesn't specify infile, `os.Stdin` file is used as infile. And if stdin is used, it must not be closed.
+    If user doesn't specify infile, `os.Stdin` file is used as infile. And if stdin is used, it must not be closed.
 
 - Preprocess
 
-Now is the time where compression occurs when encrypting, or where decoding occurs when decrypting a gfc-encoded file.
+    Now is the time where compression occurs when encrypting, or where decoding occurs when decrypting a gfc-encoded file.
 
 - Cryptography
 
-This is when encryption/decryption takes place. It is handled by the algorithm subcommand's `crypt` method.
+    This is when encryption/decryption takes place. It is handled by the algorithm subcommand's `crypt` method.
 
 - Postprocess
 
-Now is the time when gfc performs decompression (when decrypting), or encoding (when encrypting)
+    Now is the time when gfc performs decompression (when decrypting), or encoding (when encrypting)
 
 You can see all of this in file [`cli.go`](https://github.com/soyart/gfc/blob/stable/pkg/cli/cli.go).
 
