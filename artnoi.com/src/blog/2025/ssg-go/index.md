@@ -10,30 +10,55 @@ In the end, I ended up re-implenting ssg in go (ssg-go), and a lot more (soyweb)
 ## The old webtools
 
 We can't talk about ssg-go without mentioning webtools, a collection of shell scripts
-and GitHub Actions workflows designed to use ssg to publish to GitHub Pages with Markdown.
+and GitHub Actions workflows designed around the original [ssg](https://romanzolotarev.com/ssg.html).
+It used ssg and other shell scripts to publish to GitHub Pages with Markdown.
 
-Towards the end of 2023, I was thinking about overhauling
-[the old webtools](https://github.com/soyart/webtools/tree/93a36eef25f8ebf294cae0a3cb329c495d015261).
+Artnoi.com *was* generated and published via webtools, which is responsible for everything.
+While deployment was easy enough, but I started to feel some friction whenever I want to make
+changes to the old webtools however trivial the changes.
+
 The old webtools was very fragile - relying on arbitary commands on the runners to run.
-
-It needs Markdown.pl or lowdown for Markdown conversion, python3 and packages for minifiers,
+It also needs Markdown.pl *or* lowdown for Markdown conversion, python3 and packages for minifiers,
 and jq to parse JSON manifests, in addition to other UNIX tools used across the scripts.
 
 The old webtools GitHub Actions workflows feels very fragile - everything is pieced together
-via shell commands, from downloading the scripts to other dependencies.
+via shell commands, from downloading the scripts to other dependencies. A new version
+of a Python library could break our snowflake pipeline, and changes in Ubuntu now directly
+affect how the GitHub Actions scripts will look like.
 
-This is why I started packaging the original ssg and webtools with Nix, my recent obsession.
+Towards the end of 2024, I was thinking about overhauling
+[the old webtools](https://github.com/soyart/webtools/tree/93a36eef25f8ebf294cae0a3cb329c495d015261)
+to make it more "reliable" in 3rd party systems such as GitHub Actions runner.
+
+## Introducing Nix for webtools
+
+> If Nix some how falls apart due to insider politics, I plan to migrate to Guix.
+
+I wanted webtools to always work and continue to work anywhere long after its last code changes.
+This is why I started packaging the original ssg and webtools with [Nix](https://nixos.org),
+my recent obsession, to make webtools reproducible.
+
+With Nix Flake, I can even pin the whole things down to specific versions, like how `Cargo.toml`
+and `Cargo.lock` work in Rust, or `go.mod` and `go.sum` in Go. This ensures I'll always get
+the same build inputs, cryptographically enforced via SHA256 content hash.
+
+Nix cache means that even though a derivation is old and no longer available,
+it still lives on in Nix cache. With both features combined, we have packaged webtools
+in a way that will always build in Nix.
+
+Nix cache and the availability of GitHub Actions workflows for Nix means that I naturally
+chose Nix over Guix, because it has batteries included.
 
 ## Nix Flake is not enough
 
 I had many annoyance with the old webtools, in particular, the fact that I had to
-manually write indexes for blog posts or custom header titles.
+manually write index links for blog posts or custom header titles.
 
 Because the old webtools was written in shell, adding features such as modifying
-Markdown documents programmatically are very difficult and hard to test.
+Markdown documents in-place programmatically becomes very difficult and hard to test.
 
-This led to try to reimplement ssg and webtools in a real programming language,
-so that I can have those features and not end up killing myself over frustration.
+This led me to try to reimplement ssg and webtools in a real programming language,
+so that I can have those features and not end up shooting my own foot with shell scripts.
 
 ## Introducing ssg-go
 
