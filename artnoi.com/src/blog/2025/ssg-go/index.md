@@ -1,9 +1,9 @@
 Feb 17, [2025](/blog/2025/)
 
-# ssg-go
+# Introducing ssg-go
 
-My latest project was originally just a Nix flake for ssg to package all the original
-ssg shell script and its runtime dependencies.
+[My latest project](https://github.com/soyart/ssg) was originally just a Nix flake
+for the original ssg shell script and all its runtime dependencies like Markdown.pl.
 
 In the end, I ended up re-implenting ssg in go (ssg-go), and a lot more (soyweb).
 
