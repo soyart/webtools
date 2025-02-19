@@ -21,22 +21,37 @@ The old webtools was very fragile - relying on arbitary commands on the runners 
 It also needs Markdown.pl *or* lowdown for Markdown conversion, python3 and packages for minifiers,
 and jq to parse JSON manifests, in addition to other UNIX tools used across the scripts.
 
-The old webtools GitHub Actions workflows feels very fragile - everything is pieced together
-via shell commands, from downloading the scripts to other dependencies. A new version
-of a Python library could break our snowflake pipeline, and changes in Ubuntu now directly
-affect how the GitHub Actions scripts will look like.
+The old webtools GitHub Actions workflows feels like it was taped together - everything is
+pieced together via shell commands, from downloading the scripts to other dependencies.
 
-Towards the end of 2024, I was thinking about overhauling
-[the old webtools](https://github.com/soyart/webtools/tree/93a36eef25f8ebf294cae0a3cb329c495d015261)
+A new version of a Python library could break our snowflake pipeline,
+and changes in Ubuntu will now have direct effects on how the GitHub Actions scripts in webtools.
+The worst is when a dependency is somehow removed and we can no longer get a hand on it,
+or when our dependencies changed their package names.
+
+All this mess runs on GitHub Actions, an environment we cannot control. Towards the end of 2024,
+I was thinking about overhauling [the old webtools](https://github.com/soyart/webtools/tree/93a36eef25f8ebf294cae0a3cb329c495d015261)
 to make it more "reliable" in 3rd party systems such as GitHub Actions runner.
 
-## Introducing Nix for webtools
+In short, the old webtools lacked the following:
 
-> If Nix some how falls apart due to insider politics, I plan to migrate to Guix.
+- Reproducibility
+
+    We depended too much on others, and they could easily break us
+
+- Productivity
+
+    With shell scripts, we can't add new features as easily.
+
+## Address reproducibility with Nix
 
 I wanted webtools to always work and continue to work anywhere long after its last code changes.
-This is why I started packaging the original ssg and webtools with [Nix](https://nixos.org),
+This was also back when I was learning [Nix](https://nixos.org) very actively.
+
+So the first thing I do to address reproducibility is to package the original ssg and webtools with Nix,
 my recent obsession, to make webtools reproducible.
+
+Two Nix features that really caught my eyes is Nix Flake and Nix cache.
 
 With Nix Flake, I can even pin the whole things down to specific versions, like how `Cargo.toml`
 and `Cargo.lock` work in Rust, or `go.mod` and `go.sum` in Go. This ensures I'll always get
@@ -47,7 +62,9 @@ it still lives on in Nix cache. With both features combined, we have packaged we
 in a way that will always build in Nix.
 
 Nix cache and the availability of GitHub Actions workflows for Nix means that I naturally
-chose Nix over Guix, because it has batteries included.
+chose Nix over Guix, because it had batteries included and better community support.
+
+> If Nix some how falls apart due to insider politics, I plan to migrate to Guix.
 
 ## Nix Flake is not enough
 
