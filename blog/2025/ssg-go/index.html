@@ -5,19 +5,20 @@ It used ssg and other shell scripts to publish to GitHub Pages with Markdown.</p
 While deployment was easy enough, but I started to feel some friction whenever I want to make
 changes to the old webtools however trivial the changes.</p><p>The old webtools was very fragile - relying on arbitary commands on the runners to run.
 It also needs Markdown.pl <em>or</em> lowdown for Markdown conversion, python3 and packages for minifiers,
-and jq to parse JSON manifests, in addition to other UNIX tools used across the scripts.</p><p>The old webtools GitHub Actions workflows feels very fragile - everything is pieced together
-via shell commands, from downloading the scripts to other dependencies. A new version
-of a Python library could break our snowflake pipeline, and changes in Ubuntu now directly
-affect how the GitHub Actions scripts will look like.</p><p>Towards the end of 2024, I was thinking about overhauling
-<a href=https://github.com/soyart/webtools/tree/93a36eef25f8ebf294cae0a3cb329c495d015261>the old webtools</a>
-to make it more &ldquo;reliable&rdquo; in 3rd party systems such as GitHub Actions runner.</p><h2 id=introducing-nix-for-webtools>Introducing Nix for webtools</h2><blockquote><p>If Nix some how falls apart due to insider politics, I plan to migrate to Guix.</p></blockquote><p>I wanted webtools to always work and continue to work anywhere long after its last code changes.
-This is why I started packaging the original ssg and webtools with <a href=https://nixos.org>Nix</a>,
-my recent obsession, to make webtools reproducible.</p><p>With Nix Flake, I can even pin the whole things down to specific versions, like how <code>Cargo.toml</code>
+and jq to parse JSON manifests, in addition to other UNIX tools used across the scripts.</p><p>The old webtools GitHub Actions workflows feels like it was taped together - everything is
+pieced together via shell commands, from downloading the scripts to other dependencies.</p><p>A new version of a Python library could break our snowflake pipeline,
+and changes in Ubuntu will now have direct effects on how the GitHub Actions scripts in webtools.
+The worst is when a dependency is somehow removed and we can no longer get a hand on it,
+or when our dependencies changed their package names.</p><p>All this mess runs on GitHub Actions, an environment we cannot control. Towards the end of 2024,
+I was thinking about overhauling <a href=https://github.com/soyart/webtools/tree/93a36eef25f8ebf294cae0a3cb329c495d015261>the old webtools</a>
+to make it more &ldquo;reliable&rdquo; in 3rd party systems such as GitHub Actions runner.</p><p>In short, the old webtools lacked the following:</p><ul><li><p>Reproducibility</p><p>We depended too much on others, and they could easily break us</p></li><li><p>Productivity</p><p>With shell scripts, we can&rsquo;t add new features as easily.</p></li></ul><h2 id=address-reproducibility-with-nix>Address reproducibility with Nix</h2><p>I wanted webtools to always work and continue to work anywhere long after its last code changes.
+This was also back when I was learning <a href=https://nixos.org>Nix</a> very actively.</p><p>So the first thing I do to address reproducibility is to package the original ssg and webtools with Nix,
+my recent obsession, to make webtools reproducible.</p><p>Two Nix features that really caught my eyes is Nix Flake and Nix cache.</p><p>With Nix Flake, I can even pin the whole things down to specific versions, like how <code>Cargo.toml</code>
 and <code>Cargo.lock</code> work in Rust, or <code>go.mod</code> and <code>go.sum</code> in Go. This ensures I&rsquo;ll always get
 the same build inputs, cryptographically enforced via SHA256 content hash.</p><p>Nix cache means that even though a derivation is old and no longer available,
 it still lives on in Nix cache. With both features combined, we have packaged webtools
 in a way that will always build in Nix.</p><p>Nix cache and the availability of GitHub Actions workflows for Nix means that I naturally
-chose Nix over Guix, because it has batteries included.</p><h2 id=nix-flake-is-not-enough>Nix Flake is not enough</h2><p>I had many annoyance with the old webtools, in particular, the fact that I had to
+chose Nix over Guix, because it had batteries included and better community support.</p><blockquote><p>If Nix some how falls apart due to insider politics, I plan to migrate to Guix.</p></blockquote><h2 id=nix-flake-is-not-enough>Nix Flake is not enough</h2><p>I had many annoyance with the old webtools, in particular, the fact that I had to
 manually write index links for blog posts or custom header titles.</p><p>Because the old webtools was written in shell, adding features such as modifying
 Markdown documents in-place programmatically becomes very difficult and hard to test.</p><p>This led me to try to reimplement ssg and webtools in a real programming language,
 so that I can have those features and not end up shooting my own foot with shell scripts.</p><h2 id=introducing-ssg-go-1>Introducing ssg-go</h2><p>I started with the core of it all - ssg the generator.</p><p>ssg-go is the reimplementation of ssg, in Go, and with a few extra dead simple features:</p><ul><li><p>Extensible with Go API</p><p>I intend to import ssg to other code to build up the capabilities and complexity.</p></li><li><p><em>Streaming</em> builds</p><p>Instead of doing everything in a synchronous single-threaded fashion,
