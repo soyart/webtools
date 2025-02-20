@@ -1,38 +1,52 @@
 <!doctype html><html lang=en><head><title>Artnoi.com - Introducing ssg-go</title><meta name=viewport content="width=device-width,initial-scale=1"><meta name=keywords content="artnoi,Prem Phansuriyanon"><meta name=author content="@artnoi"><meta charset=UTF-8><link href=/style.css rel=stylesheet></head><body><ul class=navbar><li><a href=/><img src=/toplogo.png alt=Artnoi.com class=logo>artnoi</a></li><li class=f-right><a href=/cheat/>cheat</a></li><li class=f-right><a href=https://notes.artnoi.com/#/all-pages>notes</a></li><li class=f-right><a href=/blog/>blog</a></li></ul><p>Feb 17, <a href=/blog/2025/>2025</a></p><h1 id=introducing-ssg-go>Introducing ssg-go</h1><p><a href=https://github.com/soyart/ssg>My latest project</a> was originally just a Nix flake
-for the original ssg shell script and all its runtime dependencies like Markdown.pl.</p><p>In the end, I ended up re-implenting ssg in go (ssg-go), and a lot more (soyweb).</p><h2 id=the-old-webtools>The old webtools</h2><p>We can&rsquo;t talk about ssg-go without mentioning webtools, a collection of shell scripts
-and GitHub Actions workflows designed around the original <a href=https://romanzolotarev.com/ssg.html>ssg</a>.
-It used ssg and other shell scripts to publish to GitHub Pages with Markdown.</p><p>Artnoi.com <em>was</em> generated and published via webtools, which is responsible for everything.
-While deployment was easy enough, but I started to feel some friction whenever I want to make
+for the original ssg shell script and all its runtime dependencies like Markdown.pl.</p><p>In the end, I ended up re-implenting ssg in Go (ssg-go), and a lot more (soyweb).</p><h2 id=the-old-webtools>The old webtools</h2><p>We can&rsquo;t talk about ssg-go without mentioning <a href=https://github.com/soyart/webtools/tree/93a36eef25f8ebf294cae0a3cb329c495d015261>the old webtools</a>,
+a collection of shell scripts and GitHub Actions workflows designed around the
+<a href=https://romanzolotarev.com/ssg.html>original ssg</a>. It used ssg and other shell
+scripts to publish to GitHub Pages with Markdown.</p><p>Artnoi.com <em>was</em> generated and published via webtools, which is responsible for everything.
+While deployment was easy enough, I started to feel some friction whenever I wanted to make
 changes to the old webtools however trivial the changes.</p><p>The old webtools was very fragile - relying on arbitary commands on the runners to run.
-It also needs Markdown.pl <em>or</em> lowdown for Markdown conversion, python3 and packages for minifiers,
-and jq to parse JSON manifests, in addition to other UNIX tools used across the scripts.</p><p>The old webtools GitHub Actions workflows feels like it was taped together - everything is
-pieced together via shell commands, from downloading the scripts to other dependencies.</p><p>A new version of a Python library could break our snowflake pipeline,
-and changes in Ubuntu will now have direct effects on how the GitHub Actions scripts in webtools.
-The worst is when a dependency is somehow removed and we can no longer get a hand on it,
-or when our dependencies changed their package names.</p><p>All this mess runs on GitHub Actions, an environment we cannot control. Towards the end of 2024,
-I was thinking about overhauling <a href=https://github.com/soyart/webtools/tree/93a36eef25f8ebf294cae0a3cb329c495d015261>the old webtools</a>
-to make it more &ldquo;reliable&rdquo; in 3rd party systems such as GitHub Actions runner.</p><p>In short, the old webtools lacked the following:</p><ul><li><p>Reproducibility</p><p>We depended too much on others, and they could easily break us</p></li><li><p>Productivity</p><p>With shell scripts, we can&rsquo;t add new features as easily.</p></li></ul><h2 id=address-reproducibility-with-nix>Address reproducibility with Nix</h2><p>I wanted webtools to always work and continue to work anywhere long after its last code changes.
-This was also back when I was learning <a href=https://nixos.org>Nix</a> very actively.</p><p>So the first thing I do to address reproducibility is to package the original ssg and webtools with Nix,
-my recent obsession, to make webtools reproducible.</p><p>Two Nix features that really caught my eyes is Nix Flake and Nix cache.</p><p>With Nix Flake, I can even pin the whole things down to specific versions, like how <code>Cargo.toml</code>
-and <code>Cargo.lock</code> work in Rust, or <code>go.mod</code> and <code>go.sum</code> in Go. This ensures I&rsquo;ll always get
-the same build inputs, cryptographically enforced via SHA256 content hash.</p><p>Nix cache means that even though a derivation is old and no longer available,
-it still lives on in Nix cache. With both features combined, we have packaged webtools
-in a way that will always build in Nix.</p><p>Nix cache and the availability of GitHub Actions workflows for Nix means that I naturally
-chose Nix over Guix, because it had batteries included and better community support.</p><blockquote><p>If Nix some how falls apart due to insider politics, I plan to migrate to Guix.</p></blockquote><h2 id=nix-flake-is-not-enough>Nix Flake is not enough</h2><p>I had many annoyance with the old webtools, in particular, the fact that I had to
+It also needs Markdown.pl <em>or</em> lowdown for Markdown conversion, python3 and extra packages
+for minifiers, and jq to parse JSON manifests, in addition to other UNIX tools.</p><p>The old webtools GitHub Actions workflows feels like it was duct-taped together -
+everything is pieced together via shell commands, from downloading the scripts and
+other dependencies, building the output files, and minifying the whole thing.</p><p>A new version of a Python library could break our snowflake pipeline,
+and changes in Ubuntu will now have direct effects on how the GitHub Actions scripts
+are composed in webtools. The worst is when a dependency is somehow removed or no longer available,
+or when our dependencies changed their package names.</p><p>All this mess used to run on GitHub Actions, an environment we cannot control.
+Towards the end of 2024, I was thinking about overhauling the old webtools,
+to make it more &ldquo;reliable&rdquo; in 3rd party systems such as GitHub Actions runner.</p><p>In short, the old webtools lacked the following:</p><ul><li><p>Reproducibility</p><p>We depended too much on others, and they could easily break us</p></li><li><p>Productivity</p><p>With shell scripts, we can&rsquo;t add new features as easily.</p></li></ul><h2 id=addressing-reproducibility-with-nix>Addressing reproducibility with Nix</h2><p>I wanted webtools to always work and continue to work anywhere long after its last Git commit.</p><p>This was back when I was learning <a href=https://nixos.org>Nix</a> very actively.
+So the first thing I do to address reproducibility is to package the original ssg and webtools with Nix,
+my recent obsession, to make webtools reproducible.</p><p>Two Nix features that really caught my eyes is <a href=https://nixos.wiki/wiki/Flakes><em>Nix Flake</em></a>
+and <a href=https://nixos.wiki/wiki/Binary_Cache><em>Nix binary cache</em></a>.</p><p>With Nix Flake, I can pin the whole thing down to specific package versions,
+like how <code>Cargo.toml</code> and <code>Cargo.lock</code> work in Rust, or <code>go.mod</code> and <code>go.sum</code> in Go.
+This ensures I&rsquo;ll always get the same build inputs, cryptographically enforced via
+SHA256 content hash.</p><p>Nix Binary Cache mechanism allows everything to persist forever in theory.
+Nix community members already have set up these cache servers, and we profit off of their efforts.
+Nix cache means that even though a derivation is old and no longer available,
+it still lives on somewhere in Nix cache. With both features combined, we have packaged webtools
+in a way that will always build in Nix.</p><p>Nix Binary Cache infrastructure and the availability of GitHub Actions workflows for Nix means that
+I naturally chose Nix over Guix, because it had more batteries included and better community support.</p><blockquote><p>If Nix some how falls apart due to insider politics, I plan to migrate to Guix.</p></blockquote><h2 id=nix-flake-is-not-enough>Nix Flake is not enough</h2><p>I had many annoyances with the old webtools, in particular, the fact that I had to
 manually write index links for blog posts or custom header titles.</p><p>Because the old webtools was written in shell, adding features such as modifying
 Markdown documents in-place programmatically becomes very difficult and hard to test.</p><p>This led me to try to reimplement ssg and webtools in a real programming language,
-so that I can have those features and not end up shooting my own foot with shell scripts.</p><h2 id=introducing-ssg-go-1>Introducing ssg-go</h2><p>I started with the core of it all - ssg the generator.</p><p>ssg-go is the reimplementation of ssg, in Go, and with a few extra dead simple features:</p><ul><li><p>Extensible with Go API</p><p>I intend to import ssg to other code to build up the capabilities and complexity.</p></li><li><p><em>Streaming</em> builds</p><p>Instead of doing everything in a synchronous single-threaded fashion,
+so that I can have those features and not end up shooting my own foot with shell scripts.</p><h2 id=introducing-ssg-go-1>Introducing ssg-go</h2><p>I started with the core of it all - ssg the generator.</p><p>ssg-go is the reimplementation of ssg in Go with a few extra super simple features:</p><ul><li><p>Extensible with Go API</p><p>I intend to import ssg to other code to build up the capabilities and complexity.
+This will be important later on when we want to replace all webtools scripts with
+real programs, each having ssg-go at its core.</p></li><li><p><em>Streaming</em> builds</p><p>Instead of doing everything in a synchronous single-threaded fashion,
 ssg-go spawns 2 <em>main</em> threads, one to read and build the output,
-the other is responsible solely for spawning 1 writer thread for each output.</p></li><li><p>Customizable HTML heading title</p><p>Unlike the original ssg which only uses h1 tag.</p><p>In ssg-go, <code>_header.html</code> can specify their preferred source of heading title:</p><ul><li><p><code>{{from-h1}}</code></p><p>ssg-go will use the 1st Markdown h1 (line starting with <code>#</code>) as heading title</p></li><li><p><code>{{from-tag}}</code></p><p>ssg-go will use the first line starting with <code>:ssg-title</code> as heading title</p></li></ul></li><li><p>Concurrent writers</p><p>Users can specify how many concurrent writers to be used when writing out.</p></li></ul><p>ssg-go provides a single executable: <code>github.com/soyart/ssg/cmd/ssg</code>,
+the other is responsible solely for spawning 1 writer thread for each output.</p></li><li><p>Customizable HTML heading title</p><p>Unlike the original ssg which only uses h1 tag.</p><p>In ssg-go, <code>_header.html</code> can specify their preferred source of heading title:</p><ul><li><p><code>{{from-h1}}</code></p><p>ssg-go will use the 1st Markdown h1 (line starting with <code>#</code>) as heading title</p></li><li><p><code>{{from-tag}}</code></p><p>ssg-go will use the first line starting with <code>:ssg-title</code> as heading title</p></li></ul></li><li><p>Concurrent writers</p><p>Users can specify how many concurrent writers to be used when writing out
+via environment variable.</p></li></ul><p>ssg-go provides a single executable: <code>github.com/soyart/ssg/cmd/ssg</code>,
 which can be installed with <code>go install</code>:</p><pre><code class=language-shell>go install github.com/soyart/ssg/cmd/ssg@latest
 </code></pre><p>In addition to the executable, ssg-go exposes its own API for other consumers to augment
-ssg-go and create a higher-level generator, which we&rsquo;ll soon introduce.</p><h2 id=soyweb>soyweb</h2><p>ssg-go is great, but it does not cover all of my needs for artnoi.com.</p><p>I still had to write my own indexes, and the heading title was still hard-coded.
-Minifers were missing, and webtools&rsquo;s JSON manifest was still a foreign concept in ssg-go.</p><p>Here comes soyweb, a webtools replacement written in Go.</p><p>soyweb extends ssg-go with higher level features, such as index generators, manifests,
-and minifers.</p><blockquote><p>Because we&rsquo;re no longer working with <code>jq</code>, so there&rsquo;s no need to keep the old, dreaded
-webtools manifest schema. soyweb opts for a new schema that reads more intuitively.</p></blockquote><p>soyweb provides many executables, with most if not all of which sharing
-exactly the same CLI parameters:</p><ul><li><p>minifer</p><p>Minify a file or all files under a directory</p></li><li><p>ssg-minifer</p><p>Like ssg from ssg-go, but with minifer pipelines enabled</p></li><li><p>ssg-manifest</p><p>Reads JSON manifest and builds site(s) using ssg-go with soyweb features.
+ssg-go and create a higher-level generator, which we&rsquo;ll soon introduce.</p><h2 id=soyweb>soyweb</h2><p>I still had to write my own indexes, and the heading title was still hard-coded.
+Minifers were missing, and webtools&rsquo;s JSON manifest was still a foreign concept in ssg-go.</p><p>ssg-go is great, but it does not cover all of my needs for webtools and artnoi.com.
+ssg-go only addresses the &ldquo;HTML generation&rdquo; part of the whole picture, and a lot more
+work is needed to make it replace the old webtools.</p><p>We need minifiers, mechanism to prepare the source (i.e. copying or removing files),
+and infrastructure for extra features. This is where soyweb comes in.</p><p>soyweb extends ssg-go with higher level features, such as index generators, manifests,
+and minifers.</p><blockquote><p>Because we&rsquo;re no longer working with <code>jq</code>, so there&rsquo;s no need to keep the dreaded
+webtools&rsquo;s old manifest schema. soyweb opts for a new schema that reads more intuitively.</p></blockquote><p>Like with many scripts in webtools, where each script only does one thing,
+soyweb provides many executables, with most if not all of which sharing exactly
+the same CLI parameters:</p><ul><li><p>minifer</p><p>Minify a file or all files under a directory</p></li><li><p>ssg-minifer</p><p>Like ssg from ssg-go, but with minifer pipelines enabled</p></li><li><p>ssg-manifest</p><p>Reads JSON manifest and builds site(s) using ssg-go with soyweb features.
 All soyweb features such as minifers, index generators, etc are all available
-in ssg-manifest</p></li></ul><h2 id=the-new-webtools>The new webtools</h2><p>Now we have our own ssg and all the binaries we need to replace shell-based webtools,
+in ssg-manifest</p></li></ul><p>In addition to the executables, soyweb also exposes its own functionality as Go API.
+The API is carefully constructed to integrate seamlessly with ssg-go API.</p><p>All this allowed me to retire all of webtools old shell scripts with soyweb programs.</p><h2 id=the-new-webtools>The new webtools</h2><p>Now we have our own ssg and all the binaries we need to replace shell-based webtools,
 we can repurpose webtools to solely provide us CI/CD mechanisms for our websites.</p><p>The new webtools is just a GitHub Actions template. On push, a GitHub Actions workflow
 is run, downloading and unpacking soyweb&rsquo;s <code>ssg-manifest</code> using Nix into the runner&rsquo;s
 working directory, and use it to generate a website.</p><p>Like the original webtools, this new webtools provide us with full history of our websites,
