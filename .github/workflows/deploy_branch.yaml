@@ -7,11 +7,12 @@ on:
       branch_name:
         type: string
         required: true
-        description: Deploy the branch
+        description: Branch to deploy GitHub Pages from
       path:
         type: string
         required: false
         default: '.'
+        description: File path to GitHub Pages root within branch inputs.branch_name
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -43,14 +44,6 @@ jobs:
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
-
-      - name: Debug print
-        run: |
-          echo "Checking current Git commit"
-          git show .
-
-          echo "Listing files at ."
-          ls -al .
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
