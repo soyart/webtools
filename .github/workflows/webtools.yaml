@@ -1,4 +1,4 @@
-name: pages-v2
+name: webtools
 
 on:
   workflow_call:

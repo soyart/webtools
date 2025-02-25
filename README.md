@@ -6,7 +6,7 @@ to GitHub Pages.
 > See [ssg](https://github.com/soyart/ssg) before using webtools
 
 The entrypoint [`ci_v2.yaml`](./.github/workflows/ci_v2.yaml) sets parameters for
-[`pages_v2.yaml`](./.github/workflows/pages_v2.yaml), which uses Nix to build ssg-go
+[`webtools.yaml`](./.github/workflows/webtools.yaml), which uses Nix to build ssg-go
 executables and uses the executables to build our website(s).
 
 # Hosting with GitHub Pages
@@ -27,7 +27,7 @@ The steps are pretty straightforward:
 For example of how all this works, see branch [`artnoi.com`](https://github.com/soyart/webtools/tree/artnoi.com),
 and [`publish/artnoi.com`](https://github.com/soyart/webtools/tree/publish/artnoi.com).
 
-## [pages_v2.yaml](./.github/workflows/pages_v2.yaml) steps
+## [webtools.yaml](./.github/workflows/webtools.yaml) steps
 
 1. Install Nix on runner
 

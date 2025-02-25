@@ -1,17 +1,16 @@
-name: ci-v2
+name: webtools-ci-v2
 
 on:
   push:
     branches:
-      - master
+      - $default-branch
 
 jobs:
   build-deploy-pages:
     name: Build GitHub Pages
-    uses: ./.github/workflows/pages_v2.yaml
+    uses: ./.github/workflows/webtools.yaml
     with:
       dist: ./johndoe.com/dist
       deploy_branch: test-publish/johndoe.com
       wipe_deploy_branch: true
       cname: johndoe.com
-     
