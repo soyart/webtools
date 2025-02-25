@@ -3,7 +3,6 @@ name: webtools-ci-v2
 on:
   push:
     branches:
-      - $default-branch
       - pages-workflow
 
 jobs:
