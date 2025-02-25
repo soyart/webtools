@@ -12,6 +12,6 @@ jobs:
     uses: ./.github/workflows/webtools.yaml
     with:
       dist: ./johndoe.com/dist
-      deploy_branch: test-publish/johndoe.com
+      deploy_branch: test-pages-workflow/johndoe.com
       wipe_deploy_branch: true
       cname: johndoe.com
