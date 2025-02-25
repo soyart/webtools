@@ -8,6 +8,10 @@ on:
 
 jobs:
   build-deploy-pages:
+    permissions:
+      id-token: write
+      pages: write
+
     name: Build GitHub Pages
     uses: ./.github/workflows/webtools.yaml
     with:
