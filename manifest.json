@@ -28,7 +28,7 @@
 			},
 			"./artnoi.com/resc/logo.svg": {
 				"force": true,
-				"target": "artnoi.com/dist/logo.svg"
+				"target": "artnoi.com/dist/favicon.ico"
 			},
 			"./artnoi.com/resc/openbsd.png": {
 				"force": true,
