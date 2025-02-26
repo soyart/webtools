@@ -7,11 +7,10 @@ on:
 
 jobs:
   build-deploy-pages:
-    name: Build GitHub Pages
-    uses: ./.github/workflows/pages_v2.yaml
+    name: Build GitHub Pages using ssg
+    uses: ./.github/workflows/ssg-pages.yaml
     with:
       dist: ./johndoe.com/dist
-      deploy_branch: test-publish/johndoe.com
+      deploy_branch: test-pages-workflow/johndoe.com
       wipe_deploy_branch: true
       cname: johndoe.com
-     

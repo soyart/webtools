@@ -1,4 +1,4 @@
-name: pages-v2
+name: ssg-pages
 
 on:
   workflow_call:
@@ -116,3 +116,11 @@ jobs:
           publish_branch: ${{ inputs.deploy_branch }}
           publish_dir: ${{ inputs.dist }}
           force_orphan: $ {{ inputs.wipe_deploy_branch }}
+
+  deploy:
+    name: Deploy from branch ${{ inputs.deploy_branch }}
+    needs: build
+    uses: ./.github/workflows/deploy_branch.yaml
+    with:
+      branch_name: ${{ inputs.deploy_branch }}
+      path: '.'
