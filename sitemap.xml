@@ -7,8 +7,12 @@ xmlns="https://www.sitemaps.org/schemas/sitemap/0.9">
 <url><loc>https://johndoe.com/blog/2023/bar.html><lastmod>2025-02-26</lastmod><priority>1.0</priority></url>
 <url><loc>https://johndoe.com/blog/2023/baz/><lastmod>2025-02-26</lastmod><priority>1.0</priority></url>
 <url><loc>https://johndoe.com/blog/2023/foo.html><lastmod>2025-02-26</lastmod><priority>1.0</priority></url>
+<url><loc>https://johndoe.com/blog/2023/><lastmod>2025-02-26</lastmod><priority>1.0</priority></url>
+<url><loc>https://johndoe.com/blog/2024/article-1.html><lastmod>2025-02-26</lastmod><priority>1.0</priority></url>
+<url><loc>https://johndoe.com/blog/2024/article-2.html><lastmod>2025-02-26</lastmod><priority>1.0</priority></url>
+<url><loc>https://johndoe.com/blog/2024/><lastmod>2025-02-26</lastmod><priority>1.0</priority></url>
 <url><loc>https://johndoe.com/blog/><lastmod>2025-02-26</lastmod><priority>1.0</priority></url>
-<url><loc>https://johndoe.com/error.html><lastmod>2025-02-26</lastmod><priority>1.0</priority></url>
+<url><loc>https://johndoe.com/etc/404.html><lastmod>2025-02-26</lastmod><priority>1.0</priority></url>
 <url><loc>https://johndoe.com/fonts/Hack-Bold.ttf><lastmod>2025-02-26</lastmod><priority>1.0</priority></url>
 <url><loc>https://johndoe.com/fonts/Hack-BoldItalic.ttf><lastmod>2025-02-26</lastmod><priority>1.0</priority></url>
 <url><loc>https://johndoe.com/fonts/Hack-Italic.ttf><lastmod>2025-02-26</lastmod><priority>1.0</priority></url>
