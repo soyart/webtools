@@ -1,33 +1,34 @@
-# webtools
+# ssg-pages
 
-webtools is a GitHub Actions workflow for deploying [ssg/soyweb websites](https://github.com/soyart/ssg)
-to GitHub Pages.
+ssg-pages is a GitHub Actions workflow for deploying [ssg/soyweb](https://github.com/soyart/ssg)
+websites to GitHub Pages.
 
-> See [ssg](https://github.com/soyart/ssg) before using webtools
+> See [ssg](https://github.com/soyart/ssg) before using ssg-pages
 
-The entrypoint [`ci_v2.yaml`](./.github/workflows/ci_v2.yaml) sets parameters for
-[`webtools.yaml`](./.github/workflows/webtools.yaml), which uses Nix to build ssg-go
-executables and uses the executables to build our website(s).
+The entrypoint workflow [`ci_v2.yaml`](./.github/workflows/ci_v2.yaml) sets parameters
+for [`ssg-pages.yaml`](./.github/workflows/ssg-pages.yaml), which uses Nix
+to build ssg-go executables and uses the executables to build our website(s).
 
 # Hosting with GitHub Pages
 
-webtools requires at least 2 branches - a *source* and a *publish* branches.
+ssg-pages requires at least 2 branches - a *source* and a *publish* branches.
 The steps are pretty straightforward:
 
-- Host your Markdown site in a *site* branch, e.g. [`artnoi.com`](https://github.com/soyart/webtools/tree/artnoi.com).
+- Host your Markdown site in a *site* branch, e.g. [`artnoi.com`](https://github.com/soyart/ssg-pages/tree/artnoi.com).
 
-- Push new changes to the branch, and `ci_v2.yaml` will build your website
+- Push new changes to the branch, and `ci_v2.yaml` will be triggered to build your website
 
 - The build output from the previous step is then published to another branch,
-  a *publish*  or *deploy* branch, e.g. [`publish/artnoi.com`](https://github.com/soyart/webtools/tree/publish/artnoi.com).
+  a *publish*  or *deploy* branch, e.g. [`publish/artnoi.com`](https://github.com/soyart/ssg-pages/tree/publish/artnoi.com).
+  This preserves the whole history of our websites, in both source and web form.
 
 - GitHub Pages is set up to serve from publish branch, so the build output is served
   on GitHub Pages after the workflow ran.
 
-For example of how all this works, see branch [`artnoi.com`](https://github.com/soyart/webtools/tree/artnoi.com),
-and [`publish/artnoi.com`](https://github.com/soyart/webtools/tree/publish/artnoi.com).
+For example of how all this works, see branch [`artnoi.com`](https://github.com/soyart/ssg-pages/tree/artnoi.com),
+and [`publish/artnoi.com`](https://github.com/soyart/ssg-pages/tree/publish/artnoi.com).
 
-## [webtools.yaml](./.github/workflows/webtools.yaml) steps
+## [ssg-pages.yaml](./.github/workflows/ssg-pages.yaml) steps
 
 1. Install Nix on runner
 
@@ -41,5 +42,12 @@ and [`publish/artnoi.com`](https://github.com/soyart/webtools/tree/publish/artno
 
 6. Snapshot the output directory and publish it to deploy branch
 
-Repository owners must manually set up GitHub Pages to serve from the publish branch, otherwise,
-the workflow will only put the output files in the deploy branch.
+7. Enable HTTPS on GitHub Pages menu in your repository
+
+Note that if we do not have custom domain for our website, then GitHub Pages will serve
+your website at `username.github.io/repository`, i.e. `opensoy.github.io/ssg-pages`
+for this repository.
+
+This might break your `href` if it's absolute path. To observe this,
+go see [opensoy.github.io/ssg-pages](https://opensoy.github.io/ssg-pages)
+and try the navbar links to see where they take you.

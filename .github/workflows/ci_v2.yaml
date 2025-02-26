@@ -1,4 +1,4 @@
-name: webtools-ci-v2
+name: ci-v2
 
 on:
   push:
@@ -8,8 +8,8 @@ on:
 
 jobs:
   build-deploy-pages:
-    name: Build GitHub Pages
-    uses: ./.github/workflows/webtools.yaml
+    name: Build GitHub Pages using ssg
+    uses: ./.github/workflows/ssg-pages.yaml
     with:
       dist: ./johndoe.com/dist
       deploy_branch: test-pages-workflow/johndoe.com

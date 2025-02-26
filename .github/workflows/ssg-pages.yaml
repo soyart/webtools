@@ -1,4 +1,4 @@
-name: webtools
+name: ssg-pages
 
 on:
   workflow_call:
