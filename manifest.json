@@ -6,6 +6,10 @@
 		"dst": "johndoe.com/dist",
 		"cleanup": true,
 		"copies": {
+			"./johndoe.com/resc/error.md": {
+				"force": true,
+				"target": "./johndoe.com/src/etc/404.md"
+			},
 			"./johndoe.com/resc/_header.html": {
 				"force": true,
 				"target": "./johndoe.com/src/_header.html"
