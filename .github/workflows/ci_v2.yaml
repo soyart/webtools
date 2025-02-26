@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - pages-workflow
+      - $default_branch
 
 jobs:
   build-deploy-pages:
