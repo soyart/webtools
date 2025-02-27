@@ -150,6 +150,18 @@ Well, the tones and music are indeed the same, the way these audio equipments se
 So if your equipment could not even reproduce the easy 1KHz tone without audible distortion and noise,
 how on earth then can it reproduce the much more complex and challenging music signal?
 
+## Habitual effect
+
+People need time to adjust ears and brains, which means that the longer you have been listening to a system,
+the more it will sound more comfortable (i.e. enjoyable) to your brain.
+
+This may explain the 'burn-in' phenomenon described by audiophiles when
+they talk how they need to let their new DAC run for >100 hours for it to get to peak performance.
+
+And when some notice their gears sounding better, they think it's because of burn-in,
+not because of their steered preference. Beyerdynamic officially recognizes this problems
+and formally call the phenomenon 'habitual effects'.
+
 ## Q: Aren't discrete audio equipments going to outperform ones that rely on ICs, because the former have better parts?
 
 This is also another audio-fools myth. I don't see how discrete components can increase
@@ -198,7 +210,7 @@ Now, the question is, if analog audio performs very poorly, then why is it more 
 > why many people prefer objectively worse audio equipment.
 
 I suspect the reason people perceive digital to be less enjoyable (i.e. how audiophiles describe digital audio
-as 'sharp', or 'harsh') is because of (1) habitual effects, and (2) expectation bias.
+as 'sharp', or 'harsh') is because of (1) [habitual effect](#habitual-effect), and (2) expectation bias.
 
 These 2 topics are very interesting especially when it comes to evaluating audio performance,
 so I recommend that you read about them first if you have not.
@@ -216,14 +228,3 @@ so when digital audio reveals flaws of analog recording, people called digital a
 Another contributing factor was that older speakers and other audio components of the time when CD was introduced
 were also NOT designed to handle higher frequencies very well, resulting in even worse degradation.
 
-## More on habitual effect
-
-People need time to adjust ears and brains, which means that the longer you have been listening to a system,
-the more it will sound more comfortable (i.e. enjoyable) to your brain.
-
-This may explain the 'burn-in' phenomenon described by audiophiles when
-they talk how they need to let their new DAC run for >100 hours for it to get to peak performance.
-
-And when some notice their gears sounding better, they think it's because of burn-in,
-not because of their steered preference. Beyerdynamic officially recognizes this problems
-and formally call the phenomenon 'habitual effects'.
