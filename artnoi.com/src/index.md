@@ -1,8 +1,8 @@
 # Henlo, vvorld!
 
-Hi, I'm Prem Phansuriyanon, and I'm running this website.
+Hi, I'm Prem Phansuriyanon.
 
-I'm a self-taught back-end software engineer based in Bangkok.
+I'm a self-taught software engineer from Bangkok.
 
 Here's my quick intro:
 
@@ -37,6 +37,6 @@ which is my desktop and terminal font face, with blue-ish color scheme from
 
 <s>artnoi.com is [served using OpenBSD `httpd(8)` and `relayd(8)`](/blog/2022/openbsd-https).</s>
 
-artnoi.com is built from Markdown using [ssg](https://github.com/soyart/ssg)
-and deployed to GitHub Pages via [ssg-pages](https://github.com/opensoy/ssg-pages)
+artnoi.com is built from Markdown using [my Go implementation of ssg](https://github.com/soyart/ssg),
+deployed to GitHub Pages via [ssg-pages pipeline](https://github.com/opensoy/ssg-pages),
 and hosted on [ssg-pages/artnoi.com](https://github.com/soyart/artnoi.com).
